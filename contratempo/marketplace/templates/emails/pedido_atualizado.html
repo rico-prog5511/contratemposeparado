@@ -1,0 +1,19 @@
+{% extends "emails/base.html" %}
+{% block kicker %}Pedido #{{ pedido.id }}{% endblock %}
+{% block conteudo %}
+{% if pedido.status_pedido == "pagamento_aprovado" %}
+    <p style="margin:0 0 14px; font-size:15px; line-height:1.6;">O pagamento do seu pedido foi aprovado pelo vendedor <strong>{{ pedido.vendedor.nome_completo }}</strong>. Agora ele vai preparar o envio.</p>
+{% elif pedido.status_pedido == "processamento" %}
+    <p style="margin:0 0 14px; font-size:15px; line-height:1.6;">Seu pedido está sendo preparado para envio por <strong>{{ pedido.vendedor.nome_completo }}</strong>.</p>
+{% elif pedido.status_pedido == "enviado" %}
+    <p style="margin:0 0 14px; font-size:15px; line-height:1.6;">Seu pedido saiu para entrega!</p>
+    <p style="margin:0 0 14px; padding:14px; background:#FFFFFF; border:1.5px solid #1B1A33; font-size:15px;">Código de rastreio: <strong style="font-family:'Courier New', monospace; font-size:17px; color:#6D191D;">{{ pedido.codigo_rastreio }}</strong>{% if pedido.prazo_entrega_dias %}<br><span style="font-size:13px; color:#545166;">Prazo estimado: {{ pedido.prazo_entrega_dias }} dias úteis.</span>{% endif %}</p>
+    <p style="margin:0 0 14px; font-size:15px; line-height:1.6;">Quando receber, confirme o recebimento na página do pedido para liberar a avaliação.</p>
+{% elif pedido.status_pedido == "cancelado" %}
+    <p style="margin:0 0 14px; font-size:15px; line-height:1.6;">Seu pedido foi cancelado pelo vendedor. Se já houve pagamento, fale com a gente pela página de contato.</p>
+{% else %}
+    <p style="margin:0 0 14px; font-size:15px; line-height:1.6;">O status do seu pedido mudou para <strong>{{ pedido.get_status_pedido_display }}</strong>.</p>
+{% endif %}
+{% include "emails/_itens_pedido.html" %}
+{% endblock %}
+{% block botao %}Ver pedido{% endblock %}

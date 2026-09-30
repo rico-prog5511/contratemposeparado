@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Checkout — Pagamento | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/compra.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <header class="page-header">
+        <div>
+            <span class="eyebrow">Finalize sua compra</span>
+            <h1>Como você quer pagar?</h1>
+        </div>
+    </header>
+
+    {% include "partials/checkout_steps.html" %}
+
+    <div class="layout-aside">
+        <div>
+            <section class="panel checkout-recap">
+                <div>
+                    <span class="form-label">Entregar em</span>
+                    <p><strong>{{ endereco.nome_endereco }}</strong> — {{ endereco.logradouro }}, {{ endereco.numero }}, {{ endereco.cidade }}/{{ endereco.estado }}</p>
+                </div>
+                <a href="{% url 'checkout_endereco' %}" class="link-button">Alterar</a>
+            </section>
+
+            <section class="panel">
+                <h2 class="panel-title">Forma de pagamento</h2>
+
+                {% if formas %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <fieldset class="option-list">
+                            <legend class="sr-only">Escolha uma forma de pagamento</legend>
+                            {% for forma in formas %}
+                                <label class="option-card">
+                                    <input type="radio" name="forma_pagamento" value="{{ forma.id }}" {% if forma.id == selecionado %}checked{% endif %} required>
+                                    <span class="option-body">
+                                        <span class="option-title">
+                                            {{ forma.get_tipo_display }}
+                                            {% if forma.principal %}<span class="badge badge-plain">Principal</span>{% endif %}
+                                        </span>
+                                        <p>
+                                            {% if forma.apelido %}{{ forma.apelido }}{% endif %}
+                                            {% if forma.ultimos_digitos %}{% if forma.apelido %} · {% endif %}{{ forma.bandeira }} final <span class="mono">{{ forma.ultimos_digitos }}</span>{% endif %}
+                                        </p>
+                                    </span>
+                                </label>
+                            {% endfor %}
+                        </fieldset>
+
+                        <a href="{% url 'pagamento_criar' %}?next={% url 'checkout_pagamento' %}" class="btn btn-ghost add-option">+ Adicionar forma de pagamento</a>
+
+                        <div class="form-actions">
+                            <a href="{% url 'checkout_endereco' %}" class="btn btn-outline">Voltar</a>
+                            <span class="spacer"></span>
+                            <button type="submit" class="btn btn-accent">Revisar pedido</button>
+                        </div>
+                    </form>
+                {% else %}
+                    {% url 'pagamento_criar' as url_novo %}
+                    {% include "partials/empty_state.html" with icone="cartao" titulo="Nenhuma forma de pagamento" texto="Cadastre um cartão, PIX ou boleto para continuar a compra." link_url=url_novo|add:"?next="|add:request.path link_label="Cadastrar forma de pagamento" %}
+                {% endif %}
+            </section>
+        </div>
+
+        <aside>{% include "compra/_resumo_checkout.html" %}</aside>
+    </div>
+</div>
+{% endblock %}

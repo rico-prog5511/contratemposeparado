@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Formas de pagamento | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/conta.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <div class="account-layout">
+        {% include "partials/account_nav.html" %}
+
+        <section>
+            <header class="page-header">
+                <div>
+                    <span class="eyebrow">Pagamento</span>
+                    <h1>Formas de pagamento</h1>
+                    <p>Guardamos apenas o tipo, a bandeira e os 4 últimos dígitos — nunca o número completo do cartão.</p>
+                </div>
+                {% if formas %}
+                    <div class="page-header-actions">
+                        <a href="{% url 'pagamento_criar' %}" class="btn btn-accent">+ Nova forma</a>
+                    </div>
+                {% endif %}
+            </header>
+
+            {% if formas %}
+                <div class="card-grid">
+                    {% for forma in formas %}
+                        <article class="item-card payment-card payment-card--{{ forma.tipo }}">
+                            <div class="item-card-body">
+                                <span class="eyebrow">{{ forma.get_tipo_display }}</span>
+                                <div class="item-card-title">
+                                    {% if forma.apelido %}{{ forma.apelido }}{% else %}{{ forma.get_tipo_display }}{% endif %}
+                                    {% if forma.principal %}<span class="badge badge--ativo">Principal</span>{% endif %}
+                                </div>
+                                {% if forma.ultimos_digitos %}
+                                    <p class="payment-number mono">•••• •••• •••• {{ forma.ultimos_digitos }}</p>
+                                    <p>{{ forma.bandeira }}</p>
+                                {% endif %}
+
+                                <div class="item-card-actions">
+                                    <a href="{% url 'pagamento_editar' forma.id %}" class="btn btn-outline btn-sm">Editar</a>
+                                    {% if not forma.principal %}
+                                        <form action="{% url 'pagamento_principal' forma.id %}" method="post" class="inline-form">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-ghost btn-sm">Tornar principal</button>
+                                        </form>
+                                    {% endif %}
+                                    <form action="{% url 'pagamento_excluir' forma.id %}" method="post" class="inline-form" data-confirm="Esta forma de pagamento será excluída. Pedidos antigos não são afetados." data-confirm-title="Excluir forma de pagamento?" data-confirm-ok="Excluir">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {% url 'pagamento_criar' as url_novo %}
+                {% include "partials/empty_state.html" with icone="cartao" titulo="Nenhuma forma de pagamento" texto="Cadastre cartão, PIX ou boleto para finalizar compras mais rápido." link_url=url_novo link_label="Adicionar forma de pagamento" %}
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

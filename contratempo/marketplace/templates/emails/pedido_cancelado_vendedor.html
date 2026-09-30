@@ -1,0 +1,7 @@
+{% extends "emails/base.html" %}
+{% block kicker %}Área do vendedor{% endblock %}
+{% block conteudo %}
+<p style="margin:0 0 14px; font-size:15px; line-height:1.6;"><strong>{{ pedido.usuario.nome_completo }}</strong> cancelou o pedido abaixo. As unidades já voltaram para o seu estoque — não é preciso enviar nada.</p>
+{% include "emails/_itens_pedido.html" %}
+{% endblock %}
+{% block botao %}Ver pedido{% endblock %}

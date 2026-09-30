@@ -1,0 +1,59 @@
+"""
+python manage.py testar_email destino@exemplo.com
+
+Mostra a configuração de e-mail em uso e envia uma mensagem de teste,
+explicando o erro caso o envio falhe.
+"""
+
+from django.conf import settings
+from django.core.mail import send_mail
+from django.core.management.base import BaseCommand
+
+from marketplace.emails import explicar_erro_email
+
+
+class Command(BaseCommand):
+    help = "Envia um e-mail de teste e mostra o diagnóstico da configuração."
+
+    def add_arguments(self, parser):
+        parser.add_argument("destino", help="E-mail que vai receber o teste")
+
+    def handle(self, *args, **opcoes):
+        backend = settings.EMAIL_BACKEND.rsplit(".", 2)[-2]
+        senha = settings.EMAIL_HOST_PASSWORD
+        self.stdout.write(f"Backend ........ {backend}")
+        self.stdout.write(f"Conta Gmail .... {settings.EMAIL_HOST_USER or '(não definida)'}")
+        self.stdout.write(f"Senha de app ... {'(não definida)' if not senha else f'{len(senha)} caracteres'}")
+
+        if backend == "console":
+            self.stdout.write(self.style.WARNING(
+                "\nEMAIL_HOST_USER e/ou EMAIL_HOST_PASSWORD não estão definidas NESTE terminal, então os "
+                "e-mails só são impressos aqui, não enviados. Defina as duas no mesmo terminal em que "
+                "roda o runserver:\n"
+                '  $env:EMAIL_HOST_USER = "suaconta@gmail.com"\n'
+                '  $env:EMAIL_HOST_PASSWORD = "abcdefghijklmnop"\n'
+            ))
+        elif len(senha) != 16:
+            self.stdout.write(self.style.WARNING(
+                f"\nA senha tem {len(senha)} caracteres; senhas de app do Google têm 16. "
+                "Confira se não usou a senha normal da conta."
+            ))
+
+        try:
+            send_mail(
+                "Teste de e-mail | Contratempo",
+                "Se você recebeu esta mensagem, o envio de e-mails do Contratempo está funcionando.",
+                None,
+                [opcoes["destino"]],
+            )
+        except Exception as erro:
+            self.stdout.write(self.style.ERROR(f"\nFALHOU: {type(erro).__name__}: {erro}"))
+            self.stdout.write(explicar_erro_email(erro))
+            return
+
+        if backend == "console":
+            self.stdout.write(self.style.WARNING("\nMensagem impressa acima (nada foi enviado)."))
+        else:
+            self.stdout.write(self.style.SUCCESS(
+                f"\nEnviado para {opcoes['destino']}. Confira a caixa de entrada e o spam."
+            ))

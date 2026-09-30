@@ -1,0 +1,19 @@
+# Específico de cada máquina — não vai junto com o projeto
+venv/
+.env
+__pycache__/
+*.pyc
+
+# Dados reais exportados (e-mails, endereços, pedidos) — leve pelo pen
+# drive ou pela aba Files do PythonAnywhere, nunca pelo GitHub.
+banco/dados.json
+
+# Configurações locais do editor / Claude Code
+.claude/
+.vscode/
+
+# Gerados em execução
+contratempo/db.sqlite3
+contratempo/contratempo.sqlite3
+contratempo/media/
+contratempo/staticfiles/

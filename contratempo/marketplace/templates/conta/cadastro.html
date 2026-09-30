@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Criar conta | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/conta.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <section class="auth-box">
+        <div class="auth-visual" aria-hidden="true">
+            <span class="auth-brand">[contratempo]</span>
+            <h2>Sua coleção<br><em>começa aqui.</em></h2>
+            <ul class="auth-perks">
+                <li>Compre de outros colecionadores</li>
+                <li>Anuncie suas peças gratuitamente</li>
+                <li>Acompanhe pedidos e vendas em um só lugar</li>
+            </ul>
+        </div>
+
+        <div class="auth-content">
+            <span class="eyebrow">Bem-vindo à Contratempo</span>
+            <h1>Crie sua conta</h1>
+            <p class="auth-lead">Já possui uma conta? <a href="{% url 'login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Entrar</a></p>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+                {% include "partials/form_errors.html" %}
+
+                {% include "partials/form_field.html" with field=form.nome_completo %}
+                {% include "partials/form_field.html" with field=form.email %}
+                <div class="form-row">
+                    {% include "partials/form_field.html" with field=form.senha senha=True %}
+                    {% include "partials/form_field.html" with field=form.confirmar_senha senha=True %}
+                </div>
+
+                <div class="form-group{% if form.termos.errors %} has-error{% endif %}">
+                    <label class="check" for="{{ form.termos.id_for_label }}">
+                        {{ form.termos }}
+                        <span>Li e concordo com a <a href="{% url 'privacidade' %}" target="_blank" rel="noopener">política de privacidade</a>.</span>
+                    </label>
+                    {{ form.termos.errors }}
+                </div>
+
+                <button type="submit" class="btn btn-accent btn-block btn-lg">Criar minha conta</button>
+            </form>
+        </div>
+    </section>
+</div>
+{% endblock %}

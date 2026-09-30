@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Política de privacidade | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/institucional.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="inst-intro">
+    <div class="container">
+        <span class="about-kicker">Transparência</span>
+        <h1>Política de <em>privacidade.</em></h1>
+        {% comment %}Troque pela data real da última revisão do texto.{% endcomment %}
+        <p>Como a Contratempo coleta, usa e protege os seus dados.</p>
+    </div>
+</section>
+
+<div class="container legal-layout">
+    <nav class="legal-toc" aria-label="Nesta página">
+        <span class="form-label">Nesta página</span>
+        <ol>
+            <li><a href="#dados-coletados">Dados que coletamos</a></li>
+            <li><a href="#uso">Como usamos</a></li>
+            <li><a href="#compartilhamento">Compartilhamento</a></li>
+            <li><a href="#pagamento">Dados de pagamento</a></li>
+            <li><a href="#direitos">Seus direitos</a></li>
+            <li><a href="#contato-privacidade">Contato</a></li>
+        </ol>
+    </nav>
+
+    <article class="legal-text">
+        <section id="dados-coletados">
+            <h2>1. Dados que coletamos</h2>
+            <p>Coletamos apenas o necessário para o funcionamento do marketplace:</p>
+            <ul>
+                <li><strong>Cadastro:</strong> nome completo, e-mail, senha (armazenada de forma criptografada) e, se você informar, telefone, data de nascimento e foto de perfil.</li>
+                <li><strong>Endereços:</strong> os endereços de entrega que você cadastra.</li>
+                <li><strong>Pedidos:</strong> itens comprados, valores, status e uma cópia do endereço e da forma de pagamento usados em cada compra.</li>
+                <li><strong>Anúncios:</strong> as informações e fotos dos produtos que você publica.</li>
+                <li><strong>Perguntas aos vendedores:</strong> as perguntas que você faz nos anúncios e as respostas, que ficam públicas junto com o seu nome.</li>
+                <li><strong>Mensagens:</strong> o conteúdo enviado pela página de contato.</li>
+            </ul>
+        </section>
+
+        <section id="uso">
+            <h2>2. Como usamos seus dados</h2>
+            <p>Usamos seus dados para criar e manter sua conta, processar compras, mostrar seus anúncios na loja, entregar pedidos e responder às suas mensagens. O nome do vendedor aparece na página dos produtos que ele anuncia.</p>
+            <p>Seu e-mail é usado para mensagens de serviço: confirmação de cadastro, recuperação de senha, confirmação de compra, avisos de venda, atualizações de envio e respostas às suas perguntas. Não enviamos propaganda.</p>
+        </section>
+
+        <section id="compartilhamento">
+            <h2>3. Compartilhamento</h2>
+            <p>Nenhum dado é compartilhado com terceiros para fins de publicidade. Quando você compra um item, o vendedor vê seu nome e o endereço de entrega daquele pedido, porque precisa deles para enviá-lo.</p>
+        </section>
+
+        <section id="pagamento">
+            <h2>4. Dados de pagamento</h2>
+            <p>A Contratempo <strong>não armazena</strong> o número completo, a validade nem o código de segurança de cartões. Guardamos somente o tipo da forma de pagamento, a bandeira e os 4 últimos dígitos, para você identificar o cartão.</p>
+        </section>
+
+        <section id="direitos">
+            <h2>5. Seus direitos</h2>
+            <p>Você pode consultar e atualizar seus dados a qualquer momento em <a href="{% url 'perfil' %}">Minha conta</a>, excluir endereços e formas de pagamento e desativar sua conta. O histórico de pedidos é mantido para fins fiscais e de suporte.</p>
+        </section>
+
+        <section id="contato-privacidade">
+            <h2>6. Contato</h2>
+            <p>Para solicitar a atualização ou exclusão dos seus dados, ou tirar dúvidas sobre esta política, fale com a gente pela página de <a href="{% url 'contato' %}">contato</a> escolhendo o assunto “Privacidade e dados”.</p>
+        </section>
+    </article>
+</div>
+
+{% endblock %}

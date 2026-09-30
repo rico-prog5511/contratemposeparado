@@ -1,0 +1,32 @@
+{% comment %}
+Estado vazio reutilizável.
+Uso:
+    {% include "partials/empty_state.html" with titulo="..." texto="..." link_url=url link_label="..." icone="carrinho" %}
+Ícones: carrinho, caixa, busca, pin, cartao, estrela (padrão: caixa)
+Opcional: link2_url / link2_label para um segundo botão.
+{% endcomment %}
+<div class="empty-state">
+    <div class="empty-icon" aria-hidden="true">
+        {% if icone == "carrinho" %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+        {% elif icone == "busca" %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        {% elif icone == "pin" %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        {% elif icone == "cartao" %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        {% elif icone == "estrela" %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/></svg>
+        {% else %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><polyline points="3 8 12 13 21 8"/><line x1="12" y1="13" x2="12" y2="21"/></svg>
+        {% endif %}
+    </div>
+    <h3>{{ titulo }}</h3>
+    {% if texto %}<p>{{ texto }}</p>{% endif %}
+    {% if link_url or link2_url %}
+        <div class="cluster">
+            {% if link_url %}<a href="{{ link_url }}" class="btn btn-accent">{{ link_label }}</a>{% endif %}
+            {% if link2_url %}<a href="{{ link2_url }}" class="btn btn-outline">{{ link2_label }}</a>{% endif %}
+        </div>
+    {% endif %}
+</div>

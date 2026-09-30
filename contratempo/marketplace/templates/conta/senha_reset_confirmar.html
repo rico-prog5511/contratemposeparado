@@ -1,0 +1,23 @@
+{% extends "conta/_auth_simples.html" %}
+
+{% block title %}Nova senha | Contratempo{% endblock %}
+{% block auth_icone %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>{% endblock %}
+{% block auth_eyebrow %}Recuperar acesso{% endblock %}
+{% block auth_titulo %}{% if validlink %}Crie sua nova senha{% else %}Este link não vale mais{% endif %}{% endblock %}
+
+{% block auth_corpo %}
+{% if validlink %}
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% include "partials/form_errors.html" %}
+        {% include "partials/form_field.html" with field=form.new_password1 senha=True %}
+        {% include "partials/form_field.html" with field=form.new_password2 senha=True %}
+        <button type="submit" class="btn btn-accent btn-block btn-lg">Salvar nova senha</button>
+    </form>
+{% else %}
+    <p>O link expirou ou já foi usado. Por segurança, cada link só funciona uma vez.</p>
+    <div class="auth-card-actions">
+        <a href="{% url 'password_reset' %}" class="btn btn-accent">Pedir um novo link</a>
+    </div>
+{% endif %}
+{% endblock %}

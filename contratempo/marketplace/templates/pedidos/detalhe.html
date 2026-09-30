@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load static marketplace_extras %}
+
+{% block title %}Pedido #{{ pedido.id }} | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/compra.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <div class="account-layout">
+        {% include "partials/account_nav.html" %}
+
+        <section>
+            <header class="page-header">
+                <div>
+                    <span class="eyebrow">Feito em {{ pedido.data_criacao|date:"d/m/Y \à\s H:i" }}</span>
+                    <h1>Pedido #{{ pedido.id }}</h1>
+                    {% if pedido.vendedor %}<p>Vendido por <a href="{% url 'vendedor_perfil' pedido.vendedor_id %}" class="link-button"><strong>{{ pedido.vendedor.nome_completo }}</strong></a></p>{% endif %}
+                </div>
+                <span class="badge badge--{{ pedido.status_pedido }}">{{ pedido.get_status_pedido_display }}</span>
+            </header>
+
+            <section class="panel">
+                <h2 class="panel-title">Acompanhamento</h2>
+                {% if pedido.status_pedido == "cancelado" %}
+                    <div class="alert alert-error"><div class="alert-text"><p>Este pedido foi cancelado{% if pedido.data_atualizacao %} em {{ pedido.data_atualizacao|date:"d/m/Y" }}{% endif %}. Os itens voltaram ao estoque dos vendedores.</p></div></div>
+                {% else %}
+                    <ol class="timeline">
+                        {% for etapa in linha_do_tempo %}
+                            <li class="{% if etapa.feito %}feito{% endif %}{% if etapa.atual %} atual{% endif %}" {% if etapa.atual %}aria-current="step"{% endif %}>{{ etapa.rotulo }}</li>
+                        {% endfor %}
+                    </ol>
+                {% endif %}
+
+                {% if pedido.codigo_rastreio %}
+                    <div class="tracking-box">
+                        <div>
+                            <span class="form-label">Código de rastreio</span>
+                            <strong class="mono">{{ pedido.codigo_rastreio }}</strong>
+                            <small>Enviado em {{ pedido.data_envio|date:"d/m/Y" }}{% if pedido.prazo_entrega_dias %} · prazo estimado de {{ pedido.prazo_entrega_dias }} dias úteis{% endif %}</small>
+                        </div>
+                        {% if pode_confirmar %}
+                            <form action="{% url 'pedido_confirmar_recebimento' pedido.id %}" method="post" data-confirm="Confirme só depois de receber o pacote. Depois disso você poderá avaliar os produtos." data-confirm-title="Recebeu o pedido?" data-confirm-ok="Sim, recebi">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-accent">Confirmar recebimento</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="panel order-items-detail">
+                <h2 class="panel-title">Itens <span class="eyebrow">{{ itens|length }} produto{{ itens|length|pluralize }}</span></h2>
+                <ul class="review-items">
+                    {% for item in itens %}
+                        {% with imagem=item.produto|imagem_principal %}
+                        <li>
+                            <span class="thumb"><img src="{% if imagem %}{{ imagem }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
+                            <div class="review-item-info">
+                                {% if item.produto %}
+                                    <a href="{% url 'produto_detalhe' item.produto_id %}"><strong>{{ item.nome_produto }}</strong></a>
+                                {% else %}
+                                    <strong>{{ item.nome_produto }}</strong>
+                                    <small>Anúncio removido pelo vendedor</small>
+                                {% endif %}
+                                <small class="mono">{{ item.quantidade }} × {{ item.preco_unitario|brl }}</small>
+
+                                {% if item.ja_avaliado %}
+                                    <small class="stars">★ Você já avaliou este produto</small>
+                                {% elif item.pode_avaliar %}
+                                    <details class="rating-form">
+                                        <summary>Avaliar produto</summary>
+                                        <form action="{% url 'avaliar_produto' pedido.id item.produto_id %}" method="post">
+                                            {% csrf_token %}
+                                            <fieldset class="star-input">
+                                                <legend class="sr-only">Nota</legend>
+                                                {% for valor, rotulo in avaliacao_form.fields.nota.choices %}
+                                                    <input type="radio" id="nota-{{ item.id }}-{{ valor }}" name="nota" value="{{ valor }}" required>
+                                                    <label for="nota-{{ item.id }}-{{ valor }}" title="{{ rotulo }}">★<span class="sr-only">{{ rotulo }}</span></label>
+                                                {% endfor %}
+                                            </fieldset>
+                                            <div class="form-group">
+                                                <label for="comentario-{{ item.id }}">Comentário</label>
+                                                <textarea id="comentario-{{ item.id }}" name="comentario" rows="3" placeholder="Conte como foi sua experiência (opcional)"></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-accent btn-sm">Enviar avaliação</button>
+                                        </form>
+                                    </details>
+                                {% endif %}
+                            </div>
+                            <strong class="mono">{{ item.subtotal|brl }}</strong>
+                        </li>
+                        {% endwith %}
+                    {% endfor %}
+                </ul>
+                <div class="summary-divider"></div>
+                <div class="summary-row"><span>Produtos</span><strong>{{ pedido.valor_produtos|brl }}</strong></div>
+                <div class="summary-row"><span>Frete</span><strong>{{ pedido.valor_frete|brl }}</strong></div>
+                <div class="summary-row total mb-0"><span>Total</span><strong>{{ pedido.valor_total|brl }}</strong></div>
+            </section>
+
+            <div class="review-grid">
+                <section class="panel">
+                    <h2 class="panel-title">Entrega</h2>
+                    <p class="mb-0">{{ pedido.endereco_snapshot }}</p>
+                </section>
+                <section class="panel">
+                    <h2 class="panel-title">Pagamento</h2>
+                    <p class="mb-0">{{ pedido.forma_pagamento_snapshot }}</p>
+                </section>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'pedidos' %}" class="btn btn-outline">← Voltar aos pedidos</a>
+                <span class="spacer"></span>
+                <a href="{% url 'contato' %}" class="btn btn-ghost">Preciso de ajuda</a>
+                {% if pode_cancelar %}
+                    <form action="{% url 'pedido_cancelar' pedido.id %}" method="post" class="inline-form" data-confirm="O pedido #{{ pedido.id }} será cancelado e os itens voltarão ao estoque dos vendedores." data-confirm-title="Cancelar pedido?" data-confirm-ok="Cancelar pedido">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Cancelar pedido</button>
+                    </form>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

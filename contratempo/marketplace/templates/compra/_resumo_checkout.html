@@ -1,0 +1,38 @@
+{% load static marketplace_extras %}
+{% comment %}
+Resumo lateral das 3 etapas do checkout. Mostra os produtos agrupados
+por vendedor (cada grupo vira um pedido, com seu próprio frete).
+Espera: envios, faixa, subtotal, frete, total, total_itens.
+{% endcomment %}
+<div class="summary">
+    <h2>Resumo da compra</h2>
+    {% for envio in envios %}
+        <div class="summary-group">
+            <span class="summary-group-title">Pacote {{ forloop.counter }} · {{ envio.vendedor.nome_completo }}</span>
+            <ul class="summary-items">
+                {% for item in envio.itens %}
+                    {% with imagem=item.produto|imagem_principal %}
+                    <li>
+                        <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
+                        <span class="summary-item-name">{{ item.produto.nome }}<small>{{ item.quantidade }} × {{ item.preco_unitario|brl }}</small></span>
+                        <strong class="mono">{{ item.subtotal|brl }}</strong>
+                    </li>
+                    {% endwith %}
+                {% endfor %}
+            </ul>
+            <div class="summary-row summary-row-sm">
+                <span>Frete{% if envio.prazo_dias %} · até {{ envio.prazo_dias }} dias úteis{% endif %}</span>
+                {% if envio.frete is not None %}<strong>{{ envio.frete|brl }}</strong>{% else %}<span>—</span>{% endif %}
+            </div>
+        </div>
+    {% endfor %}
+    <div class="summary-divider"></div>
+    <div class="summary-row"><span>Produtos ({{ total_itens }})</span><strong>{{ subtotal|brl }}</strong></div>
+    <div class="summary-row">
+        <span>Frete{% if faixa %} para {{ faixa.uf }}{% endif %}</span>
+        {% if faixa %}<strong>{{ frete|brl }}</strong>{% else %}<span>Escolha o endereço</span>{% endif %}
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-row total"><span>Total</span><strong>{{ total|brl }}</strong></div>
+    <a href="{% url 'carrinho' %}" class="link-button summary-edit">Editar carrinho</a>
+</div>

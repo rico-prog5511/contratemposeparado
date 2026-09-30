@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Acesso negado | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/institucional.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="container error-page">
+    <div class="error-code" aria-hidden="true">4<span>0</span>3</div>
+    <span class="eyebrow">Erro 403</span>
+    <h1>Acesso <em>negado.</em></h1>
+    <p>Você não tem permissão para ver esta página. Se acha que isso é um engano, entre com a conta correta ou fale com a gente.</p>
+
+    <div class="cluster error-actions">
+        {% if user.is_authenticated %}
+            <a href="{% url 'perfil' %}" class="btn btn-accent">Ir para minha conta</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-accent">Entrar</a>
+        {% endif %}
+        <a href="{% url 'home' %}" class="btn btn-outline">Voltar para a loja</a>
+        <a href="{% url 'contato' %}" class="btn btn-ghost">Contato</a>
+    </div>
+</section>
+{% endblock %}

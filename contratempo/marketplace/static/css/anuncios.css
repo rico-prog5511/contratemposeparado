@@ -1,0 +1,211 @@
+/* static/css/anuncios.css — área do vendedor */
+
+.cell-sub { font-size: 0.8rem; color: var(--ink-muted); margin-top: 2px; }
+.stock-zero { color: var(--cor-destaque); font-weight: 700; }
+.row-alert td:first-child { box-shadow: inset 4px 0 0 var(--cor-destaque); }
+
+/* =====================================================================
+   FORMULÁRIO DO ANÚNCIO
+   ===================================================================== */
+.listing-form .panel + .panel { margin-top: 20px; }
+
+.upload-area {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 28px 20px;
+    text-align: center;
+    background: #fff;
+    border: 1.5px dashed var(--cor-secundaria);
+    border-radius: var(--radius);
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+.upload-area.dragging,
+.upload-area:focus-within { border-color: var(--cor-header); background: var(--cor-header-claro); }
+.upload-area.has-error { border-color: var(--cor-destaque); }
+.upload-area svg { width: 36px; height: 36px; color: var(--cor-header); }
+.upload-area label { cursor: pointer; font-size: 0.95rem; color: var(--ink); }
+.upload-area label strong { color: var(--cor-destaque); text-decoration: underline; text-underline-offset: 3px; }
+.upload-area input[type="file"] {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+.upload-area small { color: var(--ink-muted); font-size: 0.8rem; }
+.upload-aviso { color: var(--cor-destaque) !important; font-weight: 600; }
+.upload-area .errorlist { position: relative; z-index: 1; }
+
+.upload-preview,
+.image-manage,
+.listing-images {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+}
+.upload-preview:not(:empty) { margin-top: 14px; }
+.upload-thumb {
+    aspect-ratio: 1 / 1;
+    border: 1.5px solid var(--ink);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #fff;
+}
+.upload-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.upload-thumb--excede { opacity: 0.35; border-style: dashed; border-color: var(--cor-destaque); }
+
+.image-manage { margin-bottom: 16px; }
+.image-manage-item {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1.5px solid var(--ink);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: opacity 0.15s ease;
+}
+.image-manage-item img { aspect-ratio: 1 / 1; width: 100%; object-fit: cover; }
+.image-manage-item.removendo { opacity: 0.4; border-style: dashed; border-color: var(--cor-destaque); }
+.image-manage-item:has(input[type="radio"]:checked) { box-shadow: 3px 3px 0 var(--cor-destaque); }
+.image-manage-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    border-top: 1px dashed var(--line);
+}
+.image-manage-controls .check { font-size: 0.78rem; gap: 6px; }
+.image-manage-controls .check input { width: 15px; height: 15px; }
+
+.listing-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    padding: 14px 0;
+    background: var(--cor-fundo);
+    border-top: 1.5px solid var(--ink);
+}
+
+/* =====================================================================
+   VISUALIZAR ANÚNCIO
+   ===================================================================== */
+.stat-row {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    margin-bottom: 20px;
+    background: var(--paper);
+    border: var(--borda);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+}
+.stat-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px;
+    border-left: 1px dashed var(--line);
+}
+.stat-box:first-child { border-left: 0; }
+.stat-box-value {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--cor-destaque);
+    white-space: nowrap;
+}
+.stat-box-label {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+.listing-overview {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+.listing-overview .panel + .panel { margin-top: 0; }
+.listing-images li {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border: 1.5px solid var(--ink);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #fff;
+}
+.listing-images li.principal { box-shadow: 3px 3px 0 var(--cor-destaque); }
+.listing-images img { width: 100%; height: 100%; object-fit: cover; }
+.listing-images .product-flag {
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    padding: 2px 6px;
+    background: var(--cor-destaque);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.table-plain { border: 0; background: transparent; }
+.listing-manage .cluster .spacer { flex: 1; }
+
+/* =====================================================================
+   ESTOQUE
+   ===================================================================== */
+.stock-input { width: 96px !important; min-height: 40px !important; text-align: center; font-family: var(--font-mono); font-weight: 700; }
+.stock-actions {
+    position: sticky;
+    bottom: 0;
+    padding: 14px 0;
+    background: var(--cor-fundo);
+    border-top: 1.5px solid var(--ink);
+}
+
+@media (max-width: 1100px) {
+    .stat-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .stat-box:nth-child(4) { border-left: 0; }
+    .stat-box:nth-child(n + 4) { border-top: 1px dashed var(--line); }
+}
+
+@media (max-width: 860px) {
+    .listing-overview { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+    .stat-row { grid-template-columns: repeat(2, minmax(0, 1fr)); box-shadow: 4px 4px 0 var(--cor-header); }
+    .stat-box { border-left: 0; border-top: 1px dashed var(--line); }
+    .stat-box:nth-child(even) { border-left: 1px dashed var(--line); }
+    .stat-box:nth-child(-n + 2) { border-top: 0; }
+    .listing-manage .cluster { flex-direction: column; align-items: stretch; }
+    .listing-manage .cluster .btn,
+    .listing-manage .inline-form .btn { width: 100%; }
+    .data-table td .stock-input { width: 110px !important; }
+}
+
+
+/* Perguntas recebidas */
+.qa-product {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--cor-header);
+}
+.qa-product:hover { color: var(--cor-destaque); text-decoration: underline; }
+.qa-meta { margin: 4px 0 0 36px; font-size: 0.78rem; }

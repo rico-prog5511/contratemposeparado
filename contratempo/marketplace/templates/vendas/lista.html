@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static marketplace_extras %}
+
+{% block title %}Minhas vendas | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/compra.css' %}">
+<link rel="stylesheet" href="{% static 'css/anuncios.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <div class="account-layout">
+        {% include "partials/account_nav.html" %}
+
+        <section>
+            <header class="page-header">
+                <div>
+                    <span class="eyebrow">Área do vendedor</span>
+                    <h1>Minhas vendas</h1>
+                    {% if pendentes %}<p><strong>{{ pendentes }} pedido{{ pendentes|pluralize }}</strong> aguardando alguma ação sua.</p>{% endif %}
+                </div>
+            </header>
+
+            <nav class="tabs" aria-label="Filtrar por status">
+                {% for aba in abas %}
+                    <a href="?{% url_replace status=aba.valor page=None %}" class="tab {% if status == aba.valor %}active{% endif %}">
+                        {{ aba.rotulo }} <span class="tab-count">{{ aba.total }}</span>
+                    </a>
+                {% endfor %}
+            </nav>
+
+            {% if vendas %}
+                <div class="order-list">
+                    {% for pedido in vendas %}
+                        {% with itens=pedido.itens.all %}
+                        <article class="order-card {% if pedido.status_pedido == 'aguardando_pagamento' or pedido.status_pedido == 'pagamento_aprovado' or pedido.status_pedido == 'processamento' %}order-card--acao{% endif %}">
+                            <div class="order-card-head">
+                                <div class="order-meta"><span>Pedido</span><strong>#{{ pedido.id }}</strong></div>
+                                <div class="order-meta"><span>Data</span><strong>{{ pedido.data_criacao|date:"d/m/Y" }}</strong></div>
+                                <div class="order-meta"><span>Você recebe</span><strong>{{ pedido.valor_total|brl }}</strong></div>
+                                <span class="badge badge--{{ pedido.status_pedido }}">{{ pedido.get_status_pedido_display }}</span>
+                            </div>
+                            <div class="order-card-body">
+                                <div class="order-thumbs" aria-hidden="true">
+                                    {% for item in itens|slice:":3" %}
+                                        {% with imagem=item.produto|imagem_principal %}
+                                        <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
+                                        {% endwith %}
+                                    {% endfor %}
+                                </div>
+                                <div class="order-summary">
+                                    <p>{{ itens.0.nome_produto }}{% if itens|length > 1 %} <small>e mais {{ itens|length|add:"-1" }}</small>{% endif %}</p>
+                                    <small>Comprador: {{ pedido.usuario.nome_completo }}</small>
+                                </div>
+                                <a href="{% url 'venda_detalhe' pedido.id %}" class="btn {% if pedido.status_pedido in 'aguardando_pagamento pagamento_aprovado processamento' %}btn-accent{% else %}btn-outline{% endif %} btn-sm">
+                                    {% if pedido.status_pedido == "aguardando_pagamento" %}Aprovar pagamento{% elif pedido.status_pedido == "pagamento_aprovado" %}Preparar envio{% elif pedido.status_pedido == "processamento" %}Informar envio{% else %}Ver detalhes{% endif %}
+                                </a>
+                            </div>
+                        </article>
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+                {% include "partials/pagination.html" %}
+            {% elif status %}
+                {% url 'vendas' as url_vendas %}
+                {% include "partials/empty_state.html" with titulo="Nenhuma venda com este status" texto="Tente outro filtro." link_url=url_vendas link_label="Ver todas as vendas" %}
+            {% else %}
+                {% url 'anuncio_criar' as url_criar %}{% url 'anuncios' as url_anuncios %}
+                {% include "partials/empty_state.html" with titulo="Nenhuma venda ainda" texto="Quando alguém comprar um anúncio seu, o pedido aparece aqui e você recebe um e-mail." link_url=url_criar link_label="Criar anúncio" link2_url=url_anuncios link2_label="Meus anúncios" %}
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

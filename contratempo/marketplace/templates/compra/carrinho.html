@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static marketplace_extras %}
+
+{% block title %}Carrinho | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/compra.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+
+    <header class="page-header">
+        <div>
+            <span class="eyebrow">Sua coleção</span>
+            <h1>Meu carrinho</h1>
+            <p>Confira os produtos selecionados antes de continuar para o pagamento.</p>
+        </div>
+        {% if itens %}<p class="mono muted mb-0">{{ total_itens }} ite{{ total_itens|pluralize:"m,ns" }}</p>{% endif %}
+    </header>
+
+    {% if anonimo %}
+        {% url 'login' as url_login %}{% url 'cadastro' as url_cadastro %}
+        {% include "partials/empty_state.html" with icone="carrinho" titulo="Entre para ver seu carrinho" texto="O carrinho fica salvo na sua conta, assim você pode continuar a compra em qualquer dispositivo." link_url=url_login|add:"?next="|add:request.path link_label="Entrar" link2_url=url_cadastro link2_label="Criar conta" %}
+
+    {% elif not itens %}
+        {% url 'produtos' as url_produtos %}
+        {% include "partials/empty_state.html" with icone="carrinho" titulo="Seu carrinho está vazio" texto="Explore o catálogo e adicione os itens que vão completar sua coleção." link_url=url_produtos link_label="Explorar produtos" %}
+
+    {% else %}
+        {% if problemas %}
+            <div class="alert alert-warning" role="alert" style="margin-bottom: 20px;">
+                <div class="alert-text">
+                    <p><strong>Alguns itens precisam de atenção.</strong> Ajuste as quantidades ou remova os itens indisponíveis para continuar.</p>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="layout-aside">
+            <section class="cart-items" aria-label="Itens do carrinho">
+                {% for item in itens %}
+                    {% with produto=item.produto imagem=item.produto|imagem_principal %}
+                    <article class="cart-item {% if item.problema %}cart-item--problema{% endif %}">
+                        <a href="{% url 'produto_detalhe' produto.id %}" class="cart-item-image">
+                            <img src="{% if imagem %}{{ imagem }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt="">
+                        </a>
+
+                        <div class="cart-item-info">
+                            <span class="product-category">{{ produto.categoria.nome }} · {{ produto.get_condicao_display }}</span>
+                            <h2><a href="{% url 'produto_detalhe' produto.id %}">{{ produto.nome }}</a></h2>
+                            <p>Vendido por {{ produto.vendedor.nome_completo }}</p>
+                            <p class="mono">{{ item.preco_unitario|brl }} / unidade</p>
+                            {% if item.preco_atualizado %}<p class="cart-item-note">O vendedor atualizou o preço deste item.</p>{% endif %}
+                            {% if item.problema %}<p class="cart-item-alert">{{ item.problema }}</p>{% endif %}
+                        </div>
+
+                        <div class="cart-item-quantity">
+                            {% if produto.status_anuncio == "ativo" and produto.quantidade_disponivel > 0 %}
+                                <form action="{% url 'atualizar_item_carrinho' item.id %}" method="post">
+                                    {% csrf_token %}
+                                    <label for="qtd-{{ item.id }}" class="form-label">Qtd.</label>
+                                    <select id="qtd-{{ item.id }}" name="quantidade" class="input" data-auto-submit>
+                                        {% for n in produto.quantidade_disponivel|to_range %}
+                                            {% if forloop.counter <= 20 %}
+                                                <option value="{{ forloop.counter }}" {% if forloop.counter == item.quantidade %}selected{% endif %}>{{ forloop.counter }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if item.quantidade > produto.quantidade_disponivel %}
+                                            <option value="{{ item.quantidade }}" selected disabled>{{ item.quantidade }}</option>
+                                        {% endif %}
+                                    </select>
+                                    <noscript><button type="submit" class="btn btn-outline btn-sm">Atualizar</button></noscript>
+                                </form>
+                            {% endif %}
+                        </div>
+
+                        <div class="cart-item-price">
+                            <strong>{{ item.subtotal|brl }}</strong>
+                            <form action="{% url 'remover_item_carrinho' item.id %}" method="post" data-confirm="Remover “{{ produto.nome }}” do carrinho?" data-confirm-ok="Remover">
+                                {% csrf_token %}
+                                <button type="submit" class="link-button">Remover</button>
+                            </form>
+                        </div>
+                    </article>
+                    {% endwith %}
+                {% endfor %}
+
+                <a href="{% url 'produtos' %}" class="link-arrow cart-continue">← Continuar comprando</a>
+            </section>
+
+            <aside>
+                <div class="summary">
+                    <h2>Resumo da compra</h2>
+                    <div class="summary-row"><span>Produtos ({{ total_itens }})</span><strong>{{ subtotal|brl }}</strong></div>
+                    {% if faixa %}
+                        <div class="summary-row">
+                            <span>Frete para {{ faixa.uf }}{% if envios|length > 1 %} <small class="muted">({{ envios|length }} vendedores × {{ faixa.valor|brl }})</small>{% endif %}</span>
+                            <strong>{{ frete|brl }}</strong>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-row total"><span>Total estimado</span><strong>{{ total|brl }}</strong></div>
+                        <p class="summary-note">Estimativa para o seu endereço principal ({{ endereco_principal.cidade }}/{{ endereco_principal.estado }}). O valor final aparece ao escolher o endereço.</p>
+                    {% else %}
+                        <div class="summary-row"><span>Frete</span><span>Calculado no checkout</span></div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-row total"><span>Subtotal</span><strong>{{ subtotal|brl }}</strong></div>
+                    {% endif %}
+                    {% if envios|length > 1 %}
+                        <p class="summary-note">Seu carrinho tem produtos de {{ envios|length }} vendedores: cada um envia seu pacote e cobra um frete.</p>
+                    {% endif %}
+
+                    {% if problemas %}
+                        <span class="btn btn-accent btn-block btn-lg" aria-disabled="true">Continuar para pagamento</span>
+                        <p class="summary-note">Resolva os itens destacados para continuar.</p>
+                    {% else %}
+                        <a href="{% url 'checkout_endereco' %}" class="btn btn-accent btn-block btn-lg">Continuar para pagamento</a>
+                        <p class="summary-note">Você escolhe o endereço e a forma de pagamento na próxima etapa.</p>
+                    {% endif %}
+                </div>
+            </aside>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

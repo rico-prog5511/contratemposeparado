@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ titulo }} | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/conta.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <div class="account-layout">
+        {% include "partials/account_nav.html" %}
+
+        <section>
+            <header class="page-header">
+                <div>
+                    <span class="eyebrow">Pagamento</span>
+                    <h1>{{ titulo }}</h1>
+                </div>
+            </header>
+
+            <form method="post" class="panel form-narrow" novalidate data-payment-form>
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+                {% include "partials/form_errors.html" %}
+
+                {% include "partials/form_field.html" with field=form.tipo classe="radio-pills" %}
+                {% include "partials/form_field.html" with field=form.apelido %}
+
+                <div class="form-row" data-card-fields>
+                    {% include "partials/form_field.html" with field=form.bandeira %}
+                    {% include "partials/form_field.html" with field=form.ultimos_digitos %}
+                </div>
+
+                {% include "partials/form_field.html" with field=form.principal %}
+
+                <div class="alert alert-info">
+                    <div class="alert-text">
+                        <p>Por segurança, o Contratempo não armazena número completo, validade nem código de segurança do cartão. Esses dados serão pedidos pelo processador de pagamento.</p>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{% if next %}{{ next }}{% else %}{% url 'pagamentos' %}{% endif %}" class="btn btn-outline">Cancelar</a>
+                    <span class="spacer"></span>
+                    <button type="submit" class="btn btn-accent">Salvar</button>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* Mostra bandeira/últimos dígitos só para cartões. */
+document.addEventListener("DOMContentLoaded", function () {
+    var form = document.querySelector("[data-payment-form]");
+    var campos = form && form.querySelector("[data-card-fields]");
+    if (!campos) return;
+    function atualizar() {
+        var marcado = form.querySelector("input[name='tipo']:checked");
+        var cartao = marcado && marcado.value.indexOf("cartao") === 0;
+        campos.hidden = !cartao;
+    }
+    form.querySelectorAll("input[name='tipo']").forEach(function (r) { r.addEventListener("change", atualizar); });
+    atualizar();
+});
+</script>
+{% endblock %}

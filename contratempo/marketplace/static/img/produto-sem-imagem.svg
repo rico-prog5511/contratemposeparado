@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Produto sem imagem">
+  <rect width="400" height="400" fill="#E8E6EE"/>
+  <g fill="none" stroke="#787586" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M280 160l-80-44-80 44v80l80 44 80-44z"/>
+    <polyline points="120 160 200 204 280 160"/>
+    <line x1="200" y1="204" x2="200" y2="284"/>
+  </g>
+  <text x="200" y="330" text-anchor="middle" font-family="Space Mono, monospace" font-size="18" letter-spacing="3" fill="#787586">SEM IMAGEM</text>
+</svg>

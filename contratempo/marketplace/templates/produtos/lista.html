@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if busca %}Busca: {{ busca }}{% elif categoria_atual %}{{ categoria_atual.nome }}{% else %}Produtos{% endif %} | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+
+    <header class="page-header">
+        <div>
+            <span class="eyebrow">{% if busca %}Resultados da busca{% else %}Catálogo{% endif %}</span>
+            <h1>
+                {% if busca %}“{{ busca }}”
+                {% elif vendedor_atual %}Anúncios de {{ vendedor_atual.nome_completo }}
+                {% elif categoria_atual %}{{ categoria_atual.nome }}
+                {% else %}Todos os produtos{% endif %}
+            </h1>
+            {% if categoria_atual.descricao and not busca %}<p>{{ categoria_atual.descricao }}</p>{% endif %}
+        </div>
+        <p class="catalog-count mono">{{ page_obj.paginator.count }} produto{{ page_obj.paginator.count|pluralize }}</p>
+    </header>
+
+    <!-- Categorias em pílulas -->
+    <nav class="catalog-categories" aria-label="Categorias">
+        <a href="{% url 'produtos' %}{% if busca %}?q={{ busca|urlencode }}{% endif %}" class="chip {% if not categoria_atual %}active{% endif %}">Todas</a>
+        {% for categoria in categorias %}
+            <a href="?categoria={{ categoria.slug }}{% if busca %}&amp;q={{ busca|urlencode }}{% endif %}" class="chip {% if categoria_atual == categoria %}active{% endif %}">{{ categoria.nome }}</a>
+        {% endfor %}
+    </nav>
+
+    <div class="catalog-layout">
+
+        <!-- FILTROS -->
+        <aside class="catalog-filters" id="filtros" aria-label="Filtros">
+            <details class="filters-panel" open data-filters>
+                <summary>
+                    <span>Filtros</span>
+                    {% if total_filtros %}<span class="tab-count">{{ total_filtros }}</span>{% endif %}
+                </summary>
+
+                <form method="get" action="{% url 'produtos' %}" class="filters-form">
+                    {% if busca %}<input type="hidden" name="q" value="{{ busca }}">{% endif %}
+                    {% if categoria_atual %}<input type="hidden" name="categoria" value="{{ categoria_atual.slug }}">{% endif %}
+                    {% if vendedor_atual %}<input type="hidden" name="vendedor" value="{{ vendedor_atual.id }}">{% endif %}
+                    <input type="hidden" name="ordenar" value="{{ ordenar }}">
+
+                    {% if franquias %}
+                    <fieldset class="filter-group">
+                        <legend>Franquias</legend>
+                        <div class="filter-options">
+                            {% for franquia in franquias %}
+                                <label class="check">
+                                    <input type="checkbox" name="franquia" value="{{ franquia.slug }}" {% if franquia.slug in franquias_selecionadas %}checked{% endif %}>
+                                    <span>{{ franquia.nome }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+                    {% endif %}
+
+                    <fieldset class="filter-group">
+                        <legend>Condição</legend>
+                        <div class="filter-options">
+                            {% for valor, rotulo in condicoes %}
+                                <label class="check">
+                                    <input type="checkbox" name="condicao" value="{{ valor }}" {% if valor in condicoes_selecionadas %}checked{% endif %}>
+                                    <span>{{ rotulo }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="filter-group">
+                        <legend>Preço (R$)</legend>
+                        <div class="price-range">
+                            <label class="sr-only" for="preco_min">Preço mínimo</label>
+                            <input class="input" type="number" min="0" step="0.01" id="preco_min" name="preco_min" value="{{ preco_min }}" placeholder="Mín.">
+                            <span aria-hidden="true">—</span>
+                            <label class="sr-only" for="preco_max">Preço máximo</label>
+                            <input class="input" type="number" min="0" step="0.01" id="preco_max" name="preco_max" value="{{ preco_max }}" placeholder="Máx.">
+                        </div>
+                    </fieldset>
+
+                    <div class="filters-actions">
+                        <button type="submit" class="btn btn-accent btn-block">Filtrar</button>
+                        {% if total_filtros %}
+                            <a href="?{% if busca %}q={{ busca|urlencode }}&amp;{% endif %}{% if categoria_atual %}categoria={{ categoria_atual.slug }}&amp;{% endif %}ordenar={{ ordenar }}" class="btn btn-ghost btn-block">Limpar filtros</a>
+                        {% endif %}
+                    </div>
+                </form>
+            </details>
+        </aside>
+
+        <!-- RESULTADOS -->
+        <section class="catalog-results" aria-label="Produtos">
+            <form method="get" class="catalog-toolbar">
+                {% for chave, valores in request.GET.lists %}
+                    {% if chave != "ordenar" and chave != "page" %}
+                        {% for valor in valores %}<input type="hidden" name="{{ chave }}" value="{{ valor }}">{% endfor %}
+                    {% endif %}
+                {% endfor %}
+                <label for="ordenar" class="form-label mb-0">Ordenar por</label>
+                <select id="ordenar" name="ordenar" class="input" data-auto-submit>
+                    {% for chave, rotulo in ordenacoes %}
+                        <option value="{{ chave }}" {% if chave == ordenar %}selected{% endif %}>{{ rotulo }}</option>
+                    {% endfor %}
+                </select>
+                <noscript><button type="submit" class="btn btn-outline btn-sm">Aplicar</button></noscript>
+            </form>
+
+            <div class="product-grid catalog-grid">
+                {% for produto in produtos %}
+                    {% include "partials/product_card.html" %}
+                {% empty %}
+                    {% url 'produtos' as url_produtos %}
+                    {% if busca or total_filtros or categoria_atual %}
+                        {% include "partials/empty_state.html" with icone="busca" titulo="Nada encontrado" texto="Nenhum produto corresponde à sua busca ou aos filtros aplicados. Tente outros termos ou remova alguns filtros." link_url=url_produtos link_label="Ver todos os produtos" %}
+                    {% else %}
+                        {% url 'anuncio_criar' as url_anunciar %}
+                        {% include "partials/empty_state.html" with titulo="O catálogo está vazio" texto="Ainda não há anúncios ativos. Que tal ser a primeira pessoa a anunciar?" link_url=url_anunciar link_label="Criar anúncio" %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            {% include "partials/pagination.html" %}
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/catalogo.js' %}"></script>
+{% endblock %}

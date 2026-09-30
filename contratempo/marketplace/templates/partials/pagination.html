@@ -1,0 +1,26 @@
+{% load marketplace_extras %}
+{% if page_obj.has_other_pages %}
+<nav class="pagination" aria-label="Paginação">
+    {% if page_obj.has_previous %}
+        <a href="?{% url_replace page=page_obj.previous_page_number %}" aria-label="Página anterior">← Anterior</a>
+    {% else %}
+        <span class="disabled" aria-hidden="true">← Anterior</span>
+    {% endif %}
+
+    {% for numero in page_obj.paginator.get_elided_page_range %}
+        {% if numero == page_obj.number %}
+            <span class="current" aria-current="page">{{ numero }}</span>
+        {% elif numero == page_obj.paginator.ELLIPSIS %}
+            <span class="gap">…</span>
+        {% else %}
+            <a href="?{% url_replace page=numero %}">{{ numero }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a href="?{% url_replace page=page_obj.next_page_number %}" aria-label="Próxima página">Próxima →</a>
+    {% else %}
+        <span class="disabled" aria-hidden="true">Próxima →</span>
+    {% endif %}
+</nav>
+{% endif %}

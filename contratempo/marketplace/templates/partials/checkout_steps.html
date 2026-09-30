@@ -1,0 +1,16 @@
+{% comment %}Indicador de etapas do checkout. Espera `etapa` (1, 2 ou 3) no contexto.{% endcomment %}
+<ol class="checkout-steps" aria-label="Etapas da compra">
+    <li class="{% if etapa > 1 %}done{% elif etapa == 1 %}current{% endif %}" {% if etapa == 1 %}aria-current="step"{% endif %}>
+        {% if etapa > 1 %}<a href="{% url 'checkout_endereco' %}">{% endif %}
+        <span class="step-num">1</span><span class="step-label">Entrega</span>
+        {% if etapa > 1 %}</a>{% endif %}
+    </li>
+    <li class="{% if etapa > 2 %}done{% elif etapa == 2 %}current{% endif %}" {% if etapa == 2 %}aria-current="step"{% endif %}>
+        {% if etapa > 2 %}<a href="{% url 'checkout_pagamento' %}">{% endif %}
+        <span class="step-num">2</span><span class="step-label">Pagamento</span>
+        {% if etapa > 2 %}</a>{% endif %}
+    </li>
+    <li class="{% if etapa == 3 %}current{% endif %}" {% if etapa == 3 %}aria-current="step"{% endif %}>
+        <span class="step-num">3</span><span class="step-label">Revisão</span>
+    </li>
+</ol>

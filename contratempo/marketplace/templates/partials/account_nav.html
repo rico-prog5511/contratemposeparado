@@ -1,0 +1,65 @@
+{% with url_atual=request.resolver_match.url_name %}
+<aside class="account-nav" aria-label="Menu da conta">
+    <div class="account-nav-user">
+        <div class="avatar">
+            {% if user.avatar %}<img src="{{ user.avatar }}" alt="">{% else %}{{ user.nome_completo|first|upper }}{% endif %}
+        </div>
+        <div>
+            <strong>{{ user.nome_completo }}</strong>
+            <span>{{ user.email }}</span>
+        </div>
+    </div>
+    <ul>
+        <li class="nav-group">Compras</li>
+        <li><a href="{% url 'perfil' %}" class="{% if url_atual == 'perfil' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            Resumo</a></li>
+        <li><a href="{% url 'pedidos' %}" class="{% if url_atual == 'pedidos' or url_atual == 'pedido_detalhe' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><polyline points="3 8 12 13 21 8"/></svg>
+            Meus pedidos</a></li>
+        <li><a href="{% url 'enderecos' %}" class="{% if 'endereco' in url_atual %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            Endereços</a></li>
+        <li><a href="{% url 'pagamentos' %}" class="{% if 'pagamento' in url_atual %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            Pagamentos</a></li>
+
+        <li class="nav-group">Vendas</li>
+        <li><a href="{% url 'anuncios' %}" class="{% if url_atual == 'anuncios' or url_atual == 'anuncio_detalhe' or url_atual == 'anuncio_editar' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"/><circle cx="7" cy="7" r="1.5"/></svg>
+            Meus anúncios</a></li>
+        <li><a href="{% url 'anuncio_criar' %}" class="{% if url_atual == 'anuncio_criar' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Criar anúncio</a></li>
+        <li><a href="{% url 'vendas' %}" class="{% if url_atual == 'vendas' or url_atual == 'venda_detalhe' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="1" y="6" width="15" height="11"/><path d="M16 10h4l3 3v4h-7z"/><circle cx="6" cy="19" r="2"/><circle cx="19" cy="19" r="2"/></svg>
+            Minhas vendas</a></li>
+        <li><a href="{% url 'perguntas_recebidas' %}" class="{% if url_atual == 'perguntas_recebidas' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Perguntas recebidas</a></li>
+        <li><a href="{% url 'vendedor_perfil' user.pk %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v11h16V9"/><path d="M9 20v-6h6v6"/></svg>
+            Meu perfil público</a></li>
+        <li><a href="{% url 'estoque' %}" class="{% if url_atual == 'estoque' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
+            Estoque</a></li>
+
+        <li class="nav-group">Conta</li>
+        <li><a href="{% url 'editar_perfil' %}" class="{% if url_atual == 'editar_perfil' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            Dados pessoais</a></li>
+        <li><a href="{% url 'alterar_senha' %}" class="{% if url_atual == 'alterar_senha' %}active{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            Senha</a></li>
+        <li>
+            <form action="{% url 'logout' %}" method="post" class="inline-form">
+                {% csrf_token %}
+                <button type="submit">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Sair
+                </button>
+            </form>
+        </li>
+    </ul>
+</aside>
+{% endwith %}

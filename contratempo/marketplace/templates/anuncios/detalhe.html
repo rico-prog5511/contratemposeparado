@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% load static marketplace_extras %}
+
+{% block title %}{{ produto.nome }} — Meu anúncio | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/anuncios.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <div class="account-layout">
+        {% include "partials/account_nav.html" %}
+
+        <section>
+            <header class="page-header">
+                <div>
+                    <span class="eyebrow">Meu anúncio · criado em {{ produto.data_criacao|date:"d/m/Y" }}</span>
+                    <h1>{{ produto.nome }}</h1>
+                    <div class="cluster">
+                        <span class="badge badge--{{ produto.status_anuncio }}">{{ produto.get_status_anuncio_display }}</span>
+                        <span class="badge badge--{{ produto.condicao }}">{{ produto.get_condicao_display }}</span>
+                    </div>
+                </div>
+                <div class="page-header-actions">
+                    <a href="{% url 'produto_detalhe' produto.id %}" class="btn btn-outline">Ver na loja</a>
+                    <a href="{% url 'anuncio_editar' produto.id %}" class="btn btn-accent">Editar</a>
+                </div>
+            </header>
+
+            {% if produto.status_anuncio == "ativo" and produto.quantidade_disponivel == 0 %}
+                <div class="alert alert-warning" style="margin-bottom: 20px;"><div class="alert-text"><p>O anúncio está ativo, mas sem estoque — compradores não conseguem comprar. <a href="{% url 'estoque' %}" class="link-button">Atualizar estoque</a></p></div></div>
+            {% endif %}
+
+            <div class="stat-row">
+                <div class="stat-box"><span class="stat-box-value">{{ produto.preco|brl }}</span><span class="stat-box-label">Preço</span></div>
+                <div class="stat-box"><span class="stat-box-value">{{ produto.quantidade_disponivel }}</span><span class="stat-box-label">Em estoque</span></div>
+                <div class="stat-box"><span class="stat-box-value">{{ unidades_vendidas }}</span><span class="stat-box-label">Unidades vendidas</span></div>
+                <div class="stat-box"><span class="stat-box-value">{{ receita|brl }}</span><span class="stat-box-label">Receita</span></div>
+                <div class="stat-box"><span class="stat-box-value">{{ em_carrinhos }}</span><span class="stat-box-label">Em carrinhos</span></div>
+                <div class="stat-box">
+                    <span class="stat-box-value">{% if media_avaliacoes %}{{ media_avaliacoes|floatformat:1 }} ★{% else %}—{% endif %}</span>
+                    <span class="stat-box-label">{{ total_avaliacoes }} avaliaç{{ total_avaliacoes|pluralize:"ão,ões" }}</span>
+                </div>
+            </div>
+
+            <div class="listing-overview">
+                <section class="panel">
+                    <h2 class="panel-title">Fotos</h2>
+                    {% if imagens %}
+                        <ul class="listing-images">
+                            {% for imagem in imagens %}
+                                <li class="{% if imagem.principal %}principal{% endif %}">
+                                    <img src="{{ imagem.url_imagem }}" alt="Imagem {{ forloop.counter }}">
+                                    {% if imagem.principal %}<span class="product-flag">Principal</span>{% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>Este anúncio ainda não tem fotos. <a href="{% url 'anuncio_editar' produto.id %}" class="link-button">Adicionar fotos</a></p>
+                    {% endif %}
+                </section>
+
+                <section class="panel">
+                    <h2 class="panel-title">Detalhes</h2>
+                    <dl class="key-value">
+                        <dt>Categoria</dt><dd>{{ produto.categoria.nome }}</dd>
+                        <dt>Franquia</dt><dd>{{ produto.franquia.nome|default:"—" }}</dd>
+                        <dt>Marca</dt><dd>{{ produto.marca|default:"—" }}</dd>
+                        <dt>Ano</dt><dd>{{ produto.ano|default:"—" }}</dd>
+                        <dt>SKU</dt><dd class="mono">{{ produto.sku|default:"—" }}</dd>
+                        <dt>Atualizado</dt><dd>{{ produto.data_atualizacao|date:"d/m/Y H:i" }}</dd>
+                    </dl>
+                </section>
+            </div>
+
+            <section class="panel">
+                <h2 class="panel-title">Vendas recentes</h2>
+                {% if vendas_recentes %}
+                    <div class="table-wrap table-plain">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th scope="col">Pedido</th><th scope="col">Data</th><th scope="col">Qtd.</th><th scope="col">Valor</th><th scope="col">Status</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for venda in vendas_recentes %}
+                                    <tr>
+                                        <td data-label="Pedido" class="num">#{{ venda.pedido_id }}</td>
+                                        <td data-label="Data">{{ venda.pedido.data_criacao|date:"d/m/Y" }}</td>
+                                        <td data-label="Qtd." class="num">{{ venda.quantidade }}</td>
+                                        <td data-label="Valor" class="num">{{ venda.subtotal|brl }}</td>
+                                        <td data-label="Status"><span class="badge badge--{{ venda.pedido.status_pedido }}">{{ venda.pedido.get_status_pedido_display }}</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="mb-0">Nenhuma venda ainda. Boas fotos e uma descrição completa ajudam!</p>
+                {% endif %}
+            </section>
+
+            <section class="panel listing-manage">
+                <h2 class="panel-title">Gerenciar anúncio</h2>
+                <div class="cluster">
+                    {% if produto.status_anuncio == "ativo" %}
+                        <form action="{% url 'anuncio_status' produto.id %}" method="post" class="inline-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="acao" value="pausar">
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                            <button type="submit" class="btn btn-outline">Pausar anúncio</button>
+                        </form>
+                    {% elif produto.status_anuncio != "encerrado" %}
+                        <form action="{% url 'anuncio_status' produto.id %}" method="post" class="inline-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="acao" value="ativar">
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                            <button type="submit" class="btn btn-primary">Reativar anúncio</button>
+                        </form>
+                    {% endif %}
+
+                    {% if produto.status_anuncio != "encerrado" %}
+                        <form action="{% url 'anuncio_status' produto.id %}" method="post" class="inline-form" data-confirm="O anúncio sai da loja e não poderá receber novas compras. Você pode reativá-lo depois editando o status." data-confirm-title="Encerrar anúncio?" data-confirm-ok="Encerrar">
+                            {% csrf_token %}
+                            <input type="hidden" name="acao" value="encerrar">
+                            <input type="hidden" name="next" value="{{ request.path }}">
+                            <button type="submit" class="btn btn-ghost">Encerrar</button>
+                        </form>
+                    {% endif %}
+
+                    <span class="spacer"></span>
+
+                    <form action="{% url 'anuncio_excluir' produto.id %}" method="post" class="inline-form" data-confirm="“{{ produto.nome }}” e suas fotos serão excluídos permanentemente. Anúncios com vendas não podem ser excluídos." data-confirm-title="Excluir anúncio?" data-confirm-ok="Excluir">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Excluir anúncio</button>
+                    </form>
+                </div>
+            </section>
+        </section>
+    </div>
+</div>
+{% endblock %}

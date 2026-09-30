@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load static marketplace_extras %}
+
+{% block title %}Venda #{{ pedido.id }} | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/compra.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <div class="account-layout">
+        {% include "partials/account_nav.html" %}
+
+        <section>
+            <header class="page-header">
+                <div>
+                    <span class="eyebrow">Venda · {{ pedido.data_criacao|date:"d/m/Y \à\s H:i" }}</span>
+                    <h1>Pedido #{{ pedido.id }}</h1>
+                    <p>Comprado por <strong>{{ pedido.usuario.nome_completo }}</strong></p>
+                </div>
+                <span class="badge badge--{{ pedido.status_pedido }}">{{ pedido.get_status_pedido_display }}</span>
+            </header>
+
+            <!-- PRÓXIMA AÇÃO -->
+            {% if proximo_status %}
+                <section class="next-step">
+                    <div class="next-step-text">
+                        <span class="eyebrow">Próximo passo</span>
+                        {% if proximo_status == "pagamento_aprovado" %}
+                            <h2>Confirme o pagamento</h2>
+                            <p>Marque quando o pagamento de {{ pedido.valor_total|brl }} ({{ pedido.forma_pagamento_snapshot }}) estiver confirmado.</p>
+                        {% elif proximo_status == "processamento" %}
+                            <h2>Prepare o pacote</h2>
+                            <p>Separe e embale os itens abaixo. O comprador será avisado de que o pedido está em preparação.</p>
+                        {% else %}
+                            <h2>Informe o envio</h2>
+                            <p>Poste o pacote e informe o código de rastreio. O comprador recebe o código por e-mail.</p>
+                        {% endif %}
+                    </div>
+                    <form action="{% url 'venda_avancar' pedido.id %}" method="post" class="next-step-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="status_atual" value="{{ pedido.status_pedido }}">
+                        {% if proximo_status == "enviado" %}
+                            <label for="codigo_rastreio" class="form-label">Código de rastreio</label>
+                            <input type="text" id="codigo_rastreio" name="codigo_rastreio" class="input mono" required minlength="5" maxlength="50" placeholder="Ex.: AA123456789BR" autocomplete="off">
+                        {% endif %}
+                        <button type="submit" class="btn btn-accent btn-block">Marcar como “{{ proximo_rotulo|lower }}”</button>
+                    </form>
+                </section>
+            {% elif pedido.status_pedido == "enviado" %}
+                <div class="alert alert-info" style="margin-bottom: 20px;"><div class="alert-text"><p>Pedido enviado. Ele será concluído quando o comprador confirmar o recebimento.</p></div></div>
+            {% endif %}
+
+            <section class="panel">
+                <h2 class="panel-title">Andamento</h2>
+                {% if pedido.status_pedido == "cancelado" %}
+                    <div class="alert alert-error"><div class="alert-text"><p>Pedido cancelado. As unidades voltaram ao seu estoque.</p></div></div>
+                {% else %}
+                    <ol class="timeline">
+                        {% for etapa in linha_do_tempo %}
+                            <li class="{% if etapa.feito %}feito{% endif %}{% if etapa.atual %} atual{% endif %}">{{ etapa.rotulo }}</li>
+                        {% endfor %}
+                    </ol>
+                {% endif %}
+                {% if pedido.codigo_rastreio %}
+                    <div class="tracking-box">
+                        <div>
+                            <span class="form-label">Código de rastreio</span>
+                            <strong class="mono">{{ pedido.codigo_rastreio }}</strong>
+                            <small>Enviado em {{ pedido.data_envio|date:"d/m/Y H:i" }}</small>
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+
+            <div class="review-grid">
+                <section class="panel ship-to">
+                    <h2 class="panel-title">Enviar para</h2>
+                    <p class="mb-0"><strong>{{ pedido.usuario.nome_completo }}</strong></p>
+                    <p class="mb-0">{{ pedido.endereco_snapshot }}</p>
+                    {% if pedido.prazo_entrega_dias %}<p class="mb-0 muted">Prazo prometido ao comprador: {{ pedido.prazo_entrega_dias }} dias úteis após o envio.</p>{% endif %}
+                </section>
+                <section class="panel">
+                    <h2 class="panel-title">Pagamento</h2>
+                    <p class="mb-0">{{ pedido.forma_pagamento_snapshot }}</p>
+                </section>
+            </div>
+
+            <section class="panel">
+                <h2 class="panel-title">Itens para enviar</h2>
+                <ul class="review-items">
+                    {% for item in itens %}
+                        {% with imagem=item.produto|imagem_principal %}
+                        <li>
+                            <span class="thumb"><img src="{% if imagem %}{{ imagem }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
+                            <div class="review-item-info">
+                                <strong>{{ item.nome_produto }}</strong>
+                                <small class="mono">{{ item.quantidade }} × {{ item.preco_unitario|brl }}</small>
+                            </div>
+                            <strong class="mono">{{ item.subtotal|brl }}</strong>
+                        </li>
+                        {% endwith %}
+                    {% endfor %}
+                </ul>
+                <div class="summary-divider"></div>
+                <div class="summary-row"><span>Produtos</span><strong>{{ pedido.valor_produtos|brl }}</strong></div>
+                <div class="summary-row"><span>Frete pago pelo comprador</span><strong>{{ pedido.valor_frete|brl }}</strong></div>
+                <div class="summary-row total mb-0"><span>Total</span><strong>{{ pedido.valor_total|brl }}</strong></div>
+            </section>
+
+            <div class="form-actions">
+                <a href="{% url 'vendas' %}" class="btn btn-outline">← Voltar às vendas</a>
+                <span class="spacer"></span>
+                {% if pode_cancelar %}
+                    <form action="{% url 'venda_cancelar' pedido.id %}" method="post" class="inline-form" data-confirm="O pedido será cancelado, as unidades voltam ao seu estoque e o comprador será avisado por e-mail." data-confirm-title="Cancelar esta venda?" data-confirm-ok="Cancelar venda">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Cancelar venda</button>
+                    </form>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

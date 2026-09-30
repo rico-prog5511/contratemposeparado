@@ -1,0 +1,239 @@
+/* static/css/institucional.css — contato, privacidade e páginas de erro */
+
+/* Faixa de introdução (mesmo padrão de "Sobre nós") */
+.inst-intro {
+    margin: 28px var(--gutter) 0;
+    padding: 64px 0;
+    background: var(--paper);
+    border: var(--borda);
+    border-radius: var(--radius);
+}
+.inst-intro h1 {
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    line-height: 1;
+    margin: 16px 0 16px;
+}
+.inst-intro p { max-width: 580px; font-size: 1.08rem; margin: 0; }
+
+/* =====================================================================
+   CONTATO
+   ===================================================================== */
+.contact-content {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 64px;
+    align-items: start;
+    padding-top: 56px;
+    padding-bottom: 24px;
+}
+.contact-info h2 { font-size: clamp(2rem, 4vw, 2.8rem); margin: 12px 0 14px; }
+.contact-info > p { max-width: 420px; margin-bottom: 32px; }
+.contact-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 20px; }
+.contact-item { display: flex; align-items: center; gap: 16px; }
+.contact-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--paper);
+    border: var(--borda);
+    border-radius: var(--radius);
+    color: var(--cor-header);
+}
+.contact-icon svg { width: 22px; height: 22px; }
+.contact-item span {
+    display: block;
+    margin-bottom: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+.contact-item p { margin: 0; color: var(--ink); }
+.contact-item a { color: var(--cor-destaque); text-decoration: underline; text-underline-offset: 3px; }
+
+.contact-form-box {
+    padding: 32px;
+    background: var(--paper);
+    border: var(--borda);
+    border-radius: var(--radius);
+    box-shadow: 8px 8px 0 var(--cor-header);
+}
+
+/* =====================================================================
+   POLÍTICA DE PRIVACIDADE
+   ===================================================================== */
+.legal-layout {
+    display: grid;
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 48px;
+    align-items: start;
+    padding-top: 48px;
+}
+.legal-toc {
+    position: sticky;
+    top: calc(var(--header-height) + 20px);
+    padding: 18px;
+    background: var(--paper);
+    border: var(--borda);
+    border-radius: var(--radius);
+}
+.legal-toc ol { margin: 8px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 0.88rem; }
+.legal-toc a:hover { color: var(--cor-destaque); text-decoration: underline; }
+.legal-text {
+    max-width: 720px;
+    padding: 36px 40px;
+    background: var(--paper);
+    border: var(--borda);
+    border-radius: var(--radius);
+}
+.legal-text section + section { margin-top: 30px; padding-top: 26px; border-top: 1px dashed var(--line); }
+.legal-text section { scroll-margin-top: calc(var(--header-height) + 20px); }
+.legal-text h2 { font-size: 1.35rem; }
+.legal-text p,
+.legal-text li { color: var(--ink); line-height: 1.75; }
+.legal-text ul { padding-left: 20px; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.legal-text a { color: var(--cor-destaque); text-decoration: underline; text-underline-offset: 3px; }
+
+/* =====================================================================
+   PÁGINAS DE ERRO (403 / 404 / 500)
+   ===================================================================== */
+.error-page {
+    max-width: 680px;
+    padding-top: 72px;
+    padding-bottom: 40px;
+    text-align: center;
+}
+.error-code {
+    font-family: var(--font-display);
+    font-size: clamp(6rem, 22vw, 10rem);
+    font-weight: 600;
+    line-height: 0.9;
+    color: var(--cor-header);
+    text-shadow: 6px 6px 0 var(--ink);
+    margin-bottom: 24px;
+}
+.error-code span { color: var(--cor-destaque); font-style: italic; font-weight: 500; }
+.error-page h1 { font-size: clamp(1.8rem, 4.5vw, 2.6rem); margin: 10px 0 12px; }
+.error-page p { font-size: 1.02rem; }
+.error-search {
+    display: flex;
+    gap: 8px;
+    max-width: 440px;
+    margin: 26px auto 18px;
+}
+.error-actions { justify-content: center; margin-top: 16px; }
+
+@media (max-width: 860px) {
+    .contact-content { grid-template-columns: 1fr; gap: 40px; }
+    .legal-layout { grid-template-columns: 1fr; gap: 20px; }
+    .legal-toc { position: static; }
+}
+
+@media (max-width: 640px) {
+    .inst-intro { margin: 16px var(--gutter) 0; padding: 40px 0; }
+    .contact-form-box { padding: 22px 18px; box-shadow: 5px 5px 0 var(--cor-header); }
+    .legal-text { padding: 24px 20px; }
+    .error-search { flex-direction: column; }
+    .error-actions .btn { flex: 1; }
+}
+
+
+/* =====================================================================
+   DÚVIDAS FREQUENTES
+   ===================================================================== */
+.faq-search {
+    display: flex;
+    gap: 8px;
+    max-width: 560px;
+    margin-top: 26px;
+}
+.faq-layout {
+    display: grid;
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 48px;
+    align-items: start;
+    padding-top: 48px;
+}
+.faq-empty { grid-column: 1 / -1; }
+.faq-result { margin: 0 0 20px; color: var(--ink); }
+.faq-result a { color: var(--cor-destaque); text-decoration: underline; }
+.faq-group { scroll-margin-top: calc(var(--header-height) + 20px); }
+.faq-group + .faq-group { margin-top: 36px; }
+.faq-group h2 { font-size: 1.5rem; margin-bottom: 14px; }
+
+.faq-item {
+    background: var(--paper);
+    border: var(--borda);
+    border-radius: var(--radius);
+    transition: box-shadow 0.15s ease;
+}
+.faq-item + .faq-item { margin-top: 10px; }
+.faq-item[open] { box-shadow: 5px 5px 0 var(--cor-header); }
+.faq-item summary {
+    position: relative;
+    padding: 16px 52px 16px 20px;
+    font-weight: 600;
+    color: var(--ink);
+    list-style: none;
+    cursor: pointer;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+    content: "+";
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    width: 24px;
+    height: 24px;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+.faq-item[open] summary::after {
+    content: "−";
+    background: var(--cor-destaque);
+    border-color: var(--cor-destaque);
+    color: #fff;
+}
+.faq-item summary:hover { color: var(--cor-destaque); }
+.faq-answer {
+    padding: 0 20px 18px;
+    border-top: 1px dashed var(--line);
+}
+.faq-answer p { margin: 14px 0 0; color: var(--ink); line-height: 1.7; }
+
+.faq-cta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 56px;
+    padding: 32px 36px;
+    background: var(--cor-header);
+    border: var(--borda);
+    border-radius: var(--radius);
+    color: #fff;
+}
+.faq-cta .eyebrow { color: var(--cor-fundo); }
+.faq-cta h2 { color: #fff; font-size: 1.8rem; margin: 6px 0; }
+.faq-cta p { color: var(--cor-header-claro); }
+
+@media (max-width: 860px) {
+    .faq-layout { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+}
+
+@media (max-width: 640px) {
+    .faq-search { flex-direction: column; }
+    .faq-cta { flex-direction: column; align-items: stretch; padding: 24px 20px; }
+}

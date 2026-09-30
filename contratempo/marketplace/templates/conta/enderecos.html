@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Endereços | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/conta.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <div class="account-layout">
+        {% include "partials/account_nav.html" %}
+
+        <section>
+            <header class="page-header">
+                <div>
+                    <span class="eyebrow">Entrega</span>
+                    <h1>Meus endereços</h1>
+                </div>
+                {% if enderecos %}
+                    <div class="page-header-actions">
+                        <a href="{% url 'endereco_criar' %}" class="btn btn-accent">+ Novo endereço</a>
+                    </div>
+                {% endif %}
+            </header>
+
+            {% if enderecos %}
+                <div class="card-grid">
+                    {% for endereco in enderecos %}
+                        <article class="item-card {% if endereco.endereco_principal %}item-card--principal{% endif %}">
+                            <div class="item-card-body">
+                                <div class="item-card-title">
+                                    {{ endereco.nome_endereco }}
+                                    {% if endereco.endereco_principal %}<span class="badge badge--ativo">Principal</span>{% endif %}
+                                </div>
+                                <p>{{ endereco.logradouro }}, {{ endereco.numero }}{% if endereco.complemento %} — {{ endereco.complemento }}{% endif %}</p>
+                                <p>{{ endereco.bairro }}</p>
+                                <p>{{ endereco.cidade }}/{{ endereco.estado }} · <span class="mono">CEP {{ endereco.cep }}</span></p>
+
+                                <div class="item-card-actions">
+                                    <a href="{% url 'endereco_editar' endereco.id %}" class="btn btn-outline btn-sm">Editar</a>
+                                    {% if not endereco.endereco_principal %}
+                                        <form action="{% url 'endereco_principal' endereco.id %}" method="post" class="inline-form">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-ghost btn-sm">Tornar principal</button>
+                                        </form>
+                                    {% endif %}
+                                    <form action="{% url 'endereco_excluir' endereco.id %}" method="post" class="inline-form" data-confirm="O endereço “{{ endereco.nome_endereco }}” será excluído. Pedidos antigos mantêm o endereço usado na compra." data-confirm-title="Excluir endereço?" data-confirm-ok="Excluir">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {% url 'endereco_criar' as url_novo %}
+                {% include "partials/empty_state.html" with icone="pin" titulo="Nenhum endereço cadastrado" texto="Cadastre um endereço para agilizar suas compras." link_url=url_novo link_label="Adicionar endereço" %}
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

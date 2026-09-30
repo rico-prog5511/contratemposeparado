@@ -1,0 +1,258 @@
+/* static/css/conta.css — login, cadastro e área "Minha conta" */
+
+/* =====================================================================
+   LOGIN / CADASTRO
+   ===================================================================== */
+.auth-box {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    max-width: 940px;
+    margin: 16px auto 0;
+    background: var(--paper);
+    border: var(--borda);
+    border-radius: var(--radius);
+    box-shadow: 10px 10px 0 var(--cor-header);
+    overflow: hidden;
+}
+.auth-visual {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 14px;
+    padding: 40px 36px;
+    background:
+        repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0 2px, transparent 2px 14px),
+        var(--cor-header);
+    color: #fff;
+    border-right: var(--borda);
+}
+.auth-brand {
+    position: absolute;
+    top: 32px;
+    left: 36px;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    color: var(--cor-fundo);
+}
+.auth-visual h2 {
+    color: #fff;
+    font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+    margin: 0;
+}
+.auth-visual h2 em { color: var(--cor-fundo); }
+.auth-visual p { color: var(--cor-header-claro); margin: 0; }
+.auth-perks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.auth-perks li { padding-left: 22px; position: relative; color: var(--cor-header-claro); font-size: 0.92rem; }
+.auth-perks li::before { content: "✓"; position: absolute; left: 0; color: var(--cor-fundo); font-weight: 700; }
+
+.auth-content { padding: 44px 44px 40px; }
+.auth-content h1 { font-size: 2rem; margin: 8px 0 6px; }
+.auth-lead { margin-bottom: 26px; }
+.auth-lead a { color: var(--cor-destaque); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.auth-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+.auth-row .form-group { margin: 0; }
+
+/* =====================================================================
+   PERFIL
+   ===================================================================== */
+.profile-hero {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 24px;
+    margin-bottom: 20px;
+    background: var(--paper);
+    border: var(--borda);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+}
+.profile-hero .avatar { color: var(--cor-header); }
+.profile-hero-text { flex: 1; min-width: 0; }
+.profile-hero-text h1 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin: 4px 0 2px; }
+.profile-hero-text p { margin: 0; }
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+}
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 18px 20px;
+    background: var(--paper);
+    border: var(--borda);
+    border-radius: var(--radius);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.stat-card:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--cor-destaque); }
+.stat-value { font-family: var(--font-display); font-size: 2.2rem; font-weight: 600; line-height: 1; color: var(--cor-destaque); }
+.stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+.profile-grid .panel + .panel { margin-top: 0; }
+.profile-grid p { color: var(--ink); font-size: 0.92rem; }
+
+.sell-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 26px 28px;
+    background: var(--cor-header);
+    border: var(--borda);
+    border-radius: var(--radius);
+    color: #fff;
+}
+.sell-banner h2 { color: #fff; font-size: 1.5rem; margin: 6px 0 4px; }
+.sell-banner p { color: var(--cor-header-claro); }
+.sell-banner .eyebrow { color: var(--cor-fundo); }
+.sell-banner .btn-outline { border-color: var(--cor-fundo); color: #fff; }
+.sell-banner .btn-outline:hover { background: var(--cor-fundo); color: var(--cor-header); }
+
+/* =====================================================================
+   FORMULÁRIOS DA CONTA
+   ===================================================================== */
+.form-narrow { max-width: 560px; }
+
+.avatar-field {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin-bottom: 8px;
+}
+.avatar-field .avatar { color: var(--cor-header); }
+.avatar-field-body { flex: 1; }
+.avatar-field-body .form-group { margin-bottom: 8px; }
+
+.danger-zone { margin-top: 28px; border-style: dashed; border-color: var(--cor-destaque); }
+.danger-zone .panel-title { color: var(--cor-destaque); }
+.panel + .danger-zone,
+form.panel + .danger-zone { margin-top: 28px; }
+
+/* =====================================================================
+   ENDEREÇOS E PAGAMENTOS
+   ===================================================================== */
+.item-card--principal { box-shadow: 5px 5px 0 var(--cor-header); }
+
+.payment-card { position: relative; overflow: hidden; }
+.payment-card--cartao_credito,
+.payment-card--cartao_debito {
+    background:
+        linear-gradient(135deg, transparent 60%, rgba(255, 255, 255, 0.06) 60%),
+        var(--cor-header);
+    color: #fff;
+}
+.payment-card--cartao_credito .eyebrow,
+.payment-card--cartao_debito .eyebrow { color: var(--cor-fundo); }
+.payment-card--cartao_credito p,
+.payment-card--cartao_debito p { color: var(--cor-header-claro); }
+.payment-card--cartao_credito .item-card-title,
+.payment-card--cartao_debito .item-card-title { color: #fff; }
+.payment-card--cartao_credito .badge--ativo,
+.payment-card--cartao_debito .badge--ativo { background: var(--cor-fundo); border-color: var(--cor-fundo); color: var(--cor-header); }
+.payment-card--cartao_credito .btn-outline,
+.payment-card--cartao_debito .btn-outline { border-color: var(--cor-fundo); color: #fff; }
+.payment-card--cartao_credito .btn-ghost,
+.payment-card--cartao_debito .btn-ghost { color: #fff; }
+.payment-card--cartao_credito .btn-ghost:hover,
+.payment-card--cartao_debito .btn-ghost:hover { background: rgba(255, 255, 255, 0.1); }
+.payment-card--cartao_credito .btn-danger,
+.payment-card--cartao_debito .btn-danger { border-color: var(--cor-fundo); color: var(--cor-fundo); }
+.payment-number { font-size: 1.05rem; letter-spacing: 0.1em; margin: 10px 0 2px !important; }
+
+@media (max-width: 860px) {
+    .auth-box { grid-template-columns: 1fr; box-shadow: 6px 6px 0 var(--cor-header); }
+    .auth-visual { min-height: 190px; padding: 70px 24px 24px; border-right: 0; border-bottom: var(--borda); }
+    .auth-brand { top: 24px; left: 24px; }
+    .auth-perks { display: none; }
+    .auth-content { padding: 28px 22px 30px; }
+    .profile-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+    .profile-hero { flex-direction: column; align-items: flex-start; }
+    .profile-hero .btn { width: 100%; }
+    .stat-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .stat-card { padding: 14px 12px; }
+    .stat-value { font-size: 1.7rem; }
+    .stat-label { font-size: 0.6rem; }
+    .sell-banner { flex-direction: column; align-items: stretch; }
+    .sell-banner .cluster .btn { flex: 1; }
+    .avatar-field { flex-direction: column; align-items: flex-start; }
+    .auth-row { flex-wrap: wrap; }
+}
+
+
+/* =====================================================================
+   PÁGINAS CURTAS DE AUTENTICAÇÃO
+   (verificar e-mail, link inválido, recuperação de senha)
+   ===================================================================== */
+.auth-card {
+    max-width: 520px;
+    margin: 16px auto 0;
+    padding: 40px 40px 36px;
+    background: var(--paper);
+    border: var(--borda);
+    border-radius: var(--radius);
+    box-shadow: 10px 10px 0 var(--cor-header);
+}
+.auth-card-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: var(--borda);
+    border-radius: 50%;
+    background: var(--cor-header);
+    color: #fff;
+}
+.auth-card-icon svg { width: 28px; height: 28px; }
+.auth-card h1 { font-size: 2rem; margin: 8px 0 14px; }
+.auth-card p { color: var(--ink); }
+.auth-card p a,
+.auth-checklist a { color: var(--cor-destaque); text-decoration: underline; text-underline-offset: 3px; }
+.auth-checklist {
+    list-style: none;
+    margin: 0 0 24px;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1.5px dashed var(--cor-secundaria);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.9rem;
+}
+.auth-checklist li { padding-left: 20px; position: relative; }
+.auth-checklist li::before { content: "→"; position: absolute; left: 0; color: var(--cor-destaque); }
+.auth-card-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.auth-card-actions .btn { flex: 1; }
+.resend-form { margin-top: 8px; }
+
+@media (max-width: 640px) {
+    .auth-card { padding: 28px 20px; box-shadow: 6px 6px 0 var(--cor-header); }
+}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contato | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/institucional.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="inst-intro">
+    <div class="container">
+        <span class="about-kicker">Fale conosco</span>
+        <h1>Entre em <em>contato.</em></h1>
+        <p>Tem alguma dúvida, sugestão ou precisa de ajuda com um pedido? Estamos aqui para ajudar.</p>
+    </div>
+</section>
+
+<div class="container contact-content">
+    <div class="contact-info">
+        <span class="eyebrow">Atendimento</span>
+        <h2>Como podemos<br>ajudar?</h2>
+        <p>Muitas respostas já estão nas <a href="{% url 'faq' %}" class="link-button">dúvidas frequentes</a>. Se não encontrar, envie sua mensagem pelo formulário: respondemos pelo e-mail informado o mais rápido possível.</p>
+
+        <ul class="contact-items">
+            <li class="contact-item">
+                <span class="contact-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,7 12,13 21,7"/></svg>
+                </span>
+                <div><span>E-mail</span><p>contato@contratempo.com</p></div>
+            </li>
+            <li class="contact-item">
+                <span class="contact-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><polyline points="12,7 12,12 15,14"/></svg>
+                </span>
+                <div><span>Horário</span><p>Segunda a sexta, das 9h às 18h</p></div>
+            </li>
+            <li class="contact-item">
+                <span class="contact-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><polyline points="3 8 12 13 21 8"/></svg>
+                </span>
+                <div>
+                    <span>Sobre um pedido?</span>
+                    <p>{% if user.is_authenticated %}Informe o número que aparece em <a href="{% url 'pedidos' %}">Meus pedidos</a>.{% else %}Informe o número do pedido na mensagem.{% endif %}</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="contact-form-box">
+        <form method="post" class="contact-form" novalidate>
+            {% csrf_token %}
+            {% include "partials/form_errors.html" %}
+            <div class="form-row">
+                {% include "partials/form_field.html" with field=form.nome %}
+                {% include "partials/form_field.html" with field=form.email %}
+            </div>
+            {% include "partials/form_field.html" with field=form.assunto %}
+            {% include "partials/form_field.html" with field=form.mensagem %}
+            <button type="submit" class="btn btn-accent btn-block btn-lg">Enviar mensagem</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

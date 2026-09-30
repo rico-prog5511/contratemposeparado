@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Categorias | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <header class="page-header">
+        <div>
+            <span class="eyebrow">Explore</span>
+            <h1>Categorias</h1>
+            <p>Encontre o que você coleciona: cada categoria reúne os anúncios ativos da comunidade.</p>
+        </div>
+        <a href="{% url 'produtos' %}" class="btn btn-outline">Ver todos os produtos</a>
+    </header>
+
+    {% if categorias %}
+        <div class="category-grid">
+            {% for categoria in categorias %}
+                <a href="{% url 'produtos' %}?categoria={{ categoria.slug }}" class="category-card">
+                    <span class="category-card-index mono">{{ forloop.counter|stringformat:"02d" }}</span>
+                    <h2>{{ categoria.nome }}</h2>
+                    {% if categoria.descricao %}<p>{{ categoria.descricao }}</p>{% endif %}
+                    <span class="category-card-count">
+                        {{ categoria.total_produtos }} anúncio{{ categoria.total_produtos|pluralize }} ativo{{ categoria.total_produtos|pluralize }}
+                        <span aria-hidden="true">→</span>
+                    </span>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        {% url 'home' as url_home %}
+        {% include "partials/empty_state.html" with titulo="Nenhuma categoria cadastrada" texto="As categorias são criadas pela equipe da Contratempo no painel administrativo." link_url=url_home link_label="Voltar para a home" %}
+    {% endif %}
+</div>
+{% endblock %}

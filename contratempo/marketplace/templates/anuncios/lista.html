@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static marketplace_extras %}
+
+{% block title %}Meus anúncios | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/anuncios.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <div class="account-layout">
+        {% include "partials/account_nav.html" %}
+
+        <section>
+            <header class="page-header">
+                <div>
+                    <span class="eyebrow">Área do vendedor</span>
+                    <h1>Meus anúncios</h1>
+                </div>
+                <div class="page-header-actions">
+                    <a href="{% url 'estoque' %}" class="btn btn-outline">Gerenciar estoque</a>
+                    <a href="{% url 'anuncio_criar' %}" class="btn btn-accent">+ Criar anúncio</a>
+                </div>
+            </header>
+
+            <nav class="tabs" aria-label="Filtrar por status">
+                {% for aba in abas %}
+                    <a href="?{% url_replace status=aba.valor page=None %}" class="tab {% if status == aba.valor %}active{% endif %}">
+                        {{ aba.rotulo }} <span class="tab-count">{{ aba.total }}</span>
+                    </a>
+                {% endfor %}
+            </nav>
+
+            {% if abas.0.total %}
+                <form method="get" class="filter-bar" role="search">
+                    {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
+                    <label for="busca-anuncios" class="sr-only">Buscar nos meus anúncios</label>
+                    <input id="busca-anuncios" type="search" name="q" value="{{ busca }}" class="input" placeholder="Buscar por título ou código (SKU)">
+                    <button type="submit" class="btn btn-outline">Buscar</button>
+                    {% if busca %}<a href="?{% url_replace q=None page=None %}" class="btn btn-ghost">Limpar</a>{% endif %}
+                </form>
+            {% endif %}
+
+            {% if anuncios %}
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Anúncio</th>
+                                <th scope="col">Preço</th>
+                                <th scope="col">Estoque</th>
+                                <th scope="col">Vendidos</th>
+                                <th scope="col">Status</th>
+                                <th scope="col"><span class="sr-only">Ações</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for produto in anuncios %}
+                                {% with imagem=produto|imagem_principal %}
+                                <tr>
+                                    <td>
+                                        <div class="cell-product">
+                                            <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
+                                            <div>
+                                                <a href="{% url 'anuncio_detalhe' produto.id %}">{{ produto.nome }}</a>
+                                                <div class="cell-sub">{{ produto.categoria.nome }}{% if produto.sku %} · <span class="mono">{{ produto.sku }}</span>{% endif %}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td data-label="Preço" class="num">{{ produto.preco|brl }}</td>
+                                    <td data-label="Estoque" class="num {% if produto.quantidade_disponivel == 0 %}stock-zero{% endif %}">{{ produto.quantidade_disponivel }}</td>
+                                    <td data-label="Vendidos" class="num">{{ produto.total_vendido }}</td>
+                                    <td data-label="Status"><span class="badge badge--{{ produto.status_anuncio }}">{{ produto.get_status_anuncio_display }}</span></td>
+                                    <td class="cell-actions">
+                                        <a href="{% url 'anuncio_editar' produto.id %}" class="btn btn-outline btn-sm">Editar</a>
+                                        {% if produto.status_anuncio == "ativo" %}
+                                            <form action="{% url 'anuncio_status' produto.id %}" method="post" class="inline-form">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="acao" value="pausar">
+                                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                                <button type="submit" class="btn btn-ghost btn-sm">Pausar</button>
+                                            </form>
+                                        {% elif produto.status_anuncio == "pausado" %}
+                                            <form action="{% url 'anuncio_status' produto.id %}" method="post" class="inline-form">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="acao" value="ativar">
+                                                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                                <button type="submit" class="btn btn-ghost btn-sm">Reativar</button>
+                                            </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endwith %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% include "partials/pagination.html" %}
+
+            {% elif busca or status %}
+                {% url 'anuncios' as url_anuncios %}
+                {% include "partials/empty_state.html" with icone="busca" titulo="Nenhum anúncio encontrado" texto="Não há anúncios com esse filtro." link_url=url_anuncios link_label="Ver todos os anúncios" %}
+            {% else %}
+                {% url 'anuncio_criar' as url_criar %}
+                {% include "partials/empty_state.html" with titulo="Você ainda não tem anúncios" texto="Transforme aquela peça parada na estante em venda. Leva poucos minutos." link_url=url_criar link_label="Criar primeiro anúncio" %}
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

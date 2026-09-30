@@ -1,0 +1,8 @@
+{% extends "emails/base.html" %}
+{% block kicker %}Resposta do vendedor{% endblock %}
+{% block conteudo %}
+<p style="margin:0 0 14px; font-size:15px; line-height:1.6;">O vendedor de <strong>{{ pergunta.produto.nome }}</strong> respondeu sua pergunta.</p>
+<p style="margin:0 0 8px; padding:14px 16px; background:#FFFFFF; border-left:4px solid #787586; font-size:14px; line-height:1.6; color:#545166;">Você: “{{ pergunta.pergunta }}”</p>
+<p style="margin:0 0 18px; padding:14px 16px; background:#FFFFFF; border-left:4px solid #6D191D; font-size:15px; line-height:1.6;">Vendedor: “{{ pergunta.resposta }}”</p>
+{% endblock %}
+{% block botao %}Ver anúncio{% endblock %}

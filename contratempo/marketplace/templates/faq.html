@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dúvidas frequentes | Contratempo{% endblock %}
+{% block meta_description %}Respostas sobre conta, compras, frete, entrega e vendas na Contratempo.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/institucional.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="inst-intro">
+    <div class="container">
+        <span class="about-kicker">Central de ajuda</span>
+        <h1>Dúvidas <em>frequentes.</em></h1>
+        <form class="faq-search" method="get" role="search">
+            <label for="faq-busca" class="sr-only">Buscar nas dúvidas frequentes</label>
+            <input id="faq-busca" type="search" name="q" value="{{ busca }}" class="input" placeholder="Busque por frete, senha, pagamento…">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+    </div>
+</section>
+
+<div class="container faq-layout">
+    {% if temas %}
+        <nav class="legal-toc" aria-label="Temas">
+            <span class="form-label">Temas</span>
+            <ol>
+                {% for tema in temas %}
+                    <li><a href="#{{ tema.codigo }}">{{ tema.rotulo }}</a> <span class="muted">({{ tema.perguntas|length }})</span></li>
+                {% endfor %}
+            </ol>
+        </nav>
+
+        <div class="faq-list">
+            {% if busca %}
+                <p class="faq-result">Resultados para “<strong>{{ busca }}</strong>” · <a href="{% url 'faq' %}">ver todas</a></p>
+            {% endif %}
+            {% for tema in temas %}
+                <section id="{{ tema.codigo }}" class="faq-group">
+                    <h2>{{ tema.rotulo }}</h2>
+                    {% for item in tema.perguntas %}
+                        <details class="faq-item" {% if busca %}open{% endif %}>
+                            <summary>{{ item.pergunta }}</summary>
+                            <div class="faq-answer">{{ item.resposta|linebreaks }}</div>
+                        </details>
+                    {% endfor %}
+                </section>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="faq-empty">
+            {% url 'faq' as url_faq %}
+            {% if busca %}
+                {% include "partials/empty_state.html" with icone="busca" titulo="Nenhuma resposta encontrada" texto="Tente outras palavras ou fale diretamente com a gente." link_url=url_faq link_label="Ver todas as dúvidas" %}
+            {% else %}
+                {% url 'contato' as url_contato %}
+                {% include "partials/empty_state.html" with titulo="Nenhuma pergunta cadastrada" texto="As perguntas frequentes são gerenciadas pelo painel administrativo." link_url=url_contato link_label="Fale conosco" %}
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+<section class="container">
+    <div class="faq-cta">
+        <div>
+            <span class="eyebrow">Não encontrou?</span>
+            <h2>Fale com a gente.</h2>
+            <p class="mb-0">Respondemos pelo e-mail informado no formulário de contato.</p>
+        </div>
+        <a href="{% url 'contato' %}" class="btn btn-accent btn-lg">Enviar mensagem</a>
+    </div>
+</section>
+
+{% endblock %}

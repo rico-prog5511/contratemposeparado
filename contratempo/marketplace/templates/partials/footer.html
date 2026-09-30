@@ -1,0 +1,54 @@
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="{% url 'home' %}" class="logo">CONTRA<span>TEMPO</span></a>
+                <p>Colecionáveis para quem valoriza histórias, nostalgia e peças únicas.</p>
+                <div class="payment-chips" aria-label="Formas de pagamento aceitas">
+                    <span>Crédito</span><span>Débito</span><span>PIX</span><span>Boleto</span>
+                </div>
+            </div>
+
+            <div>
+                <h3>Loja</h3>
+                <nav class="footer-links" aria-label="Loja">
+                    <a href="{% url 'produtos' %}">Todos os produtos</a>
+                    <a href="{% url 'categorias' %}">Categorias</a>
+                    <a href="{% url 'produtos' %}?ordenar=recentes">Novidades</a>
+                    <a href="{% url 'anuncio_criar' %}">Anunciar um item</a>
+                </nav>
+            </div>
+
+            <div>
+                <h3>Minha conta</h3>
+                <nav class="footer-links" aria-label="Minha conta">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'perfil' %}">Perfil</a>
+                        <a href="{% url 'pedidos' %}">Meus pedidos</a>
+                        <a href="{% url 'anuncios' %}">Meus anúncios</a>
+                        <a href="{% url 'vendas' %}">Minhas vendas</a>
+                    {% else %}
+                        <a href="{% url 'login' %}">Entrar</a>
+                        <a href="{% url 'cadastro' %}">Criar conta</a>
+                    {% endif %}
+                    <a href="{% url 'carrinho' %}">Carrinho</a>
+                </nav>
+            </div>
+
+            <div>
+                <h3>Institucional</h3>
+                <nav class="footer-links" aria-label="Institucional">
+                    <a href="{% url 'sobre_nos' %}">Sobre nós</a>
+                    <a href="{% url 'faq' %}">Dúvidas frequentes</a>
+                    <a href="{% url 'contato' %}">Contato</a>
+                    <a href="{% url 'privacidade' %}">Política de privacidade</a>
+                </nav>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© {% now "Y" %} Contratempo — Todos os direitos reservados.</span>
+            <span>Feito para colecionadores.</span>
+        </div>
+    </div>
+</footer>

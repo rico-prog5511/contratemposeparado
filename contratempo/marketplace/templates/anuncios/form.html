@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ titulo }} | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/anuncios.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <div class="account-layout">
+        {% include "partials/account_nav.html" %}
+
+        <section>
+            <header class="page-header">
+                <div>
+                    <span class="eyebrow">Área do vendedor</span>
+                    <h1>{{ titulo }}</h1>
+                    {% if produto %}<p>{{ produto.nome }}</p>{% else %}<p>Quanto mais detalhes e fotos, mais fácil vender.</p>{% endif %}
+                </div>
+                {% if produto %}
+                    <div class="page-header-actions">
+                        <a href="{% url 'produto_detalhe' produto.id %}" class="btn btn-outline" target="_blank" rel="noopener">Ver na loja ↗</a>
+                    </div>
+                {% endif %}
+            </header>
+
+            <form method="post" enctype="multipart/form-data" novalidate class="listing-form">
+                {% csrf_token %}
+                {% include "partials/form_errors.html" %}
+
+                <!-- FOTOS -->
+                <section class="panel">
+                    <h2 class="panel-title">Fotos <span class="eyebrow">até {{ limite_imagens }}</span></h2>
+
+                    {% if imagens %}
+                        <ul class="image-manage">
+                            {% for imagem in imagens %}
+                                <li class="image-manage-item">
+                                    <img src="{{ imagem.url_imagem }}" alt="Imagem {{ forloop.counter }} do anúncio">
+                                    <div class="image-manage-controls">
+                                        <label class="check">
+                                            <input type="radio" name="imagem_principal" value="{{ imagem.id }}" {% if imagem.principal %}checked{% endif %}>
+                                            <span>Principal</span>
+                                        </label>
+                                        <label class="check">
+                                            <input type="checkbox" name="remover_imagens" value="{{ imagem.id }}" data-remove-image>
+                                            <span>Remover</span>
+                                        </label>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    <div class="upload-area {% if form.imagens.errors %}has-error{% endif %}" data-upload-area data-limite="{{ limite_imagens }}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        <label for="{{ form.imagens.id_for_label }}">
+                            <strong>Clique para escolher</strong> ou arraste as imagens aqui
+                        </label>
+                        {{ form.imagens }}
+                        <small>{{ form.imagens.help_text }}</small>
+                        <small class="upload-aviso" data-upload-aviso aria-live="polite"></small>
+                        {{ form.imagens.errors }}
+                    </div>
+                    <ul class="upload-preview" data-upload-preview aria-label="Novas imagens selecionadas"></ul>
+                </section>
+
+                <!-- INFORMAÇÕES -->
+                <section class="panel">
+                    <h2 class="panel-title">Informações do produto</h2>
+                    {% include "partials/form_field.html" with field=form.nome %}
+                    <div class="form-row">
+                        {% include "partials/form_field.html" with field=form.categoria %}
+                        {% include "partials/form_field.html" with field=form.franquia %}
+                    </div>
+                    {% include "partials/form_field.html" with field=form.condicao classe="radio-pills" %}
+                    <div class="form-row">
+                        {% include "partials/form_field.html" with field=form.marca %}
+                        {% include "partials/form_field.html" with field=form.ano %}
+                    </div>
+                    {% include "partials/form_field.html" with field=form.descricao %}
+                </section>
+
+                <!-- VENDA -->
+                <section class="panel">
+                    <h2 class="panel-title">Preço e estoque</h2>
+                    <div class="form-row form-row-3">
+                        {% include "partials/form_field.html" with field=form.preco %}
+                        {% include "partials/form_field.html" with field=form.quantidade_disponivel %}
+                        {% include "partials/form_field.html" with field=form.sku %}
+                    </div>
+                    {% include "partials/form_field.html" with field=form.status_anuncio classe="radio-pills" %}
+                </section>
+
+                <div class="form-actions listing-actions">
+                    <a href="{% if produto %}{% url 'anuncio_detalhe' produto.id %}{% else %}{% url 'anuncios' %}{% endif %}" class="btn btn-outline">Cancelar</a>
+                    <span class="spacer"></span>
+                    <button type="submit" class="btn btn-accent btn-lg">{% if produto %}Salvar alterações{% else %}Publicar anúncio{% endif %}</button>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/upload.js' %}"></script>
+{% endblock %}

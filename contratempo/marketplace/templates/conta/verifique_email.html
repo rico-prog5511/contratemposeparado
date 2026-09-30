@@ -1,0 +1,24 @@
+{% extends "conta/_auth_simples.html" %}
+
+{% block title %}Confirme seu e-mail | Contratempo{% endblock %}
+{% block auth_eyebrow %}Quase lá{% endblock %}
+{% block auth_titulo %}Confirme seu e-mail{% endblock %}
+
+{% block auth_corpo %}
+{% if falha_envio %}
+    <div class="alert alert-error form-errors-top" role="alert">
+        <div class="alert-text"><p>Sua conta foi criada, mas não conseguimos enviar o e-mail agora. Tente reenviar em alguns minutos.</p></div>
+    </div>
+{% endif %}
+<p>Enviamos um link de ativação para <strong>{{ email }}</strong>. Clique nele para ativar sua conta. Depois disso você já pode entrar.</p>
+<ul class="auth-checklist">
+    <li>O link vale por 3 dias e só funciona uma vez.</li>
+    <li>Não chegou? Confira o spam e a aba Promoções.</li>
+</ul>
+<form action="{% url 'reenviar_confirmacao' %}" method="post" class="auth-card-actions">
+    {% csrf_token %}
+    <input type="hidden" name="email" value="{{ email }}">
+    <button type="submit" class="btn btn-outline">Reenviar e-mail</button>
+    <a href="{% url 'login' %}" class="btn btn-accent">Ir para o login</a>
+</form>
+{% endblock %}

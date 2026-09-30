@@ -1,0 +1,352 @@
+{% extends "base.html" %}
+{% load static %}
+{% load marketplace_extras %}
+
+{% block title %}{{ produto.nome }} | Contratempo{% endblock %}
+{% block meta_description %}{{ produto.descricao|truncatechars:150 }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/produto.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container produto-page">
+
+    <!-- GALERIA -->
+    <div class="produto-galeria {% if imagens|length > 1 %}com-miniaturas{% endif %}">
+        {% if imagens|length > 1 %}
+        <div class="produto-miniaturas" role="list" aria-label="Imagens do produto">
+            {% for imagem in imagens %}
+                <button type="button" role="listitem" class="produto-miniatura {% if forloop.first %}active{% endif %}" data-src="{{ imagem.url_imagem }}" data-indice="{{ forloop.counter0 }}" aria-label="Ver imagem {{ forloop.counter }}">
+                    <img src="{{ imagem.url_imagem }}" alt="">
+                </button>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="produto-imagem-principal">
+            {% if imagens %}
+                <button type="button" class="zoom-trigger" data-lightbox-open aria-label="Ampliar imagem">
+                    <img id="imagem-principal" src="{{ imagens.0.url_imagem }}" alt="{{ produto.nome }}" data-indice="0">
+                    <span class="zoom-hint" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                        Ampliar
+                    </span>
+                </button>
+            {% else %}
+                <img id="imagem-principal" src="{% static 'img/produto-sem-imagem.svg' %}" alt="{{ produto.nome }} (sem imagem)">
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- INFORMAÇÕES -->
+    <div class="produto-info">
+        <div class="cluster">
+            <span class="badge badge--{{ produto.condicao }}">{{ produto.get_condicao_display }}</span>
+            {% if produto.franquia %}
+                <a href="{% url 'produtos' %}?franquia={{ produto.franquia.slug }}" class="produto-franquia">{{ produto.franquia.nome }}</a>
+            {% endif %}
+        </div>
+
+        <h1>{{ produto.nome }}</h1>
+
+        <div class="produto-meta-links">
+            {% if media_avaliacoes %}
+                <a href="#avaliacoes" class="produto-rating">
+                    <span class="stars" aria-hidden="true">{% for _ in media_avaliacoes|floatformat:0|to_range %}★{% endfor %}</span>
+                    {{ media_avaliacoes|floatformat:1 }}
+                    <span>({{ avaliacoes.count }} avaliaç{{ avaliacoes.count|pluralize:"ão,ões" }})</span>
+                </a>
+            {% endif %}
+            <a href="#perguntas" class="produto-rating"><span>{{ perguntas|length }} pergunta{{ perguntas|length|pluralize }}</span></a>
+        </div>
+
+        <p class="produto-preco">{{ produto.preco|brl }}</p>
+
+        <dl class="key-value produto-specs">
+            <dt>Categoria</dt>
+            <dd><a href="{% url 'produtos' %}?categoria={{ produto.categoria.slug }}">{{ produto.categoria.nome }}</a></dd>
+            <dt>Condição</dt><dd>{{ produto.get_condicao_display }}</dd>
+            {% if produto.marca %}<dt>Marca</dt><dd>{{ produto.marca }}</dd>{% endif %}
+            {% if produto.ano %}<dt>Ano</dt><dd>{{ produto.ano }}</dd>{% endif %}
+            {% if produto.sku %}<dt>Código</dt><dd class="mono">{{ produto.sku }}</dd>{% endif %}
+        </dl>
+
+        <div class="produto-descricao">
+            <h2>Descrição</h2>
+            {{ produto.descricao|linebreaks }}
+        </div>
+
+        {% if not eh_dono %}
+        <div class="report" id="denunciar">
+            {% if not user.is_authenticated %}
+                <a href="{% url 'login' %}?next={{ request.path|urlencode }}%23denunciar" class="report-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 22V4a1 1 0 0 1 1-1h13l-2 5 2 5H5"/></svg>
+                    Denunciar anúncio
+                </a>
+            {% elif ja_denunciou %}
+                <p class="report-done">Você denunciou este anúncio. Nossa equipe está analisando.</p>
+            {% else %}
+                <details class="report-box">
+                    <summary class="report-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 22V4a1 1 0 0 1 1-1h13l-2 5 2 5H5"/></svg>
+                        Denunciar anúncio
+                    </summary>
+                    <form action="{% url 'denunciar_produto' produto.id %}" method="post" class="report-form" data-confirm="A denúncia é analisada pela equipe da Contratempo. O vendedor não fica sabendo quem denunciou." data-confirm-title="Enviar denúncia?" data-confirm-ok="Enviar denúncia">
+                        {% csrf_token %}
+                        <fieldset>
+                            <legend class="form-label">Qual é o problema?</legend>
+                            {% for valor, rotulo in motivos_denuncia %}
+                                <label class="check"><input type="radio" name="motivo" value="{{ valor }}" required> <span>{{ rotulo }}</span></label>
+                            {% endfor %}
+                        </fieldset>
+                        <label for="denuncia-descricao" class="form-label">Detalhes <span class="muted">(obrigatório em “Outro motivo”)</span></label>
+                        <textarea id="denuncia-descricao" name="descricao" rows="3" maxlength="1000" class="input" placeholder="O que há de errado com este anúncio?"></textarea>
+                        <button type="submit" class="btn btn-danger btn-sm">Enviar denúncia</button>
+                    </form>
+                </details>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- PAINEL DE COMPRA -->
+    <aside class="buy-panel" aria-label="Comprar">
+        {% if eh_dono %}
+            <span class="eyebrow">Seu anúncio</span>
+            <p class="buy-status"><span class="badge badge--{{ produto.status_anuncio }}">{{ produto.get_status_anuncio_display }}</span></p>
+            <p>{{ produto.quantidade_disponivel }} unidade{{ produto.quantidade_disponivel|pluralize }} em estoque.</p>
+            <div class="stack buy-actions">
+                <a href="{% url 'anuncio_editar' produto.id %}" class="btn btn-light btn-block">Editar anúncio</a>
+                <a href="{% url 'anuncio_detalhe' produto.id %}" class="btn btn-outline btn-block buy-outline">Ver desempenho</a>
+            </div>
+
+        {% elif produto.status_anuncio != "ativo" %}
+            <span class="eyebrow">Indisponível</span>
+            <p class="produto-indisponivel">Este anúncio está {{ produto.get_status_anuncio_display|lower }} e não pode ser comprado no momento.</p>
+            <a href="{% url 'produtos' %}?categoria={{ produto.categoria.slug }}" class="btn btn-light btn-block">Ver itens parecidos</a>
+
+        {% elif produto.quantidade_disponivel == 0 %}
+            <span class="eyebrow">Esgotado</span>
+            <p class="produto-indisponivel">Sem estoque no momento.</p>
+            <a href="{% url 'produtos' %}?categoria={{ produto.categoria.slug }}" class="btn btn-light btn-block">Ver itens parecidos</a>
+
+        {% else %}
+            <span class="eyebrow">Disponível</span>
+            <p class="buy-price">{{ produto.preco|brl }}</p>
+            <p class="produto-estoque">
+                {% if produto.quantidade_disponivel == 1 %}Última unidade!{% else %}{{ produto.quantidade_disponivel }} unidades em estoque{% endif %}
+            </p>
+
+            {% if user.is_authenticated %}
+                <form action="{% url 'adicionar_ao_carrinho' produto.id %}" method="post" class="produto-comprar-form">
+                    {% csrf_token %}
+                    <label for="quantidade" class="form-label">Quantidade</label>
+                    <div class="quantidade-stepper">
+                        <button type="button" class="qtd-btn" data-acao="menos" aria-label="Diminuir quantidade">−</button>
+                        <input type="number" name="quantidade" id="quantidade" value="1" min="1" max="{{ produto.quantidade_disponivel }}" inputmode="numeric">
+                        <button type="button" class="qtd-btn" data-acao="mais" aria-label="Aumentar quantidade">+</button>
+                    </div>
+                    <button type="submit" name="comprar_agora" value="1" class="btn btn-light btn-block">Comprar agora</button>
+                    <button type="submit" class="btn btn-outline btn-block buy-outline">Adicionar ao carrinho</button>
+                </form>
+            {% else %}
+                <div class="stack buy-actions">
+                    <a href="{% url 'login' %}?next={{ request.path|urlencode }}" class="btn btn-light btn-block">Entrar para comprar</a>
+                    <a href="{% url 'cadastro' %}?next={{ request.path|urlencode }}" class="btn btn-outline btn-block buy-outline">Criar conta</a>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <!-- CALCULADORA DE FRETE -->
+        <div class="frete-calc" id="frete">
+            <form method="get" action="{{ request.path }}#frete" class="frete-form">
+                <label for="cep-frete" class="form-label">Calcular frete</label>
+                <div class="frete-row">
+                    <input type="text" id="cep-frete" name="cep" value="{{ cep }}" placeholder="00000-000" inputmode="numeric" autocomplete="postal-code" data-mask="cep" class="input">
+                    <button type="submit" class="btn btn-light btn-sm">OK</button>
+                </div>
+            </form>
+            {% if frete %}
+                {% if frete.erro %}
+                    <p class="frete-erro" role="alert">{{ frete.erro }}</p>
+                {% else %}
+                    <p class="frete-resultado" aria-live="polite">
+                        <strong>{{ frete.valor|brl }}</strong> para {{ frete.uf }}
+                        <span>Chega em até {{ frete.prazo_dias }} dias úteis após o envio</span>
+                    </p>
+                {% endif %}
+            {% endif %}
+            <a href="{% url 'faq' %}#entrega" class="frete-ajuda">Como o frete é calculado?</a>
+        </div>
+
+        <ul class="buy-perks">
+            <li>Pagamento por cartão, PIX ou boleto</li>
+            <li>Código de rastreio por e-mail no envio</li>
+        </ul>
+    </aside>
+</div>
+
+<!-- VENDEDOR -->
+<section class="container seller-section">
+    <div class="seller-card">
+        <div class="seller-id">
+            <span class="avatar avatar-lg">
+                {% if produto.vendedor.avatar %}<img src="{{ produto.vendedor.avatar }}" alt="">{% else %}{{ produto.vendedor.nome_completo|first|upper }}{% endif %}
+            </span>
+            <div>
+                <span class="eyebrow">Vendido por</span>
+                <h2><a href="{% url 'vendedor_perfil' produto.vendedor_id %}">{{ produto.vendedor.nome_completo }}</a></h2>
+                <p class="mb-0">Na Contratempo desde {{ produto.vendedor.data_cadastro|date:"F \d\e Y" }}</p>
+            </div>
+        </div>
+        <dl class="seller-stats">
+            <div>
+                <dt>Nota</dt>
+                <dd>{% if vendedor_resumo.media %}{{ vendedor_resumo.media|floatformat:1 }} <span class="stars">★</span>{% else %}—{% endif %}</dd>
+                <small>{{ vendedor_resumo.total_avaliacoes }} avaliaç{{ vendedor_resumo.total_avaliacoes|pluralize:"ão,ões" }}</small>
+            </div>
+            <div>
+                <dt>Vendas</dt>
+                <dd>{{ vendedor_resumo.vendas }}</dd>
+                <small>unidade{{ vendedor_resumo.vendas|pluralize }} vendida{{ vendedor_resumo.vendas|pluralize }}</small>
+            </div>
+            <div>
+                <dt>Anúncios</dt>
+                <dd>{{ vendedor_resumo.anuncios_ativos }}</dd>
+                <small>ativo{{ vendedor_resumo.anuncios_ativos|pluralize }}</small>
+            </div>
+        </dl>
+        <a href="{% url 'vendedor_perfil' produto.vendedor_id %}" class="btn btn-outline">Ver perfil do vendedor</a>
+    </div>
+
+    {% if mais_do_vendedor %}
+        <div class="section-head">
+            <h2>Mais deste vendedor</h2>
+            <a href="{% url 'vendedor_perfil' produto.vendedor_id %}" class="link-arrow">Ver todos →</a>
+        </div>
+        <div class="product-grid">
+            {% for produto in mais_do_vendedor %}
+                {% include "partials/product_card.html" %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>
+
+<!-- PERGUNTAS -->
+<section class="container produto-perguntas" id="perguntas">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Tire suas dúvidas</span>
+            <h2>Perguntas ao vendedor</h2>
+        </div>
+    </div>
+
+    {% if not eh_dono %}
+        {% if user.is_authenticated %}
+            <form action="{% url 'fazer_pergunta' produto.id %}" method="post" class="ask-form">
+                {% csrf_token %}
+                <label for="pergunta" class="sr-only">Sua pergunta</label>
+                <textarea id="pergunta" name="pergunta" rows="2" maxlength="500" minlength="5" required class="input" placeholder="Escreva sua pergunta — ex.: acompanha a caixa original?"></textarea>
+                <button type="submit" class="btn btn-accent">Perguntar</button>
+            </form>
+            <p class="ask-note">A pergunta e a resposta ficam públicas. Não compartilhe telefone, e-mail ou endereço.</p>
+        {% else %}
+            <p class="panel ask-login"><a href="{% url 'login' %}?next={{ request.path|urlencode }}%23perguntas">Entre na sua conta</a> para fazer uma pergunta ao vendedor.</p>
+        {% endif %}
+    {% endif %}
+
+    {% if perguntas %}
+        <ul class="qa-list">
+            {% for pergunta in perguntas %}
+                <li class="qa-item {% if not pergunta.resposta %}qa-item--pendente{% endif %}">
+                    <p class="qa-q"><span class="qa-tag">P</span>{{ pergunta.pergunta }}</p>
+                    {% if pergunta.resposta %}
+                        <p class="qa-a"><span class="qa-tag qa-tag--a">R</span>{{ pergunta.resposta }}<small>{{ pergunta.data_resposta|date:"d/m/Y" }}</small></p>
+                    {% elif eh_dono %}
+                        <form action="{% url 'responder_pergunta' pergunta.id %}" method="post" class="answer-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.path }}#perguntas">
+                            <label for="resposta-{{ pergunta.id }}" class="sr-only">Resposta</label>
+                            <textarea id="resposta-{{ pergunta.id }}" name="resposta" rows="2" maxlength="1000" required class="input" placeholder="Escreva sua resposta"></textarea>
+                            <button type="submit" class="btn btn-primary btn-sm">Responder</button>
+                        </form>
+                    {% else %}
+                        <p class="qa-waiting">Aguardando resposta do vendedor.</p>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="muted">Ninguém perguntou nada ainda.{% if not eh_dono %} Seja a primeira pessoa!{% endif %}</p>
+    {% endif %}
+</section>
+
+<!-- AVALIAÇÕES -->
+<section class="container produto-avaliacoes" id="avaliacoes">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Opiniões de quem comprou</span>
+            <h2>Avaliações</h2>
+        </div>
+        {% if media_avaliacoes %}
+            <p class="avaliacoes-media"><strong>{{ media_avaliacoes|floatformat:1 }}</strong> / 5</p>
+        {% endif %}
+    </div>
+    {% if avaliacoes %}
+        <ul class="lista-avaliacoes">
+            {% for avaliacao in avaliacoes %}
+                <li>
+                    <div class="avaliacao-topo">
+                        <span class="avatar">{{ avaliacao.usuario.nome_completo|first|upper }}</span>
+                        <strong>{{ avaliacao.usuario.nome_completo }}</strong>
+                        <span class="avaliacao-nota stars" aria-label="{{ avaliacao.nota }} de 5 estrelas">{% for _ in avaliacao.nota|to_range %}★{% endfor %}</span>
+                        <span class="avaliacao-data">{{ avaliacao.data_avaliacao|date:"d/m/Y" }}</span>
+                    </div>
+                    {% if avaliacao.comentario %}<p>{{ avaliacao.comentario }}</p>{% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="panel muted">Este produto ainda não tem avaliações. Quem comprar poderá avaliar depois de confirmar o recebimento.</p>
+    {% endif %}
+</section>
+
+<!-- RELACIONADOS -->
+{% if produtos_relacionados %}
+<section class="container section">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">{{ produto.categoria.nome }}</span>
+            <h2>Você também pode gostar</h2>
+        </div>
+        <a href="{% url 'produtos' %}?categoria={{ produto.categoria.slug }}" class="link-arrow">Ver categoria →</a>
+    </div>
+    <div class="product-grid">
+        {% for produto in produtos_relacionados %}
+            {% include "partials/product_card.html" %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- LIGHTBOX (galeria ampliada) -->
+{% if imagens %}
+<dialog class="lightbox" id="lightbox" aria-label="Imagens de {{ produto.nome }}">
+    <button type="button" class="lightbox-close" data-lightbox-close aria-label="Fechar">&times;</button>
+    {% if imagens|length > 1 %}
+        <button type="button" class="lightbox-nav lightbox-prev" data-lightbox-prev aria-label="Imagem anterior">‹</button>
+        <button type="button" class="lightbox-nav lightbox-next" data-lightbox-next aria-label="Próxima imagem">›</button>
+    {% endif %}
+    <figure class="lightbox-figure">
+        <img id="lightbox-img" src="{{ imagens.0.url_imagem }}" alt="{{ produto.nome }}">
+        <figcaption><span id="lightbox-pos">1</span> / {{ imagens|length }}</figcaption>
+    </figure>
+    <script type="application/json" id="lightbox-dados">[{% for imagem in imagens %}"{{ imagem.url_imagem|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}]</script>
+</dialog>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/produto.js' %}"></script>
+{% endblock %}

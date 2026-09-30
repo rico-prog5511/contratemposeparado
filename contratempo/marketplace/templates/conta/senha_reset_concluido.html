@@ -1,0 +1,13 @@
+{% extends "conta/_auth_simples.html" %}
+
+{% block title %}Senha alterada | Contratempo{% endblock %}
+{% block auth_icone %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>{% endblock %}
+{% block auth_eyebrow %}Tudo certo{% endblock %}
+{% block auth_titulo %}Senha alterada{% endblock %}
+
+{% block auth_corpo %}
+<p>Sua nova senha já está valendo. Entre com ela para continuar.</p>
+<div class="auth-card-actions">
+    <a href="{% url 'login' %}" class="btn btn-accent btn-block">Entrar</a>
+</div>
+{% endblock %}

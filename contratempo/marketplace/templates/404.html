@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Página não encontrada | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/institucional.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="container error-page">
+    <div class="error-code" aria-hidden="true">4<span>0</span>4</div>
+    <span class="eyebrow">Erro 404</span>
+    <h1>Essa página se perdeu <em>no tempo.</em></h1>
+    <p>O link que você acessou não existe, foi movido ou o anúncio saiu do ar.</p>
+
+    <form class="error-search" action="{% url 'produtos' %}" method="get" role="search">
+        <label for="busca-404" class="sr-only">Buscar produtos</label>
+        <input id="busca-404" type="search" name="q" class="input" placeholder="Buscar um produto">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+
+    <div class="cluster error-actions">
+        <a href="{% url 'home' %}" class="btn btn-accent">Voltar para a loja</a>
+        <a href="{% url 'produtos' %}" class="btn btn-outline">Ver produtos</a>
+    </div>
+</section>
+{% endblock %}

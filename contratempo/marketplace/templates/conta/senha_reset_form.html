@@ -1,0 +1,17 @@
+{% extends "conta/_auth_simples.html" %}
+
+{% block title %}Recuperar senha | Contratempo{% endblock %}
+{% block auth_icone %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>{% endblock %}
+{% block auth_eyebrow %}Recuperar acesso{% endblock %}
+{% block auth_titulo %}Esqueceu sua senha?{% endblock %}
+
+{% block auth_corpo %}
+<p>Informe o e-mail da sua conta. Enviaremos um link para você criar uma senha nova.</p>
+<form method="post" novalidate>
+    {% csrf_token %}
+    {% include "partials/form_errors.html" %}
+    {% include "partials/form_field.html" with field=form.email %}
+    <button type="submit" class="btn btn-accent btn-block btn-lg">Enviar link</button>
+</form>
+<p class="form-footer">Lembrou? <a href="{% url 'login' %}">Voltar para o login</a></p>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Editar perfil | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/conta.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <div class="account-layout">
+        {% include "partials/account_nav.html" %}
+
+        <section>
+            <header class="page-header">
+                <div>
+                    <span class="eyebrow">Conta</span>
+                    <h1>Dados pessoais</h1>
+                </div>
+            </header>
+
+            <form method="post" enctype="multipart/form-data" class="panel" novalidate>
+                {% csrf_token %}
+                {% include "partials/form_errors.html" %}
+
+                <div class="avatar-field">
+                    <div class="avatar avatar-lg" data-avatar-preview>
+                        {% if user.avatar %}<img src="{{ user.avatar }}" alt="Foto de perfil atual">{% else %}{{ user.nome_completo|first|upper }}{% endif %}
+                    </div>
+                    <div class="avatar-field-body">
+                        {% include "partials/form_field.html" with field=form.avatar_arquivo %}
+                        {% if user.avatar %}
+                            <label class="check"><input type="checkbox" name="remover_avatar" value="1"> <span>Remover foto atual</span></label>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    {% include "partials/form_field.html" with field=form.nome_completo %}
+                    <div class="form-row">
+                        {% include "partials/form_field.html" with field=form.email %}
+                        {% include "partials/form_field.html" with field=form.telefone %}
+                    </div>
+                    <div class="form-row">
+                        {% include "partials/form_field.html" with field=form.data_nascimento %}
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{% url 'perfil' %}" class="btn btn-outline">Cancelar</a>
+                    <span class="spacer"></span>
+                    <button type="submit" class="btn btn-accent">Salvar alterações</button>
+                </div>
+            </form>
+
+            <section class="panel danger-zone">
+                <h2 class="panel-title">Desativar conta</h2>
+                <p>Sua conta deixa de funcionar, mas o histórico de pedidos e vendas é mantido. Pause ou encerre seus anúncios ativos antes.</p>
+                <form action="{% url 'desativar_conta' %}" method="post" data-confirm="Você será desconectado e não poderá mais entrar com esta conta." data-confirm-title="Desativar sua conta?" data-confirm-ok="Desativar">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Desativar minha conta</button>
+                </form>
+            </section>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/upload.js' %}"></script>
+{% endblock %}

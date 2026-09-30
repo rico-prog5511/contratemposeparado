@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Entrar | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/conta.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <section class="auth-box">
+        <div class="auth-visual" aria-hidden="true">
+            <span class="auth-brand">[contratempo]</span>
+            <h2>O passado<br><em>nunca sai de moda.</em></h2>
+            <p>Acompanhe seus pedidos, gerencie seus anúncios e continue sua coleção de onde parou.</p>
+        </div>
+
+        <div class="auth-content">
+            <span class="eyebrow">Bem-vindo de volta</span>
+            <h1>Entrar na conta</h1>
+            <p class="auth-lead">Ainda não tem conta? <a href="{% url 'cadastro' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Crie uma</a></p>
+
+            {% if email_pendente %}
+                <div class="alert alert-warning form-errors-top" role="alert">
+                    <div class="alert-text">
+                        <p><strong>Confirme seu e-mail para entrar.</strong> Enviamos um link de ativação para {{ email_pendente }}. Confira também a caixa de spam.</p>
+                        <form action="{% url 'reenviar_confirmacao' %}" method="post" class="resend-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="email" value="{{ email_pendente }}">
+                            <button type="submit" class="link-button">Reenviar link de confirmação</button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+                {% include "partials/form_errors.html" %}
+
+                {% include "partials/form_field.html" with field=form.email %}
+                {% include "partials/form_field.html" with field=form.senha senha=True %}
+
+                <div class="auth-row">
+                    {% include "partials/form_field.html" with field=form.lembrar %}
+                    <a href="{% url 'password_reset' %}" class="link-button">Esqueci minha senha</a>
+                </div>
+
+                <button type="submit" class="btn btn-accent btn-block btn-lg">Entrar</button>
+            </form>
+        </div>
+    </section>
+</div>
+{% endblock %}

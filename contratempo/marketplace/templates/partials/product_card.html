@@ -1,0 +1,21 @@
+{% load static marketplace_extras %}
+{% with imagem=produto|imagem_principal %}
+<article class="product-card">
+    <a href="{% url 'produto_detalhe' produto.id %}" class="product-image" tabindex="-1" aria-hidden="true">
+        <img src="{% if imagem %}{{ imagem }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt="" loading="lazy">
+        {% if produto.status_anuncio == "ativo" and produto.quantidade_disponivel == 1 %}
+            <span class="product-flag">Peça única</span>
+        {% endif %}
+    </a>
+    <div class="product-body">
+        <div class="product-meta">
+            <span class="product-category">{{ produto.categoria.nome }}</span>
+            <span class="product-condition">· {{ produto.get_condicao_display }}</span>
+        </div>
+        <a href="{% url 'produto_detalhe' produto.id %}" class="product-name">{{ produto.nome }}</a>
+        {% if produto.franquia %}<span class="product-franchise">{{ produto.franquia.nome }}</span>{% endif %}
+        <span class="product-price">{{ produto.preco|brl }}</span>
+    </div>
+    <a href="{% url 'produto_detalhe' produto.id %}" class="btn btn-outline btn-block">Ver produto</a>
+</article>
+{% endwith %}

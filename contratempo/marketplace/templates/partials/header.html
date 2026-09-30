@@ -1,0 +1,109 @@
+{% with url_atual=request.resolver_match.url_name %}
+<header class="header">
+    <a href="{% url 'home' %}" class="logo" aria-label="Contratempo — página inicial">CONTRA<span>TEMPO</span></a>
+
+    <nav class="main-nav" id="menu-principal" aria-label="Menu principal">
+        <div class="nav-mobile-extra">
+            <form class="search-box" role="search" action="{% url 'produtos' %}" method="get" data-sugestoes="{% url 'sugestoes_busca' %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <label for="busca-mobile" class="sr-only">Buscar produtos</label>
+                <input id="busca-mobile" type="search" name="q" autocomplete="off" placeholder="Buscar produtos" value="{{ request.GET.q|default:'' }}">
+            </form>
+            <a href="{% url 'anuncio_criar' %}" class="btn btn-light btn-sm">+ Anunciar um item</a>
+        </div>
+
+        <ul>
+            <li><a href="{% url 'home' %}" class="{% if url_atual == 'home' %}active{% endif %}">Home</a></li>
+            <li class="has-dropdown">
+                <a href="{% url 'produtos' %}" class="{% if url_atual == 'produtos' or url_atual == 'produto_detalhe' or url_atual == 'categorias' %}active{% endif %}">Produtos</a>
+                {% if categorias_menu %}
+                    <button type="button" class="dropdown-toggle" aria-label="Ver categorias" aria-expanded="false">
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                            <polyline points="6 9 12 15 18 9"/>
+                        </svg>
+                    </button>
+                    <ul class="dropdown-menu">
+                        {% for categoria in categorias_menu %}
+                            <li><a href="{% url 'produtos' %}?categoria={{ categoria.slug }}">{{ categoria.nome }}</a></li>
+                        {% endfor %}
+                        <li class="dropdown-sep" role="separator"></li>
+                        <li class="dropdown-all"><a href="{% url 'categorias' %}">Todas as categorias</a></li>
+                    </ul>
+                {% endif %}
+            </li>
+            <li><a href="{% url 'sobre_nos' %}" class="{% if url_atual == 'sobre_nos' %}active{% endif %}">Sobre nós</a></li>
+            <li><a href="{% url 'contato' %}" class="{% if url_atual == 'contato' %}active{% endif %}">Contato</a></li>
+        </ul>
+    </nav>
+
+    <div class="header-right">
+        <form class="search-box" role="search" action="{% url 'produtos' %}" method="get" data-sugestoes="{% url 'sugestoes_busca' %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <label for="busca" class="sr-only">Buscar produtos</label>
+            <input id="busca" type="search" name="q" autocomplete="off" placeholder="Buscar" value="{{ request.GET.q|default:'' }}">
+        </form>
+
+        <a href="{% url 'anuncio_criar' %}" class="btn btn-outline header-sell">Anunciar</a>
+
+        <a href="{% url 'carrinho' %}" class="icon-btn" aria-label="Carrinho{% if carrinho_total_itens %} ({{ carrinho_total_itens }} ite{{ carrinho_total_itens|pluralize:'m,ns' }}){% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="9" cy="21" r="1"/>
+                <circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/>
+            </svg>
+            {% if carrinho_total_itens %}
+                <span class="cart-count" aria-hidden="true">{{ carrinho_total_itens }}</span>
+            {% endif %}
+        </a>
+
+        {% if user.is_authenticated %}
+            <div class="has-dropdown account-menu">
+                <button type="button" class="dropdown-toggle icon-btn" aria-label="Menu da conta" aria-expanded="false">
+                    {% if user.avatar %}
+                        <img src="{{ user.avatar }}" alt="" class="avatar-mini">
+                    {% else %}
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <circle cx="12" cy="8" r="4"/>
+                            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                        </svg>
+                    {% endif %}
+                </button>
+                <ul class="dropdown-menu dropdown-right">
+                    <li class="dropdown-head"><strong>{{ user.nome_completo }}</strong>{{ user.email }}</li>
+                    <li><a href="{% url 'perfil' %}">Minha conta</a></li>
+                    <li><a href="{% url 'pedidos' %}">Meus pedidos</a></li>
+                    <li><a href="{% url 'anuncios' %}">Meus anúncios</a></li>
+                    <li><a href="{% url 'vendas' %}">Minhas vendas</a></li>
+                    <li><a href="{% url 'enderecos' %}">Endereços</a></li>
+                    <li class="dropdown-sep" role="separator"></li>
+                    <li>
+                        <form action="{% url 'logout' %}" method="post" class="inline-form">
+                            {% csrf_token %}
+                            <button type="submit">Sair</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        {% else %}
+            <a href="{% url 'login' %}{% if request.path != '/' and url_atual != 'login' and url_atual != 'cadastro' %}?next={{ request.path|urlencode }}{% endif %}" class="icon-btn" aria-label="Entrar na conta">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                </svg>
+            </a>
+        {% endif %}
+
+        <button type="button" class="menu-toggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-principal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22" aria-hidden="true">
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+        </button>
+    </div>
+</header>
+{% endwith %}

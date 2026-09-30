@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static marketplace_extras %}
+
+{% block title %}Checkout — Entrega | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/compra.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+    <header class="page-header">
+        <div>
+            <span class="eyebrow">Finalize sua compra</span>
+            <h1>Onde vamos entregar?</h1>
+        </div>
+    </header>
+
+    {% include "partials/checkout_steps.html" %}
+
+    <div class="layout-aside">
+        <section class="panel">
+            <h2 class="panel-title">Endereço de entrega</h2>
+
+            {% if enderecos %}
+                <form method="post">
+                    {% csrf_token %}
+                    <fieldset class="option-list">
+                        <legend class="sr-only">Escolha um endereço</legend>
+                        {% for endereco in enderecos %}
+                            <label class="option-card {% if not endereco.faixa %}option-card--off{% endif %}">
+                                <input type="radio" name="endereco" value="{{ endereco.id }}" {% if endereco.id == selecionado %}checked{% endif %} {% if not endereco.faixa %}disabled{% endif %} required>
+                                <span class="option-body">
+                                    <span class="option-title">
+                                        {{ endereco.nome_endereco }}
+                                        {% if endereco.endereco_principal %}<span class="badge badge-plain">Principal</span>{% endif %}
+                                    </span>
+                                    <p>{{ endereco.logradouro }}, {{ endereco.numero }}{% if endereco.complemento %} — {{ endereco.complemento }}{% endif %}</p>
+                                    <p>{{ endereco.bairro }} · {{ endereco.cidade }}/{{ endereco.estado }} · CEP {{ endereco.cep }}</p>
+                                    {% if endereco.faixa %}
+                                        <p class="option-frete">
+                                            Frete <strong>{{ endereco.frete_total|brl }}</strong>
+                                            {% if qtd_vendedores > 1 %}({{ qtd_vendedores }} × {{ endereco.faixa.valor|brl }}){% endif %}
+                                            · até {{ endereco.faixa.prazo_dias }} dias úteis
+                                        </p>
+                                    {% else %}
+                                        <p class="option-frete option-frete--off">Ainda não entregamos em {{ endereco.estado }}.</p>
+                                    {% endif %}
+                                    <span class="option-actions">
+                                        <a href="{% url 'endereco_editar' endereco.id %}?next={% url 'checkout_endereco' %}">Editar</a>
+                                    </span>
+                                </span>
+                            </label>
+                        {% endfor %}
+                    </fieldset>
+
+                    <a href="{% url 'endereco_criar' %}?next={% url 'checkout_endereco' %}" class="btn btn-ghost add-option">+ Adicionar novo endereço</a>
+
+                    <div class="form-actions">
+                        <a href="{% url 'carrinho' %}" class="btn btn-outline">Voltar ao carrinho</a>
+                        <span class="spacer"></span>
+                        <button type="submit" class="btn btn-accent">Continuar para pagamento</button>
+                    </div>
+                </form>
+            {% else %}
+                {% url 'endereco_criar' as url_novo %}
+                {% include "partials/empty_state.html" with icone="pin" titulo="Nenhum endereço cadastrado" texto="Cadastre um endereço de entrega para continuar a compra." link_url=url_novo|add:"?next="|add:request.path link_label="Cadastrar endereço" %}
+            {% endif %}
+        </section>
+
+        <aside>{% include "compra/_resumo_checkout.html" %}</aside>
+    </div>
+</div>
+{% endblock %}

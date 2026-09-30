@@ -1,0 +1,13 @@
+{% extends "emails/base.html" %}
+{% load marketplace_extras %}
+{% block kicker %}Compra realizada{% endblock %}
+{% block conteudo %}
+<p style="margin:0 0 14px; font-size:15px; line-height:1.6;">Obrigado pela compra! {% if pedidos|length > 1 %}Como os produtos são de vendedores diferentes, ela foi dividida em {{ pedidos|length }} pedidos, cada um com seu frete e seu envio.{% else %}Seu pedido foi registrado.{% endif %}</p>
+{% for pedido in pedidos %}
+    {% include "emails/_itens_pedido.html" with mostrar_vendedor=True %}
+{% endfor %}
+{% if pedidos|length > 1 %}<p style="margin:0 0 14px; font-size:16px;"><strong>Total da compra: {{ total|brl }}</strong></p>{% endif %}
+<p style="margin:0 0 14px; font-size:15px; line-height:1.6;"><strong>Entrega:</strong> {{ pedidos.0.endereco_snapshot }}<br><strong>Pagamento:</strong> {{ pedidos.0.forma_pagamento_snapshot }}</p>
+<p style="margin:0 0 14px; font-size:15px; line-height:1.6;">Avisaremos por e-mail a cada atualização, e você recebe o código de rastreio quando o vendedor enviar.</p>
+{% endblock %}
+{% block botao %}Acompanhar pedidos{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static marketplace_extras %}
+
+{% block title %}Compra concluída | Contratempo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/compra.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page page-narrow">
+    <section class="done-ticket">
+        <div class="done-stamp" aria-hidden="true">✓</div>
+        <span class="eyebrow">Já feito!</span>
+        <h1>Compra confirmada.</h1>
+        <p>
+            Obrigado! Enviamos um resumo para <strong>{{ user.email }}</strong>.
+            {% if pedidos|length > 1 %}Como os produtos são de {{ pedidos|length }} vendedores, a compra virou {{ pedidos|length }} pedidos — cada um com envio e rastreio próprios.{% endif %}
+        </p>
+
+        <dl class="key-value done-details">
+            <dt>Data</dt><dd>{{ pedidos.0.data_criacao|date:"d/m/Y \à\s H:i" }}</dd>
+            <dt>Pagamento</dt><dd>{{ pedidos.0.forma_pagamento_snapshot }}</dd>
+            <dt>Entrega</dt><dd>{{ pedidos.0.endereco_snapshot }}</dd>
+        </dl>
+
+        {% for pedido in pedidos %}
+            <div class="done-order">
+                <div class="done-order-head">
+                    <strong class="mono">Pedido #{{ pedido.id }}</strong>
+                    <span class="muted">vendido por {{ pedido.vendedor.nome_completo }}</span>
+                    <span class="badge badge--{{ pedido.status_pedido }}">{{ pedido.get_status_pedido_display }}</span>
+                </div>
+                <ul class="review-items">
+                    {% for item in pedido.itens.all %}
+                        <li>
+                            <div class="review-item-info">
+                                <strong>{{ item.nome_produto }}</strong>
+                                <small class="mono">{{ item.quantidade }} × {{ item.preco_unitario|brl }}</small>
+                            </div>
+                            <strong class="mono">{{ item.subtotal|brl }}</strong>
+                        </li>
+                    {% endfor %}
+                    <li>
+                        <div class="review-item-info"><small>Frete · até {{ pedido.prazo_entrega_dias }} dias úteis após o envio</small></div>
+                        <strong class="mono">{{ pedido.valor_frete|brl }}</strong>
+                    </li>
+                </ul>
+                <a href="{% url 'pedido_detalhe' pedido.id %}" class="link-button">Acompanhar pedido #{{ pedido.id }}</a>
+            </div>
+        {% endfor %}
+
+        <div class="summary-row total done-total"><span>Total</span><strong>{{ total|brl }}</strong></div>
+
+        <div class="form-actions">
+            <a href="{% url 'pedidos' %}" class="btn btn-accent">Meus pedidos</a>
+            <a href="{% url 'produtos' %}" class="btn btn-ghost">Continuar comprando</a>
+        </div>
+    </section>
+</div>
+{% endblock %}

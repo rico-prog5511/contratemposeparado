@@ -1,0 +1,19 @@
+{% extends "conta/_auth_simples.html" %}
+
+{% block title %}Verifique seu e-mail | Contratempo{% endblock %}
+{% block auth_eyebrow %}Recuperar acesso{% endblock %}
+{% block auth_titulo %}Confira seu e-mail{% endblock %}
+
+{% block auth_corpo %}
+{% comment %}A mensagem é igual existindo ou não a conta, para não revelar quais e-mails estão cadastrados.{% endcomment %}
+<p>Se houver uma conta ativa com o e-mail informado, você vai receber em instantes um link para criar uma senha nova.</p>
+<ul class="auth-checklist">
+    <li>O link vale por 3 dias e só funciona uma vez.</li>
+    <li>Não chegou? Confira o spam e a aba Promoções.</li>
+    <li>Contas desativadas não recebem o link. Fale com a gente pela <a href="{% url 'contato' %}">página de contato</a>.</li>
+</ul>
+<div class="auth-card-actions">
+    <a href="{% url 'password_reset' %}" class="btn btn-outline">Tentar outro e-mail</a>
+    <a href="{% url 'login' %}" class="btn btn-accent">Voltar para o login</a>
+</div>
+{% endblock %}

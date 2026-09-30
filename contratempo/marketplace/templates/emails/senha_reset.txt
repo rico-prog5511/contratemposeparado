@@ -1,0 +1,9 @@
+Olá, {{ user.nome_completo }}!
+
+Recebemos um pedido para criar uma nova senha para a conta {{ user.email }}.
+
+Abra o link abaixo para escolher a nova senha (vale por 3 dias e só funciona uma vez):
+{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
+
+Se não foi você, ignore este e-mail: sua senha atual continua valendo.
+A Contratempo nunca pede sua senha por e-mail.

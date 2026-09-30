@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static marketplace_extras %}
+
+{% block title %}{{ vendedor.nome_completo }} — Vendedor | Contratempo{% endblock %}
+{% block meta_description %}Anúncios e avaliações de {{ vendedor.nome_completo }} na Contratempo.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/produto.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container page">
+
+    {% if eh_voce %}
+        <div class="alert alert-info" style="margin-bottom: 20px;">
+            <div class="alert-text"><p>Este é o seu perfil público, do jeito que os compradores veem. <a href="{% url 'editar_perfil' %}" class="link-button">Trocar foto ou nome</a></p></div>
+        </div>
+    {% endif %}
+
+    <!-- CABEÇALHO -->
+    <section class="seller-card seller-hero">
+        <div class="seller-id">
+            <span class="avatar avatar-lg">
+                {% if vendedor.avatar %}<img src="{{ vendedor.avatar }}" alt="">{% else %}{{ vendedor.nome_completo|first|upper }}{% endif %}
+            </span>
+            <div>
+                <span class="eyebrow">Vendedor</span>
+                <h1>{{ vendedor.nome_completo }}</h1>
+                <p class="mb-0">Na Contratempo desde {{ vendedor.data_cadastro|date:"F \d\e Y" }}</p>
+            </div>
+        </div>
+        <dl class="seller-stats seller-stats-4">
+            <div>
+                <dt>Nota</dt>
+                <dd>{% if resumo.media %}{{ resumo.media|floatformat:1 }} <span class="stars">★</span>{% else %}—{% endif %}</dd>
+                <small>{{ resumo.total_avaliacoes }} avaliaç{{ resumo.total_avaliacoes|pluralize:"ão,ões" }}</small>
+            </div>
+            <div>
+                <dt>Vendas</dt>
+                <dd>{{ resumo.vendas }}</dd>
+                <small>unidade{{ resumo.vendas|pluralize }}</small>
+            </div>
+            <div>
+                <dt>Anúncios</dt>
+                <dd>{{ resumo.anuncios_ativos }}</dd>
+                <small>ativo{{ resumo.anuncios_ativos|pluralize }}</small>
+            </div>
+            <div>
+                <dt>Respostas</dt>
+                <dd>{% if taxa_resposta is not None %}{{ taxa_resposta }}%{% else %}—{% endif %}</dd>
+                <small>das perguntas</small>
+            </div>
+        </dl>
+    </section>
+
+    <div class="seller-profile-layout">
+        <!-- AVALIAÇÕES -->
+        <aside class="seller-reviews" aria-label="Avaliações recebidas">
+            <section class="panel">
+                <h2 class="panel-title">Reputação</h2>
+                {% if resumo.total_avaliacoes %}
+                    <p class="rating-big"><strong>{{ resumo.media|floatformat:1 }}</strong> / 5</p>
+                    <ul class="rating-bars">
+                        {% for faixa in distribuicao %}
+                            <li>
+                                <span class="rating-bars-label">{{ faixa.nota }} ★</span>
+                                <span class="rating-bars-track" aria-hidden="true"><span style="width: {{ faixa.percentual }}%"></span></span>
+                                <span class="rating-bars-total">{{ faixa.total }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="mb-0">Ainda sem avaliações. Elas aparecem quando os compradores confirmam o recebimento.</p>
+                {% endif %}
+            </section>
+
+            {% if avaliacoes %}
+                <section class="panel">
+                    <h2 class="panel-title">Últimas avaliações</h2>
+                    <ul class="seller-review-list">
+                        {% for avaliacao in avaliacoes %}
+                            <li>
+                                <div class="avaliacao-topo">
+                                    <span class="stars" aria-label="{{ avaliacao.nota }} de 5 estrelas">{% for _ in avaliacao.nota|to_range %}★{% endfor %}</span>
+                                    <span class="avaliacao-data">{{ avaliacao.data_avaliacao|date:"d/m/Y" }}</span>
+                                </div>
+                                {% if avaliacao.comentario %}<p>“{{ avaliacao.comentario }}”</p>{% endif %}
+                                <small>{{ avaliacao.usuario.nome_completo }} · <a href="{% url 'produto_detalhe' avaliacao.produto_id %}">{{ avaliacao.produto.nome }}</a></small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endif %}
+        </aside>
+
+        <!-- ANÚNCIOS -->
+        <section aria-label="Anúncios do vendedor">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">À venda</span>
+                    <h2>Anúncios de {{ vendedor.nome_completo.split.0 }}</h2>
+                </div>
+            </div>
+            {% if categorias_vendedor %}
+                <div class="seller-categories">
+                    {% for categoria in categorias_vendedor %}
+                        <span class="badge badge-plain">{{ categoria.nome }} · {{ categoria.total }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="product-grid seller-grid">
+                {% for produto in anuncios %}
+                    {% include "partials/product_card.html" %}
+                {% empty %}
+                    {% url 'produtos' as url_produtos %}
+                    {% include "partials/empty_state.html" with titulo="Nenhum anúncio ativo" texto="Este vendedor não tem produtos à venda no momento." link_url=url_produtos link_label="Explorar produtos" %}
+                {% endfor %}
+            </div>
+            {% include "partials/pagination.html" %}
+        </section>
+    </div>
+</div>
+{% endblock %}

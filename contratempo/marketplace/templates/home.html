@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contratempo — Colecionáveis, retrô e cultura geek{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="home-hero">
+    <div class="container home-hero-inner">
+        <div class="home-hero-text">
+            <span class="about-kicker">Marketplace de colecionáveis</span>
+            <h1>Colecionáveis que <em>atravessam o tempo.</em></h1>
+            <p>Action figures, cartas raras, HQs, vinis e peças vintage — compre de outros colecionadores ou anuncie o que está parado na sua estante.</p>
+            <div class="cluster">
+                <a href="{% url 'produtos' %}" class="btn btn-accent btn-lg">Explorar produtos</a>
+                <a href="{% url 'anuncio_criar' %}" class="btn btn-light btn-lg">Vender um item</a>
+            </div>
+        </div>
+
+        <div class="home-hero-ticket" aria-hidden="true">
+            <div class="ticket">
+                <span class="ticket-top">ADMIT ONE · Nº 0001</span>
+                <strong>CONTRA<em>TEMPO</em></strong>
+                <span class="ticket-line">ESTILO · MEMÓRIA · PRESENTE</span>
+                <span class="ticket-stamp">desde<br>sempre</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- VANTAGENS -->
+<section class="home-strip" aria-label="Como funciona">
+    <div class="container home-strip-inner">
+        <div><span class="mono">01</span> Anuncie grátis em minutos</div>
+        <div><span class="mono">02</span> Pagamento por cartão, PIX ou boleto</div>
+        <div><span class="mono">03</span> Acompanhe cada pedido pela sua conta</div>
+    </div>
+</section>
+
+<!-- CATEGORIAS -->
+{% if categorias %}
+<section class="container section">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Explore</span>
+            <h2>Mais colecionáveis</h2>
+        </div>
+        <a href="{% url 'categorias' %}" class="link-arrow">Todas as categorias →</a>
+    </div>
+    <div class="home-categories">
+        {% for categoria in categorias|slice:":8" %}
+            <a href="{% url 'produtos' %}?categoria={{ categoria.slug }}" class="home-category-pill">
+                <span class="home-category-index mono">{{ forloop.counter|stringformat:"02d" }}</span>
+                <strong>{{ categoria.nome }}</strong>
+                <span class="home-category-count">{{ categoria.total_produtos }} anúncio{{ categoria.total_produtos|pluralize }}</span>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- MAIS VENDIDOS -->
+<section class="container section">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Destaques</span>
+            <h2>Mais vendidos</h2>
+        </div>
+        <a href="{% url 'produtos' %}" class="link-arrow">Ver todos →</a>
+    </div>
+    <div class="product-grid">
+        {% for produto in produtos_destaque %}
+            {% include "partials/product_card.html" %}
+        {% empty %}
+            {% url 'anuncio_criar' as url_anunciar %}
+            {% include "partials/empty_state.html" with titulo="Nenhum produto por aqui ainda" texto="Seja a primeira pessoa a anunciar um colecionável na Contratempo." link_url=url_anunciar link_label="Criar anúncio" %}
+        {% endfor %}
+    </div>
+</section>
+
+<!-- CHEGOU AGORA -->
+{% if produtos_recentes %}
+<section class="container section">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Novidades</span>
+            <h2>Chegou agora</h2>
+        </div>
+        <a href="{% url 'produtos' %}?ordenar=recentes" class="link-arrow">Ver todos →</a>
+    </div>
+    <div class="product-grid">
+        {% for produto in produtos_recentes %}
+            {% include "partials/product_card.html" %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- VENDER -->
+<section class="container section">
+    <div class="home-sell">
+        <div>
+            <span class="eyebrow">Para colecionadores</span>
+            <h2>Aquela peça parada na estante <em>merece um novo dono.</em></h2>
+            <p>Crie seu anúncio com fotos, preço e estoque, e acompanhe tudo pela área de anúncios.</p>
+        </div>
+        <a href="{% url 'anuncio_criar' %}" class="btn btn-accent btn-lg">Criar anúncio</a>
+    </div>
+</section>
+
+{% endblock %}

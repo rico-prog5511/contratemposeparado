@@ -1,0 +1,32 @@
+{% comment %}
+Renderiza um campo de formulário Django no padrão visual do site.
+Uso:
+    {% include "partials/form_field.html" with field=form.email %}
+    {% include "partials/form_field.html" with field=form.senha senha=True %}
+    {% include "partials/form_field.html" with field=form.tipo classe="radio-pills" %}
+Checkbox (BooleanField) é detectado automaticamente.
+{% endcomment %}
+<div class="form-group {{ classe|default:'' }}{% if field.errors %} has-error{% endif %}">
+    {% if field.widget_type == "checkbox" %}
+        <label class="check" for="{{ field.id_for_label }}">
+            {{ field }}
+            <span>{{ field.label }}</span>
+        </label>
+    {% else %}
+        {% if field.widget_type == "radioselect" %}
+            <span class="form-label">{{ field.label }}{% if field.field.required %} <span class="required-mark" aria-hidden="true">*</span>{% endif %}</span>
+        {% else %}
+            <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="required-mark" aria-hidden="true">*</span>{% endif %}</label>
+        {% endif %}
+        {% if senha %}
+            <div class="password-wrap">
+                {{ field }}
+                <button type="button" class="password-toggle" data-password-toggle aria-label="Mostrar senha">Mostrar</button>
+            </div>
+        {% else %}
+            {{ field }}
+        {% endif %}
+    {% endif %}
+    {% if field.help_text %}<div class="form-help">{{ field.help_text|safe }}</div>{% endif %}
+    {% if field.errors %}{{ field.errors }}{% endif %}
+</div>

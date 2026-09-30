@@ -1,0 +1,8 @@
+{% extends "emails/base.html" %}
+{% block kicker %}Área do vendedor{% endblock %}
+{% block conteudo %}
+<p style="margin:0 0 14px; font-size:15px; line-height:1.6;">Alguém tem uma dúvida sobre o anúncio <strong>{{ pergunta.produto.nome }}</strong>:</p>
+<p style="margin:0 0 18px; padding:14px 16px; background:#FFFFFF; border-left:4px solid #313170; font-size:15px; line-height:1.6;">“{{ pergunta.pergunta }}”</p>
+<p style="margin:0 0 14px; font-size:15px; line-height:1.6;">Responder rápido ajuda a vender. A resposta fica pública no anúncio.</p>
+{% endblock %}
+{% block botao %}Responder{% endblock %}

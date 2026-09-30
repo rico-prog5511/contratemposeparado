@@ -1,0 +1,9 @@
+{% extends "emails/base.html" %}
+{% block kicker %}Área do vendedor{% endblock %}
+{% block conteudo %}
+<p style="margin:0 0 14px; font-size:15px; line-height:1.6;">Você vendeu! <strong>{{ pedido.usuario.nome_completo }}</strong> comprou os itens abaixo.</p>
+{% include "emails/_itens_pedido.html" %}
+<p style="margin:0 0 14px; font-size:15px; line-height:1.6;"><strong>Entregar em:</strong> {{ pedido.endereco_snapshot }}</p>
+<p style="margin:0 0 14px; font-size:15px; line-height:1.6;">Próximos passos em Minhas vendas: confirme o pagamento, prepare o pacote e informe o código de rastreio ao enviar.</p>
+{% endblock %}
+{% block botao %}Ver venda{% endblock %}

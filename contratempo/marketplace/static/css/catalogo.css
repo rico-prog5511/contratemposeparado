@@ -1,0 +1,153 @@
+/* static/css/catalogo.css — catálogo, busca e categorias */
+
+.catalog-count { margin: 0; font-size: 0.8rem; color: var(--ink-muted); }
+
+/* Pílulas de categoria */
+.catalog-categories {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    margin-bottom: 24px;
+    scrollbar-width: thin;
+}
+.chip {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border: 1.5px solid var(--ink);
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ink);
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.chip:hover { background: var(--paper-2); }
+.chip.active { background: var(--cor-header); border-color: var(--cor-header); color: #fff; }
+
+/* Layout */
+.catalog-layout {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+}
+
+/* Filtros */
+.catalog-filters { position: sticky; top: calc(var(--header-height) + 20px); }
+.filters-panel {
+    background: var(--paper);
+    border: var(--borda);
+    border-radius: var(--radius);
+}
+.filters-panel summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 18px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--cor-header);
+    color: #fff;
+    list-style: none;
+    cursor: pointer;
+}
+.filters-panel summary::-webkit-details-marker { display: none; }
+.filters-panel summary .tab-count {
+    padding: 1px 7px;
+    border-radius: var(--radius-pill);
+    background: var(--cor-acento);
+    font-size: 0.66rem;
+}
+.filters-form { padding: 6px 18px 18px; }
+.filter-group {
+    border: 0;
+    margin: 0;
+    padding: 16px 0;
+    border-bottom: 1px dashed var(--line);
+}
+.filter-group legend {
+    padding: 0;
+    margin-bottom: 10px;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+}
+.filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+.filter-options .check { font-size: 0.88rem; }
+.price-range {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 6px;
+}
+.price-range .input { min-height: 38px; padding: 6px 8px; font-size: 0.85rem; }
+.filters-actions { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
+
+/* Barra de ordenação */
+.catalog-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+.catalog-toolbar .input { width: auto; min-width: 180px; min-height: 40px; padding: 6px 10px; }
+
+.catalog-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+/* Categorias */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 18px;
+}
+.category-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 180px;
+    padding: 22px;
+    background: var(--paper);
+    border: var(--borda);
+    border-radius: var(--radius);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.category-card:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-card); }
+.category-card:nth-child(3n + 2):hover { box-shadow: var(--shadow-hover); }
+.category-card-index { font-size: 0.75rem; font-weight: 700; color: var(--cor-destaque); }
+.category-card h2 { font-size: 1.45rem; margin: 8px 0 0; }
+.category-card p { font-size: 0.88rem; margin: 0; }
+.category-card-count {
+    margin-top: auto;
+    padding-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--cor-header);
+}
+
+@media (max-width: 1100px) {
+    .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 860px) {
+    .catalog-layout { grid-template-columns: minmax(0, 1fr); }
+    .catalog-filters { position: static; }
+    .catalog-toolbar { justify-content: space-between; }
+}
+
+@media (max-width: 640px) {
+    .catalog-toolbar .input { flex: 1; min-width: 0; }
+}

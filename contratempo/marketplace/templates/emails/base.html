@@ -1,0 +1,43 @@
+{% comment %}
+Layout de todos os e-mails. Clientes de e-mail (Gmail, Outlook) ignoram
+<style> e CSS moderno, por isso tudo é tabela + estilo inline, usando
+as cores oficiais do Contratempo.
+{% endcomment %}<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0; padding:0; background:#ACA9BB; font-family: Arial, Helvetica, sans-serif; color:#1B1A33;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ACA9BB; padding:32px 12px;">
+<tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px; background:#F4F2F7; border:2px solid #1B1A33;">
+    <tr>
+        <td style="background:#313170; padding:22px 28px; border-bottom:3px solid #6D191D;">
+            <a href="{{ site_url }}" style="font-family: Georgia, 'Times New Roman', serif; font-size:22px; font-weight:bold; letter-spacing:1px; color:#FFFFFF; text-decoration:none;">CONTRA<span style="color:#ACA9BB; font-style:italic; font-weight:normal;">TEMPO</span></a>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding:32px 28px 12px;">
+            <p style="margin:0 0 6px; font-family:'Courier New', monospace; font-size:11px; font-weight:bold; letter-spacing:2px; text-transform:uppercase; color:#6D191D;">{% block kicker %}Contratempo{% endblock %}</p>
+            <h1 style="margin:0 0 18px; font-family: Georgia, 'Times New Roman', serif; font-size:26px; line-height:1.2; color:#1B1A33;">{{ assunto }}</h1>
+            <p style="margin:0 0 14px; font-size:15px; line-height:1.6;">Olá, {% firstof usuario.nome_completo user.nome_completo "colecionador(a)" %}!</p>
+            {% block conteudo %}{% endblock %}
+        </td>
+    </tr>
+    {% if link %}
+    <tr>
+        <td style="padding:8px 28px 30px;">
+            <a href="{{ link }}" style="display:inline-block; background:#6D191D; color:#FFFFFF; border:2px solid #1B1A33; padding:13px 24px; font-family:'Courier New', monospace; font-size:13px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; text-decoration:none;">{% block botao %}Abrir no site{% endblock %}</a>
+            <p style="margin:18px 0 0; font-size:12px; line-height:1.5; color:#545166;">Se o botão não funcionar, copie e cole este endereço no navegador:<br><a href="{{ link }}" style="color:#313170; word-break:break-all;">{{ link }}</a></p>
+        </td>
+    </tr>
+    {% endif %}
+    <tr>
+        <td style="padding:18px 28px; background:#E8E6EE; border-top:1px dashed #787586; font-size:12px; line-height:1.5; color:#545166;">
+            {% block rodape %}Este é um e-mail automático, não responda. Dúvidas? Veja as <a href="{{ site_url }}{% url 'faq' %}" style="color:#313170;">perguntas frequentes</a> ou fale com a gente pela <a href="{{ site_url }}{% url 'contato' %}" style="color:#313170;">página de contato</a>.{% endblock %}
+            <br>A Contratempo nunca pede sua senha por e-mail.
+        </td>
+    </tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>
