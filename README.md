@@ -212,4 +212,4 @@ Rode dentro da pasta `contratempo`, com a venv ativa.
 ## Publicar na internet
 
 Veja o **[DEPLOY.md](DEPLOY.md)**, com o passo a passo para o
-PythonAnywhere (plano gratuito, com MySQL).
+PythonAnywhere (plano gratuito com SQLite, ou MySQL no plano pago).

@@ -7,6 +7,7 @@ __pycache__/
 # Dados reais exportados (e-mails, endereços, pedidos) — leve pelo pen
 # drive ou pela aba Files do PythonAnywhere, nunca pelo GitHub.
 banco/dados.json
+enviar_pythonanywhere.zip
 
 # Configurações locais do editor / Claude Code
 .claude/

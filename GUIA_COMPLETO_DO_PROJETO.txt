@@ -1,0 +1,1110 @@
+================================================================================
+                      CONTRATEMPO — GUIA COMPLETO DO PROJETO
+================================================================================
+
+Este guia explica o projeto inteiro: o que ele faz, como o Django
+funciona, cada arquivo, cada tabela do banco de dados, cada página, cada
+fluxo (cadastro, compra, venda...) e como instalar e publicar.
+
+Dica: no Bloco de Notas, use Ctrl+F para buscar um assunto, por exemplo
+"PEDIDOS" ou "/carrinho/".
+
+ÍNDICE
+   1. O que é o Contratempo
+   2. Tecnologias usadas
+   3. Como o Django funciona (o caminho de uma página)
+   4. Estrutura de pastas e arquivos
+   5. Configuração (.env e settings.py)
+   6. Banco de dados (todas as tabelas)
+   7. Tipos de usuário
+   8. Todas as páginas do site
+   9. Fluxos passo a passo
+  10. Regras de negócio
+  11. Frete
+  12. Busca
+  13. E-mails automáticos
+  14. Visual (CSS) e interatividade (JavaScript)
+  15. Painel administrativo (/admin/)
+  16. Segurança
+  17. Instalação, scripts e comandos
+  18. Publicação na internet (PythonAnywhere)
+  19. Limitações conhecidas e próximos passos
+  20. Glossário
+  21. Perguntas que podem aparecer na apresentação
+
+
+================================================================================
+1. O QUE É O CONTRATEMPO
+================================================================================
+
+Um MARKETPLACE de colecionáveis: action figures, cartas, HQs, vinis,
+videogames, itens retrô e de cultura geek.
+
+"Marketplace" quer dizer que a loja não vende nada sozinha: ela conecta
+pessoas. Qualquer usuário cadastrado pode:
+  - COMPRAR de outros usuários (carrinho, checkout, frete, pedidos);
+  - VENDER os próprios itens (anúncios com fotos, estoque, vendas).
+
+Uma mesma conta compra e vende; não existem "tipos" separados de conta.
+
+A equipe do site (administradores) cuida do catálogo (categorias e
+franquias), do frete, das perguntas frequentes, das mensagens de contato e
+das denúncias, pelo painel /admin/.
+
+
+================================================================================
+2. TECNOLOGIAS USADAS
+================================================================================
+
+  Python 3.10+ ......... linguagem do servidor
+  Django 5.2 ........... framework web (páginas, banco, login, admin)
+  MySQL 8 .............. banco de dados principal (no computador)
+  SQLite ............... alternativa sem servidor (pen drive e PythonAnywhere
+                         grátis); o projeto funciona igual com os dois
+  mysqlclient .......... "driver" que liga o Django ao MySQL
+  Pillow ............... leitura e validação de imagens enviadas
+  HTML + Django Templates  as páginas
+  CSS puro ............. visual (sem Bootstrap), arquivos em static/css
+  JavaScript puro ...... interatividade (sem jQuery), arquivos em static/js
+  Google Fonts ......... fontes Fraunces (títulos), Work Sans (texto) e
+                         Space Mono (preços e rótulos)
+  ViaCEP ............... serviço gratuito que preenche o endereço pelo CEP
+  Gmail (SMTP) ......... envio dos e-mails
+  GitHub ............... guarda o código (repositório)
+  PythonAnywhere ....... hospedagem do site publicado
+
+Versões exatas dos pacotes: arquivo requirements.txt
+(Django 5.2.17, mysqlclient 2.3.0, pillow 12.3.0).
+
+
+================================================================================
+3. COMO O DJANGO FUNCIONA (O CAMINHO DE UMA PÁGINA)
+================================================================================
+
+Django segue o padrão MVT (Model – View – Template). Quando alguém abre,
+por exemplo, http://127.0.0.1:8000/produtos/4/ acontece isto:
+
+  1. NAVEGADOR pede o endereço /produtos/4/ ao servidor.
+
+  2. MIDDLEWARES (filtros que rodam em toda requisição): leem o cookie de
+     sessão para saber quem está logado (request.user), protegem contra
+     CSRF, preparam as mensagens de aviso etc.
+
+  3. URLS (marketplace/urls.py): a lista de endereços. O Django acha a
+     linha  path("produtos/<int:produto_id>/", views.produto_detalhe)
+     e chama a função produto_detalhe com produto_id=4.
+
+  4. VIEW (marketplace/views.py): a função que contém a lógica. Ela pede ao
+     banco o produto 4, as fotos, as avaliações, as perguntas, calcula o
+     frete etc.
+
+  5. MODEL (marketplace/models.py): cada classe representa uma tabela. A
+     view escreve  Produto.objects.get(pk=4)  e o Django gera o SQL
+     (SELECT ... FROM produtos WHERE id = 4) sozinho. Isso é o ORM.
+
+  6. TEMPLATE (templates/produto.html): HTML com "buracos" que o Django
+     preenche:  {{ produto.nome }},  {% for imagem in imagens %} ... etc.
+     Todos os templates "estendem" o base.html (cabeçalho, rodapé,
+     mensagens), então cada página só escreve o próprio miolo.
+
+  7. CONTEXT PROCESSORS (marketplace/context_processors.py): dados que
+     TODAS as páginas recebem automaticamente — as categorias do menu e o
+     número de itens do carrinho (a bolinha no ícone).
+
+  8. RESPOSTA: o HTML pronto volta ao navegador, que baixa o CSS, o
+     JavaScript e as imagens (arquivos "estáticos" e "media").
+
+Outros conceitos que aparecem no projeto:
+
+  - SESSÃO: o Django guarda no banco (tabela django_session) quem está
+    logado e as escolhas do checkout. O navegador só guarda um cookie com
+    um código (sessionid).
+  - MESSAGES: os avisos coloridos no topo ("Anúncio publicado", "Senha
+    incorreta"...). A view registra a mensagem e a próxima página exibe.
+  - FORMS (forms.py): classes que desenham os campos e VALIDAM o que o
+    usuário digitou (CEP com 8 dígitos, senha forte, preço > 0...).
+  - POST x GET: GET só lê (abrir página). POST altera dados (salvar,
+    excluir, comprar). Toda ação que altera dados neste projeto é POST.
+  - @login_required: "etiqueta" colocada nas views que exigem login; quem
+    não está logado é levado à página de login e volta depois (?next=).
+  - MIGRATIONS: arquivos que descrevem mudanças no banco. O comando
+    "python manage.py migrate" aplica o que falta.
+
+
+================================================================================
+4. ESTRUTURA DE PASTAS E ARQUIVOS
+================================================================================
+
+contratemposeparado/                  (raiz do projeto / repositório)
+│
+├── instalar.bat / instalar.ps1       instalação automática numa máquina nova
+├── rodar.bat                         aplica migrations e liga o site
+├── requirements.txt                  pacotes Python necessários
+├── .env                              senhas DESTA máquina (não vai pro GitHub)
+├── .env.exemplo                      modelo do .env, comentado
+├── .gitignore                        o que o Git deve ignorar
+├── README.md                         apresentação do projeto (GitHub)
+├── DEPLOY.md                         passo a passo do PythonAnywhere
+├── GUIA_COMPLETO_DO_PROJETO.txt      este arquivo
+│
+├── banco/
+│   ├── contratempo_db.sql            cria o banco MySQL completo do zero
+│   ├── atualizacao_v2.sql            atualiza um banco da versão 1 para a 2
+│   ├── atualizacao_v3.sql            atualiza da versão 2 para a 3 (denúncias)
+│   ├── criar_banco.py                usado pelo instalar.bat
+│   └── dados.json                    seus dados exportados (não vai pro GitHub)
+│
+├── venv/                             ambiente virtual Python (não vai pro GitHub)
+│
+└── contratempo/                      o projeto Django
+    ├── manage.py                     "controle remoto" do Django (comandos)
+    ├── media/                        fotos enviadas pelos usuários
+    ├── staticfiles/                  CSS/JS reunidos para produção (collectstatic)
+    │
+    ├── contratempo/                  configuração do projeto
+    │   ├── settings.py               configurações (banco, e-mail, segurança...)
+    │   ├── urls.py                   URLs principais: /admin/ + as do app
+    │   └── wsgi.py / asgi.py         ponto de entrada para o servidor web
+    │
+    └── marketplace/                  o APP (todo o sistema está aqui)
+        ├── models.py                 as tabelas (seção 6)
+        ├── urls.py                   todas as URLs do site (seção 8)
+        ├── views.py                  vitrine: home, catálogo, busca, produto,
+        │                             perfil do vendedor, carrinho, FAQ,
+        │                             contato, perguntas, denúncias
+        ├── views_conta.py            login, cadastro, confirmação de e-mail,
+        │                             recuperação de senha, perfil, endereços,
+        │                             formas de pagamento
+        ├── views_checkout.py         checkout em 3 etapas e "Meus pedidos"
+        ├── views_anuncios.py         anúncios e estoque do vendedor
+        ├── views_vendas.py           "Minhas vendas" e perguntas recebidas
+        ├── views_errors.py           páginas de erro 403, 404 e 500
+        ├── forms.py                  formulários e validações
+        ├── admin.py                  configuração do painel /admin/
+        ├── busca.py                  busca sem acentos
+        ├── frete.py                  cálculo do frete
+        ├── emails.py                 envio de todos os e-mails
+        ├── context_processors.py     dados globais (menu, carrinho)
+        ├── apps.py                   inicialização do app (busca no SQLite)
+        ├── templatetags/
+        │   └── marketplace_extras.py filtros: |brl (R$ 1.234,56),
+        │                             |imagem_principal, |to_range, url_replace
+        ├── management/commands/
+        │   └── testar_email.py       comando "python manage.py testar_email"
+        ├── migrations/               0001 a 0004 (histórico do banco)
+        ├── templates/                as páginas HTML (lista na seção 8)
+        │   ├── base.html             esqueleto comum a todas as páginas
+        │   ├── partials/             pedaços reutilizáveis: header, footer,
+        │   │                         card de produto, paginação, campo de
+        │   │                         formulário, menu da conta, etapas do
+        │   │                         checkout, janela de confirmação...
+        │   ├── emails/               modelos dos e-mails
+        │   ├── produtos/  compra/  pedidos/  conta/  anuncios/  vendas/
+        │   └── home.html, produto.html, vendedor.html, faq.html,
+        │       contato.html, sobre_nos.html, privacidade.html, 403/404/500
+        └── static/
+            ├── css/                  styles-retro.css (global) + um por área
+            ├── js/                   main.js (global) + produto, catálogo, upload
+            └── img/                  produto-sem-imagem.svg
+
+
+================================================================================
+5. CONFIGURAÇÃO (.env E settings.py)
+================================================================================
+
+O settings.py NÃO tem senhas escritas. Ele lê o arquivo .env (na raiz do
+projeto), que cada máquina tem o seu.
+
+Variáveis do .env:
+
+  DJANGO_DEBUG ........... 1 = desenvolvimento (seu computador)
+                           0 = produção (site publicado)
+  DJANGO_ALLOWED_HOSTS ... domínio do site publicado
+                           (ex.: enaldo.pythonanywhere.com)
+  DJANGO_SECRET_KEY ...... chave secreta usada para assinar cookies e
+                           links; obrigatória em produção
+  DB_ENGINE .............. mysql  ou  sqlite
+  DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+                           dados de conexão do MySQL
+  EMAIL_HOST_USER ........ conta Gmail que envia os e-mails
+  EMAIL_HOST_PASSWORD .... SENHA DE APP do Gmail (16 letras), não a senha
+                           normal. Vazio = e-mails aparecem no terminal.
+
+Diferenças entre os modos:
+
+  DESENVOLVIMENTO (DEBUG=1)            PRODUÇÃO (DEBUG=0)
+  - erros mostram a tela técnica       - erros mostram as páginas 404/500
+    amarela do Django                    bonitas do site
+  - o próprio Django serve CSS e fotos - o servidor web serve /static/ e
+                                         /media/ (configurado no PythonAnywhere)
+  - aceita só localhost                - aceita só o domínio configurado
+                                       - cookies só por HTTPS
+                                       - não inicia sem DJANGO_SECRET_KEY
+
+Outras configurações importantes no settings.py:
+  - AUTH_USER_MODEL = "marketplace.Usuario"  (usuário personalizado, login
+    por e-mail)
+  - LANGUAGE_CODE "pt-br" e fuso "America/Sao_Paulo"
+  - MEDIA_ROOT = contratempo/media (onde as fotos são gravadas)
+  - PASSWORD_RESET_TIMEOUT = 3 dias (validade dos links por e-mail)
+  - LOGGING: mostra no terminal os erros de envio de e-mail
+
+
+================================================================================
+6. BANCO DE DADOS (TODAS AS TABELAS)
+================================================================================
+
+São 26 tabelas: 17 do marketplace + 9 internas do Django.
+(O script MySQL ainda cria 2 "views" SQL de consulta: vw_produtos_ativos e
+vw_pedidos_resumo.)
+
+Cada classe em models.py = uma tabela. Nome da classe -> nome da tabela
+(definido em  class Meta: db_table = "...").
+
+--------------------------------------------------------------------------------
+6.1  USUÁRIOS E DADOS PESSOAIS
+--------------------------------------------------------------------------------
+
+[usuarios]  — model Usuario
+  Substitui o usuário padrão do Django. O LOGIN É PELO E-MAIL.
+  id ................. número do usuário
+  nome_completo ...... nome
+  email .............. único; sempre gravado em minúsculas
+  senha .............. HASH da senha (nunca a senha em texto). No Python o
+                       campo se chama "password" (exigência do Django) e é
+                       ligado à coluna "senha" por db_column.
+                       Formato: pbkdf2_sha256$iterações$sal$hash
+  data_nascimento, telefone ... opcionais
+  avatar ............. endereço da foto de perfil (/media/avatares/...)
+  data_cadastro, data_atualizacao ... preenchidas automaticamente
+  status_conta ....... ativo / inativo / suspenso (regra de negócio; conta
+                       suspensa não entra)
+  is_active .......... se pode fazer login (desativar conta = False)
+  is_staff ........... pode entrar no /admin/
+  is_superuser ....... tem todas as permissões
+  email_confirmado ... conta nova criada pelo site começa em False até
+                       clicar no link do e-mail
+  last_login ......... último login (preenchido pelo Django)
+
+  Desativar conta é um "soft delete": o usuário nunca é apagado de verdade,
+  para não perder o histórico de pedidos e vendas.
+
+[enderecos]  — model Endereco
+  Vários por usuário. nome_endereco (Casa, Trabalho), cep, logradouro,
+  numero, complemento, bairro, cidade, estado (UF), pais, endereco_principal.
+  Só um é principal por usuário (o código garante).
+  Se o usuário for apagado, os endereços vão junto (CASCADE).
+
+[formas_pagamento]  — model FormaPagamento
+  tipo (crédito, débito, PIX, boleto, outro), apelido, bandeira,
+  ultimos_digitos, principal, token_externo.
+  NUNCA guarda o número completo, validade ou CVV do cartão.
+  token_externo: reservado para quando houver um gateway de pagamento.
+
+--------------------------------------------------------------------------------
+6.2  CATÁLOGO
+--------------------------------------------------------------------------------
+
+[categorias] e [franquias]  — models Categoria e Franquia
+  nome (único), slug (versão para URL: "video-games"), descricao, ativo.
+  Cadastradas pela equipe no /admin/.
+
+[produtos]  — model Produto (= o ANÚNCIO)
+  vendedor_id ....... quem anuncia                    (PROTECT)
+  categoria_id ...... obrigatória                     (PROTECT)
+  franquia_id ....... opcional                        (SET_NULL)
+  nome, descricao, preco (decimal 10,2)
+  quantidade_disponivel ... estoque
+  condicao .......... novo / usado / semi-novo
+  marca, ano, sku (código interno; único, mas pode ficar vazio)
+  status_anuncio .... ativo / pausado / vendido / encerrado
+  data_criacao, data_atualizacao
+
+  Status do anúncio:
+    ativo ...... aparece na loja e pode ser comprado
+    pausado .... escondido temporariamente pelo vendedor
+    vendido .... estoque zerou (o SISTEMA define sozinho)
+    encerrado .. retirado da loja pelo vendedor ou por denúncia procedente
+
+[produto_imagens]  — model ProdutoImagem
+  produto_id, url_imagem (/media/produtos/<id>/<código>.png), principal,
+  ordem_exibicao. Só uma principal por produto (o model garante).
+  Apagar o produto apaga as imagens (CASCADE).
+
+--------------------------------------------------------------------------------
+6.3  CARRINHO
+--------------------------------------------------------------------------------
+
+[carrinhos]  — model Carrinho
+  usuario_id, status (ativo / finalizado / abandonado).
+  O carrinho fica NO BANCO (não no navegador), então aparece em qualquer
+  computador em que a pessoa entrar. Cada usuário tem no máximo UM carrinho
+  ativo — no MySQL isso é garantido por uma coluna calculada
+  (usuario_carrinho_ativo) com índice UNIQUE. Ao comprar, ele vira
+  "finalizado" e um novo é criado na próxima vez.
+
+[itens_carrinho]  — model ItemCarrinho
+  carrinho_id, produto_id, quantidade, preco_unitario.
+  unique_together (carrinho, produto): o mesmo produto não se repete;
+  adicionar de novo soma a quantidade.
+
+--------------------------------------------------------------------------------
+6.4  PEDIDOS
+--------------------------------------------------------------------------------
+
+[pedidos]  — model Pedido
+  usuario_id ............ o COMPRADOR                     (PROTECT)
+  vendedor_id ........... o VENDEDOR daquele pedido       (PROTECT)
+  endereco_id, forma_pagamento_id ... ligação opcional    (SET_NULL)
+  endereco_snapshot ..... CÓPIA em texto do endereço usado
+  forma_pagamento_snapshot  CÓPIA da forma de pagamento usada
+  status_pedido ......... ver tabela abaixo
+  valor_total ........... produtos + frete
+  valor_frete ........... frete deste pedido
+  prazo_entrega_dias .... prazo prometido (dias úteis após o envio)
+  codigo_rastreio, data_envio ... preenchidos quando o vendedor envia
+  data_criacao, data_atualizacao
+
+  Uma compra com produtos de 3 vendedores gera 3 PEDIDOS — cada vendedor
+  envia o seu pacote, cobra o seu frete e atualiza o seu status.
+
+  Status do pedido e quem muda:
+    aguardando_pagamento  -> criado no checkout
+    pagamento_aprovado    -> o VENDEDOR marca
+    processamento         -> o VENDEDOR marca ("em preparação")
+    enviado               -> o VENDEDOR marca, informando o rastreio
+    entregue              -> o COMPRADOR confirma o recebimento
+    cancelado             -> o comprador (só enquanto aguarda pagamento)
+                             ou o vendedor (antes de enviar)
+
+[itens_pedido]  — model ItemPedido
+  pedido_id (PROTECT), produto_id (SET_NULL), nome_produto,
+  preco_unitario, quantidade, subtotal.
+  Nome e preço são COPIADOS no momento da compra: se o vendedor mudar o
+  preço ou apagar o anúncio depois, o pedido antigo não muda.
+
+--------------------------------------------------------------------------------
+6.5  PÓS-VENDA E ATENDIMENTO
+--------------------------------------------------------------------------------
+
+[avaliacoes]  — model Avaliacao
+  usuario_id, produto_id, pedido_id, nota (1 a 5), comentario,
+  status (publicada / oculta / removida — moderação).
+  Uma avaliação por produto por compra (unique_together).
+  Só avalia quem comprou E recebeu (regra no método clean()).
+
+[perguntas_produto]  — model PerguntaProduto
+  produto_id, usuario_id (quem perguntou), pergunta, resposta (vazia =
+  sem resposta), status (publicada / oculta), data_pergunta, data_resposta.
+
+[denuncias]  — model Denuncia
+  produto_id, usuario_id (quem denunciou), motivo (falsificado, proibido,
+  enganoso, golpe, ofensivo, outro), descricao, status (pendente /
+  procedente / improcedente), data_denuncia, data_analise.
+
+[contatos]  — model Contato
+  Mensagens do formulário de contato: nome, email, assunto, mensagem,
+  status (pendente / respondido / arquivado). usuario_id é opcional
+  (visitantes também escrevem).
+
+--------------------------------------------------------------------------------
+6.6  FRETE E AJUDA
+--------------------------------------------------------------------------------
+
+[tabela_frete]  — model TabelaFrete
+  uf (única), regiao, valor, prazo_dias, ativo. Uma linha por estado
+  (27). ativo = False -> "ainda não entregamos nesse estado".
+
+[perguntas_frequentes]  — model PerguntaFrequente
+  tema (conta, compras, entrega, vendas, segurança), pergunta, resposta,
+  ordem, ativo. É o conteúdo da página "Dúvidas frequentes".
+
+--------------------------------------------------------------------------------
+6.7  COMO AS TABELAS SE LIGAM
+--------------------------------------------------------------------------------
+
+  usuarios ─┬─< enderecos
+            ├─< formas_pagamento
+            ├─< produtos >── categorias
+            │      │     >── franquias (opcional)
+            │      ├─< produto_imagens
+            │      ├─< perguntas_produto
+            │      └─< denuncias
+            ├─< carrinhos ─< itens_carrinho >── produtos
+            ├─< pedidos (como comprador) ─< itens_pedido >── produtos
+            ├─< pedidos (como vendedor)
+            ├─< avaliacoes >── produtos, pedidos
+            └─< contatos (opcional)
+
+  ─<  = "um para muitos" (um usuário tem muitos endereços).
+  >── = chave estrangeira (FOREIGN KEY) apontando para outra tabela.
+
+Regras de exclusão (on_delete), e o porquê:
+  PROTECT .. impede apagar se houver dependentes. Usado em tudo que é
+             DINHEIRO e HISTÓRICO: não se apaga usuário com pedidos ou
+             anúncios, nem categoria em uso.
+  CASCADE .. apaga junto. Usado em dados AUXILIARES: endereços do usuário,
+             fotos do produto, itens do carrinho.
+  SET_NULL . só desliga a referência. Usado em ligações OPCIONAIS: franquia
+             do produto, endereço do pedido (o snapshot preserva o texto).
+
+--------------------------------------------------------------------------------
+6.8  AS 9 TABELAS DO DJANGO
+--------------------------------------------------------------------------------
+
+  django_migrations .......... quais migrations já foram aplicadas
+  django_content_type ........ um registro por model (base das permissões)
+  auth_permission ............ permissões (adicionar/alterar/excluir/ver)
+  auth_group ................. grupos (ex.: "Moderadores")
+  auth_group_permissions ..... permissões de cada grupo
+  usuarios_groups ............ grupo de cada usuário
+  usuarios_user_permissions .. permissões individuais
+  django_session ............. sessões de login e escolhas do checkout
+  django_admin_log ........... histórico do que foi feito no /admin/
+
+--------------------------------------------------------------------------------
+6.9  MIGRATIONS (HISTÓRICO DO BANCO)
+--------------------------------------------------------------------------------
+
+  0001_initial ................ as 13 tabelas originais
+  0002_frete_vendas_perguntas . email_confirmado; vendedor, frete e
+                                rastreio no pedido; tabelas tabela_frete,
+                                perguntas_frequentes, perguntas_produto
+  0003_dados_iniciais ......... preenche o frete das 27 UFs e 17 perguntas
+                                frequentes; liga pedidos antigos ao vendedor
+  0004_denuncias .............. tabela denuncias
+
+--------------------------------------------------------------------------------
+6.10  ARQUIVOS DE BANCO (pasta banco/)
+--------------------------------------------------------------------------------
+
+  contratempo_db.sql ... cria o banco MySQL COMPLETO do zero (tabelas,
+                         views, categorias, franquias, frete, FAQ) e marca
+                         as migrations como aplicadas. Não tem dados
+                         pessoais. Uso: mysql -u root -p < banco/contratempo_db.sql
+  atualizacao_v2/v3.sql  atualizam um banco antigo (alternativa ao migrate)
+  dados.json ........... exportação dos SEUS dados (usuários, anúncios,
+                         pedidos...) para levar a outra máquina ou ao
+                         PythonAnywhere. Gerado com "dumpdata" e carregado
+                         com "loaddata" (comandos na seção 17).
+
+
+================================================================================
+7. TIPOS DE USUÁRIO
+================================================================================
+
+  VISITANTE (sem login)
+    Vê a loja: home, catálogo, busca, produtos, perfis de vendedores,
+    categorias, FAQ, contato, sobre, privacidade. Calcula frete.
+    Não compra, não pergunta, não denuncia.
+
+  USUÁRIO LOGADO (comprador e vendedor ao mesmo tempo)
+    Tudo do visitante +
+    Comprar: carrinho, checkout, meus pedidos, avaliar, cancelar.
+    Vender: anúncios, estoque, minhas vendas, responder perguntas.
+    Conta: dados pessoais, foto, senha, endereços, formas de pagamento.
+
+  ADMINISTRADOR (is_staff / is_superuser)
+    Tudo acima + painel /admin/.
+
+
+================================================================================
+8. TODAS AS PÁGINAS DO SITE
+================================================================================
+
+Formato:  URL  —  quem acessa  —  arquivo da view  —  template
+          descrição
+
+--------------------------------------------------------------------------------
+8.1  VITRINE E INSTITUCIONAL
+--------------------------------------------------------------------------------
+
+/  — todos — views.home — home.html
+  Destaque inicial, faixa "como funciona", até 8 categorias com a
+  quantidade de anúncios, "Mais vendidos" (8 produtos ordenados pelas
+  unidades vendidas), "Chegou agora" (4 mais recentes) e chamada para
+  vender.
+
+/produtos/  — todos — views.produtos — produtos/lista.html
+  Catálogo. Filtros na lateral: franquias, condição, preço mínimo e
+  máximo. Categorias em "pílulas" no topo. Ordenação: mais recentes, menor
+  preço, maior preço, nome. 12 produtos por página.
+  Parâmetros da URL: ?q= (busca) ?categoria= ?franquia= ?condicao=
+  ?preco_min= ?preco_max= ?ordenar= ?vendedor= ?page=
+
+/produtos/sugestoes/?q=...  — todos — views.sugestoes_busca — (JSON)
+  Não é uma página: devolve dados (JSON) para a lista de sugestões que
+  aparece enquanto se digita na busca.
+
+/categorias/  — todos — views.categorias — produtos/categorias.html
+  Todas as categorias ativas com a contagem de anúncios.
+
+/produtos/<id>/  — todos — views.produto_detalhe — produto.html
+  A página do produto:
+   - galeria com miniaturas e "Ampliar" (tela cheia; setas, deslizar no
+     celular, Esc fecha);
+   - nome, condição, franquia, nota média, preço, categoria, marca, ano,
+     SKU, descrição;
+   - painel de compra (estilo ingresso): quantidade, "Comprar agora",
+     "Adicionar ao carrinho". Mostra "Seu anúncio" para o dono e
+     "Indisponível/Esgotado" quando não dá para comprar;
+   - calculadora de frete por CEP (usa o CEP do endereço principal se
+     estiver logado);
+   - "Denunciar anúncio";
+   - cartão do vendedor (nota, vendas, anúncios) e "Mais deste vendedor";
+   - perguntas e respostas (o público vê só as respondidas; o autor vê a
+     própria pendente; o vendedor responde ali mesmo);
+   - avaliações; "Você também pode gostar" (mesma categoria).
+
+/produtos/<id>/perguntar/  — logado — views.fazer_pergunta — (POST)
+/produtos/<id>/denunciar/  — logado — views.denunciar_produto — (POST)
+  Ações (não são páginas): recebem o formulário e voltam ao produto.
+
+/vendedores/<id>/  — todos — views.vendedor_perfil — vendedor.html
+  Perfil público: foto, nome, desde quando está no site, nota, vendas,
+  anúncios ativos, taxa de resposta às perguntas, gráfico de barras das
+  notas (5 a 1 estrela), últimas avaliações, categorias que vende e todos
+  os anúncios ativos.
+
+/duvidas-frequentes/  — todos — views.faq — faq.html
+  Perguntas agrupadas por tema, abre e fecha ao clicar, com busca.
+
+/contato/  — todos — views.contato — contato.html
+  Formulário (nome, e-mail, assunto, mensagem). Grava na tabela contatos.
+  Logado: nome e e-mail já vêm preenchidos.
+
+/sobre-nos/  — todos — sobre_nos.html     História e valores da marca.
+/privacidade/ — todos — privacidade.html  Política de privacidade.
+
+403 / 404 / 500  — páginas de erro (403.html, 404.html, 500.html)
+  Só aparecem com DJANGO_DEBUG=0. A 500 não usa o banco (o erro pode ter
+  sido nele).
+
+--------------------------------------------------------------------------------
+8.2  CONTA, LOGIN E SENHA  (views_conta.py, templates/conta/)
+--------------------------------------------------------------------------------
+
+/cadastro/  — visitante — cadastro.html
+  Nome, e-mail, senha, confirmar senha, aceite da política. Após enviar,
+  mostra "Confirme seu e-mail" (verifique_email.html).
+
+/cadastro/confirmar/<uid>/<token>/  — link do e-mail
+  Ativa a conta e já faz login. Link inválido/expirado:
+  confirmacao_invalida.html (com campo para pedir outro).
+
+/cadastro/reenviar/  — (POST) reenvia o link (máximo 1 por minuto).
+
+/login/  — visitante — login.html
+  E-mail, senha, "Lembrar de mim". Avisa e oferece reenvio se o e-mail
+  não foi confirmado.
+
+/sair/  — (POST) sai da conta.
+
+/senha/recuperar/  — senha_reset_form.html         informa o e-mail
+/senha/recuperar/enviado/ — senha_reset_enviado.html  "confira seu e-mail"
+/senha/nova/<uid>/<token>/ — senha_reset_confirmar.html  nova senha
+/senha/nova/concluido/ — senha_reset_concluido.html  "senha alterada"
+
+/conta/  — logado — perfil.html
+  Resumo: saudação, contadores (pedidos, anúncios ativos, endereços),
+  dados pessoais, endereço principal, 3 pedidos recentes, atalhos para
+  vender.
+
+/conta/editar/  — editar.html
+  Nome, e-mail, telefone (com máscara), nascimento, foto (pré-visualiza
+  antes de salvar), remover foto. Embaixo: "Desativar minha conta".
+
+/conta/senha/  — senha.html   Trocar a senha (pede a atual).
+/conta/desativar/ — (POST)    Desativa (exige não ter anúncios ativos).
+
+/conta/enderecos/  — enderecos.html
+  Cartões com cada endereço: editar, tornar principal, excluir.
+/conta/enderecos/novo/  e  /conta/enderecos/<id>/editar/ — endereco_form.html
+  Ao digitar o CEP, o site busca rua, bairro, cidade e UF no ViaCEP.
+
+/conta/pagamentos/  — pagamentos.html   Cartões com cada forma.
+/conta/pagamentos/novo/  e  /<id>/editar/ — pagamento_form.html
+  Tipo; bandeira e 4 últimos dígitos só aparecem para cartão.
+
+Todas as páginas /conta/... têm o MENU DA CONTA na lateral
+(partials/account_nav.html), dividido em Compras, Vendas e Conta.
+
+--------------------------------------------------------------------------------
+8.3  COMPRA  (views.py + views_checkout.py, templates/compra/ e pedidos/)
+--------------------------------------------------------------------------------
+
+/carrinho/  — carrinho.html
+  Itens com foto, quantidade (muda sozinho ao escolher), subtotal e
+  remover. Avisos: preço atualizado pelo vendedor, item indisponível ou
+  estoque menor. Resumo com estimativa de frete pelo endereço principal.
+  Visitante vê "Entre para ver seu carrinho".
+
+/checkout/  — etapa 1 — checkout_endereco.html
+  Escolha do endereço; cada endereço mostra o frete e o prazo. Estados sem
+  frete ficam desabilitados.
+/checkout/pagamento/  — etapa 2 — checkout_pagamento.html
+/checkout/revisao/  — etapa 3 — checkout_revisao.html
+  Mostra um "Pacote" por vendedor, com frete e total de cada um.
+  "Confirmar pedido" cria os pedidos.
+/checkout/concluido/  — concluido.html
+  "Compra confirmada", com cada pedido gerado.
+
+/conta/pedidos/  — pedidos/lista.html
+  Pedidos com abas por status e paginação (10 por página).
+/conta/pedidos/<id>/  — pedidos/detalhe.html
+  Linha do tempo do status, rastreio, itens, frete, total, entrega,
+  pagamento. Botões conforme o caso: "Cancelar pedido", "Confirmar
+  recebimento", "Avaliar produto" (estrelas + comentário).
+/conta/pedidos/<id>/cancelar/ , /recebido/ , /avaliar/<produto>/ — (POST)
+
+--------------------------------------------------------------------------------
+8.4  VENDA  (views_anuncios.py e views_vendas.py)
+--------------------------------------------------------------------------------
+
+/anuncios/  — anuncios/lista.html
+  Tabela dos seus anúncios: abas por status com contagem, busca por título
+  ou SKU, preço, estoque, vendidos, editar, pausar/reativar.
+/anuncios/novo/  e  /anuncios/<id>/editar/  — anuncios/form.html
+  Fotos (até 8; arrastar e soltar; escolher a principal; remover),
+  título, categoria, franquia, condição, marca, ano, descrição, preço,
+  estoque, SKU, status.
+/anuncios/<id>/  — anuncios/detalhe.html
+  Desempenho: preço, estoque, unidades vendidas, receita, quantos
+  carrinhos têm o produto, avaliações, fotos, vendas recentes, botões
+  pausar / reativar / encerrar / excluir.
+/anuncios/estoque/  — anuncios/estoque.html
+  Edita o estoque de vários anúncios de uma vez.
+/anuncios/<id>/status/ , /excluir/  — (POST)
+
+/vendas/  — vendas/lista.html
+  Pedidos recebidos, abas por status, destaque para os que pedem ação, e
+  o botão já diz o próximo passo ("Aprovar pagamento", "Preparar envio",
+  "Informar envio").
+/vendas/<id>/  — vendas/detalhe.html
+  "Próximo passo" em destaque, endereço de entrega, itens a enviar,
+  valores, campo do código de rastreio, "Cancelar venda".
+/vendas/<id>/avancar/ , /cancelar/  — (POST)
+
+/vendas/perguntas/  — vendas/perguntas.html
+  Perguntas recebidas: abas "Sem resposta" e "Respondidas", com campo para
+  responder.
+/vendas/perguntas/<id>/responder/  — (POST)
+
+--------------------------------------------------------------------------------
+8.5  ELEMENTOS PRESENTES EM TODAS AS PÁGINAS
+--------------------------------------------------------------------------------
+
+  CABEÇALHO (partials/header.html): logo, Home, Produtos (com submenu de
+    categorias), Sobre nós, Contato, busca com sugestões, "Anunciar",
+    carrinho com o número de itens, menu da conta (ou ícone de login) e
+    menu "sanduíche" no celular.
+  TRILHA (breadcrumb): Home / Produtos / Categoria / Produto.
+  MENSAGENS: avisos coloridos (sucesso some sozinho em 6 s).
+  RODAPÉ (partials/footer.html): links da loja, da conta e institucionais.
+  JANELA DE CONFIRMAÇÃO: antes de excluir, cancelar, desativar etc.
+
+
+================================================================================
+9. FLUXOS PASSO A PASSO
+================================================================================
+
+9.1 CADASTRO E CONFIRMAÇÃO DE E-MAIL
+  1. A pessoa preenche /cadastro/. O formulário valida e-mail repetido,
+     senhas iguais e senha forte (validadores do Django: mínimo 8
+     caracteres, não só números, não comum, não parecida com nome/e-mail).
+  2. A conta é criada com email_confirmado = False e SEM login.
+  3. emails.enviar_confirmacao_cadastro() manda um link com um TOKEN
+     assinado (vale 3 dias e uma única vez).
+  4. O clique abre /cadastro/confirmar/... -> email_confirmado = True ->
+     login automático -> "Minha conta".
+  5. Antes de confirmar, o login é recusado com o botão "Reenviar link".
+
+9.2 LOGIN
+  Busca o usuário pelo e-mail, compara o hash da senha, recusa se o
+  e-mail não foi confirmado ou se a conta está suspensa. Sem "Lembrar de
+  mim", a sessão acaba ao fechar o navegador. Volta à página de origem
+  (?next=), mas só se for do próprio site.
+
+9.3 RECUPERAR SENHA
+  Usa o sistema pronto do Django com telas e e-mail próprios: informa o
+  e-mail -> recebe link (3 dias, uso único) -> define nova senha. A
+  mensagem é a mesma exista ou não a conta (para não revelar e-mails
+  cadastrados). Redefinir também confirma o e-mail.
+
+9.4 COMPRA
+  1. Produto -> "Adicionar ao carrinho" (ou "Comprar agora", que já vai
+     ao checkout). Não deixa passar do estoque nem comprar o próprio
+     anúncio.
+  2. Carrinho -> confere preço e disponibilidade de novo.
+  3. Checkout 1: endereço (guardado na SESSÃO). Calcula o frete.
+  4. Checkout 2: forma de pagamento (guardada na sessão).
+  5. Checkout 3: revisão -> "Confirmar pedido".
+  6. Dentro de uma TRANSAÇÃO (tudo ou nada):
+       - trava os produtos no banco (select_for_update), para duas pessoas
+         não comprarem a última unidade ao mesmo tempo;
+       - confere de novo status e estoque;
+       - cria 1 pedido por vendedor (com frete e prazo) e os itens;
+       - baixa o estoque; estoque 0 -> anúncio "vendido";
+       - finaliza o carrinho.
+     Se qualquer coisa falhar, nada é gravado.
+  7. E-mails: resumo para o comprador e "Nova venda" para cada vendedor.
+
+9.5 VIDA DE UM PEDIDO
+  Vendedor em /vendas/<id>/:
+    Aprovar pagamento -> Em preparação -> Enviar (exige código de
+    rastreio). A cada etapa o comprador recebe um e-mail.
+    Proteção contra clique duplo: o formulário informa de qual status
+    partiu; se já mudou, nada acontece.
+  Comprador em /conta/pedidos/<id>/:
+    "Confirmar recebimento" (só depois de enviado) -> "entregue" ->
+    libera "Avaliar produto".
+  Cancelar:
+    comprador: só enquanto "aguardando pagamento";
+    vendedor: até "em preparação".
+    O estoque volta (e "vendido" volta a "ativo"); a outra parte recebe
+    e-mail.
+
+9.6 VENDA (ANÚNCIO)
+  1. "Anunciar" -> preenche o formulário e envia fotos.
+  2. As fotos vão para media/produtos/<id>/ com nome aleatório; a primeira
+     vira a principal.
+  3. Pausar / reativar / encerrar a qualquer momento. Reativar exige
+     estoque.
+  4. Excluir só é permitido se nunca vendeu (para não quebrar pedidos).
+  5. Estoque em lote: zerar um anúncio ativo -> "vendido"; repor estoque
+     de um "vendido" -> volta a "ativo".
+
+9.7 PERGUNTAS AO VENDEDOR
+  Comprador pergunta (5 a 500 caracteres; não duplica) -> vendedor
+  recebe e-mail -> responde no produto ou em "Perguntas recebidas" ->
+  comprador recebe e-mail -> resposta fica pública no anúncio.
+
+9.8 AVALIAÇÃO
+  Só depois de "entregue", uma vez por produto por pedido, nota de 1 a 5
+  + comentário opcional. Entra na nota do produto e do vendedor.
+
+9.9 DENÚNCIA
+  Usuário logado (não o dono) escolhe o motivo ("outro" exige descrição
+  de 10+ caracteres). Uma denúncia pendente por pessoa por anúncio. No
+  /admin/ > Denúncias, a equipe seleciona e aplica:
+    "Procedente" -> anúncio encerrado + todas as denúncias dele resolvidas
+    "Improcedente" -> só arquiva.
+  O vendedor nunca sabe quem denunciou.
+
+9.10 DESATIVAR CONTA
+  Exige pausar/encerrar os anúncios ativos antes. A conta é desativada
+  (não apagada) e o histórico permanece.
+
+
+================================================================================
+10. REGRAS DE NEGÓCIO (RESUMO)
+================================================================================
+
+  - Login por e-mail; e-mail único e em minúsculas.
+  - Conta nova só entra depois de confirmar o e-mail.
+  - Ninguém compra, pergunta ou denuncia o próprio anúncio.
+  - Carrinho nunca passa do estoque disponível.
+  - O preço do carrinho acompanha o preço atual do anúncio.
+  - Uma compra = um pedido por vendedor; frete cobrado por vendedor.
+  - Pedido guarda cópia de endereço, pagamento, nome e preço (snapshots).
+  - Estoque 0 -> "vendido"; repor -> "ativo"; cancelar devolve estoque.
+  - Anúncio ativo precisa de pelo menos 1 unidade; preço > 0.
+  - Até 8 fotos por anúncio, 5 MB cada.
+  - Anúncio com vendas não pode ser excluído (só encerrado).
+  - Só avalia quem recebeu; uma avaliação por produto por pedido.
+  - Endereços: um principal; apagar o principal promove outro.
+  - Formas de pagamento: idem; cartão exige bandeira e 4 dígitos.
+  - CEP com 8 dígitos; UF com 2 letras.
+  - Conta só é desativada sem anúncios ativos; usuário nunca é apagado.
+
+
+================================================================================
+11. FRETE  (marketplace/frete.py)
+================================================================================
+
+  - Valor e prazo dependem do ESTADO de destino (tabela_frete, editável no
+    admin). Valores iniciais de exemplo:
+      Sudeste R$ 19,90 (5 dias)     Sul R$ 24,90 (7 dias)
+      Centro-Oeste R$ 29,90 (8)     Nordeste R$ 34,90 (10)
+      Norte R$ 39,90 (12 dias)
+  - Cobrado UMA VEZ POR VENDEDOR (cada vendedor envia um pacote).
+  - Página do produto: o visitante digita só o CEP; o site descobre o
+    estado pelas faixas de CEP dos Correios (ex.: 01000–19999 = SP).
+  - Checkout: usa o estado do endereço escolhido.
+  - Prazo em dias úteis, contado a partir do envio.
+
+
+================================================================================
+12. BUSCA  (marketplace/busca.py)
+================================================================================
+
+  - Procura em: nome, descrição, marca, franquia e categoria.
+  - Ignora acentos e maiúsculas: "pokemon" acha "Pokémon".
+      MySQL: o próprio banco compara sem acento (collation
+      utf8mb4_0900_ai_ci — "ai" = accent insensitive).
+      SQLite: o projeto registra uma função SEM_ACENTO (apps.py).
+  - Várias palavras: TODAS precisam aparecer ("carta charizard").
+  - Só anúncios ativos.
+  - Sugestões ao digitar (2+ letras): até 6 produtos e 3 categorias;
+    setas, Enter e Esc funcionam (main.js).
+
+
+================================================================================
+13. E-MAILS AUTOMÁTICOS  (marketplace/emails.py, templates/emails/)
+================================================================================
+
+  Quando ......................................... Para quem
+  Cadastro (link de confirmação) ................. novo usuário
+  "Esqueci minha senha" (link) ................... usuário
+  Compra concluída (resumo de todos os pedidos) .. comprador
+  Nova venda (itens + endereço de entrega) ....... cada vendedor
+  Pagamento aprovado / em preparação ............. comprador
+  Enviado (com código de rastreio) ............... comprador
+  Venda cancelada pelo vendedor .................. comprador
+  Pedido cancelado pelo comprador ................ vendedor
+  Nova pergunta no anúncio ....................... vendedor
+  Pergunta respondida ............................ quem perguntou
+
+  - Visual no estilo do site, com versão em texto puro.
+  - Sem Gmail configurado, o e-mail aparece no terminal (com os links).
+  - Se o envio falhar, a ação NÃO é desfeita (a compra continua valendo);
+    o motivo aparece no terminal com a explicação em português.
+  - Teste: python manage.py testar_email seu@email.com
+
+
+================================================================================
+14. VISUAL (CSS) E INTERATIVIDADE (JAVASCRIPT)
+================================================================================
+
+CORES OFICIAIS (definidas uma vez como variáveis em styles-retro.css):
+  #313170  azul — cabeçalho, rodapé, botões principais
+  #ACA9BB  lilás acinzentado — fundo das páginas
+  #787586  cinza — bordas e textos secundários
+  #6D191D  vinho — preços e botões de ação
+  #A54C49  terracota — destaques e hover
+
+ESTILO "RETRÔ": bordas de 1,5 px, sombras deslocadas (sem desfoque),
+cantos pouco arredondados, painel de compra em forma de ingresso.
+
+ARQUIVOS CSS:
+  styles-retro.css .. sistema global: cores, botões, formulários, cards,
+                      tabelas, cabeçalho, rodapé, abas, paginação,
+                      mensagens, sugestões da busca, responsividade
+  home.css, catalogo.css, produto.css (inclui perfil do vendedor e
+  denúncia), compra.css (carrinho, checkout, pedidos, vendas), conta.css,
+  anuncios.css, institucional.css, sobre-nos.css
+
+RESPONSIVO: funciona do celular (390 px) ao computador. Tabelas viram
+cartões empilhados no celular; o menu vira "sanduíche".
+
+JAVASCRIPT (o site funciona mesmo sem JS; o JS só melhora a experiência):
+  main.js ..... menu do celular, submenus, fechar avisos, janela de
+                confirmação, mostrar/ocultar senha, máscaras de CEP e
+                telefone, busca de endereço pelo CEP (ViaCEP), envio
+                automático (ordenar, quantidade), sugestões da busca
+  produto.js .. troca de fotos, galeria ampliada, botões + e − da quantidade
+  catalogo.js . filtros recolhidos no celular
+  upload.js ... pré-visualização das fotos (perfil e anúncio), arrastar e
+                soltar
+
+ACESSIBILIDADE: textos alternativos, atalho "Pular para o conteúdo",
+navegação por teclado (galeria, sugestões, menus), avisos lidos por
+leitores de tela, rótulos em todos os campos.
+
+
+================================================================================
+15. PAINEL ADMINISTRATIVO (/admin/)
+================================================================================
+
+Entrar com uma conta is_staff (criada com "python manage.py
+createsuperuser"). Principais telas:
+
+  Usuários ............... contas, administradores, e-mail confirmado
+  Endereços / Formas de pagamento
+  Categorias / Franquias . cadastro do catálogo
+  Produtos ............... todos os anúncios
+  Carrinhos
+  Pedidos ................ vendas, status, rastreio (valores só leitura)
+  Avaliações ............. moderação (publicada/oculta/removida)
+  Mensagens de contato ... status pendente/respondido/arquivado
+  Tabela de frete ........ valor e prazo editáveis direto na lista
+  Perguntas frequentes ... conteúdo da página de dúvidas
+  Perguntas aos vendedores  moderação (ocultar)
+  Denúncias .............. ações "Procedente" e "Improcedente"
+
+
+================================================================================
+16. SEGURANÇA
+================================================================================
+
+  - Senhas com hash PBKDF2 (o Django nunca guarda a senha).
+  - Validação de senha forte no cadastro e na troca.
+  - Cartões: só bandeira e 4 últimos dígitos.
+  - CSRF: todo formulário tem um código secreto ({% csrf_token %}) que
+    impede outros sites de enviarem formulários em nome do usuário.
+  - Ações que alteram dados só por POST, e destrutivas com confirmação.
+  - Cada pessoa só acessa os próprios pedidos, anúncios, endereços e
+    vendas (as views filtram pelo usuário logado; tentativas dão 404).
+  - Redirecionamentos (?next=) só para o próprio site.
+  - Links de e-mail assinados, com validade e uso único.
+  - Reenvio de confirmação limitado (1 por minuto) e mensagens que não
+    revelam quais e-mails existem.
+  - Uploads: só imagens, até 5 MB, salvas com nome aleatório.
+  - Senhas e chaves fora do código (.env), e .env fora do GitHub.
+  - Produção: cookies só por HTTPS, domínio restrito, chave obrigatória;
+    "python manage.py check --deploy" sem problemas.
+  - Dados pessoais (dados.json, .zip, banco SQLite, fotos) fora do GitHub.
+
+
+================================================================================
+17. INSTALAÇÃO, SCRIPTS E COMANDOS
+================================================================================
+
+NUMA MÁQUINA NOVA (Windows):
+  1. Instalar Python 3.10+ (marcar "Add python.exe to PATH").
+     MySQL é opcional.
+  2. Copiar a pasta do projeto (sem venv e sem .env) ou clonar do GitHub.
+  3. Dois cliques em instalar.bat: cria a venv, instala os pacotes,
+     pergunta MySQL ou SQLite, cria o .env e o banco, aplica as migrations,
+     carrega banco/dados.json (no SQLite) e oferece criar um administrador.
+  4. Dois cliques em rodar.bat: atualiza o banco e abre
+     http://127.0.0.1:8000
+
+COMANDOS (dentro da pasta contratempo, com a venv ativa):
+  python manage.py runserver ............... liga o site
+  python manage.py migrate ................. aplica mudanças no banco
+  python manage.py makemigrations .......... cria migration após mudar models
+  python manage.py createsuperuser ......... cria administrador
+  python manage.py changepassword email .... troca a senha de alguém
+  python manage.py testar_email email ...... testa o e-mail
+  python manage.py check --deploy .......... confere segurança de produção
+  python manage.py collectstatic ........... reúne CSS/JS (produção)
+
+EXPORTAR / IMPORTAR DADOS (na raiz do projeto):
+  venv\Scripts\python.exe -X utf8 contratempo\manage.py dumpdata
+     --natural-foreign --indent 1 --exclude contenttypes
+     --exclude auth.permission --exclude admin.logentry
+     --exclude sessions -o banco\dados.json          (tudo numa linha)
+  python -X utf8 manage.py loaddata ../banco/dados.json
+  (o "-X utf8" evita problemas com acentos no Windows)
+
+GITHUB (GitHub Desktop):
+  Alterou algo -> aba Changes -> escrever o resumo -> "Commit to main" ->
+  "Push origin".
+
+
+================================================================================
+18. PUBLICAÇÃO NA INTERNET (PYTHONANYWHERE)
+================================================================================
+
+Passo a passo completo no DEPLOY.md. Resumo:
+  1. Conta grátis -> Bash -> git clone (repositório privado exige um
+     TOKEN do GitHub no lugar da senha).
+  2. mkvirtualenv + pip install -r requirements.txt
+  3. .env com DJANGO_DEBUG=0, domínio, chave secreta e DB_ENGINE=sqlite
+     (o MySQL lá é só no plano pago).
+  4. migrate, collectstatic, loaddata (opcional), createsuperuser.
+  5. Aba Web: Manual configuration, virtualenv, arquivo WSGI (criar pelo
+     Bash para não dar IndentationError), Static files /static/ e /media/,
+     Force HTTPS, Reload.
+  6. Renovar a cada 3 meses ("Run until 3 months from today").
+
+  Atualizar o site: git pull -> migrate -> collectstatic -> Reload.
+  Backup (SQLite): baixar contratempo/contratempo.sqlite3 na aba Files.
+
+
+================================================================================
+19. LIMITAÇÕES CONHECIDAS E PRÓXIMOS PASSOS
+================================================================================
+
+  - PAGAMENTO É SIMULADO: é o vendedor quem marca "pagamento aprovado".
+    Próximo passo: integrar Mercado Pago/PIX (modo de teste).
+  - Pedidos não pagos seguram o estoque até serem cancelados. Ideal:
+    cancelamento automático depois de alguns dias.
+  - E-mails são enviados na hora da ação (o checkout pode demorar alguns
+    segundos com o Gmail).
+  - Login sem limite de tentativas.
+  - Fotos são guardadas no tamanho original (sem miniaturas).
+  - Não há favoritos nem chat entre comprador e vendedor.
+  - Os testes automatizados usados no desenvolvimento não estão no
+    repositório (marketplace/tests.py está vazio).
+
+
+================================================================================
+20. GLOSSÁRIO
+================================================================================
+
+  App ............... parte de um projeto Django (aqui: marketplace)
+  Model ............. classe Python que representa uma tabela
+  View .............. função que processa a requisição e devolve a página
+  Template .......... HTML com marcações do Django ({{ }}, {% %})
+  ORM ............... tradução automática de Python para SQL
+  Migration ......... arquivo que descreve uma mudança no banco
+  QuerySet .......... consulta ao banco (ex.: Produto.objects.filter(...))
+  Chave estrangeira . coluna que aponta para outra tabela (FOREIGN KEY)
+  Snapshot .......... cópia de um dado no momento (endereço no pedido)
+  Soft delete ....... "apagar" marcando como inativo, sem remover
+  Transação ......... grupo de operações "tudo ou nada"
+  Slug .............. versão do nome para URL ("video-games")
+  Hash .............. resultado irreversível de uma senha
+  Token ............. código secreto temporário (links de e-mail)
+  Sessão ............ memória do servidor sobre um visitante
+  CSRF .............. ataque de formulário forjado (o Django bloqueia)
+  Static ............ arquivos fixos do site (CSS, JS, ícones)
+  Media ............. arquivos enviados pelos usuários (fotos)
+  venv .............. ambiente Python isolado do projeto
+  .env .............. arquivo de configurações secretas da máquina
+  WSGI .............. ponte entre o servidor web e o Django
+  SMTP .............. protocolo de envio de e-mail
+  JSON .............. formato de dados em texto (sugestões, dados.json)
+  Deploy ............ publicar o site na internet
+  Commit / Push ..... salvar uma versão no Git / enviar ao GitHub
+
+
+================================================================================
+21. PERGUNTAS QUE PODEM APARECER NA APRESENTAÇÃO
+================================================================================
+
+P: Por que um usuário personalizado em vez do padrão do Django?
+R: Para o login ser por e-mail (o padrão usa "username") e para ter os
+   campos do projeto (telefone, avatar, status, e-mail confirmado).
+
+P: Por que copiar endereço e preço no pedido (snapshot)?
+R: Para o histórico não mudar. Se o cliente apagar o endereço ou o
+   vendedor mudar o preço, o pedido continua mostrando o que valeu na
+   compra.
+
+P: O que impede duas pessoas de comprarem a última unidade?
+R: A compra roda numa transação que trava os produtos (select_for_update)
+   e confere o estoque de novo antes de gravar.
+
+P: Por que um pedido por vendedor?
+R: Cada vendedor envia um pacote diferente, com frete, prazo, rastreio e
+   status próprios.
+
+P: Como as senhas são guardadas?
+R: Como hash PBKDF2 com "sal". Nem o administrador consegue ver a senha.
+
+P: Por que PROTECT, CASCADE e SET_NULL?
+R: PROTECT para não perder dinheiro/histórico; CASCADE para dados que só
+   existem por causa do dono; SET_NULL para ligações opcionais.
+
+P: Como funciona a busca sem acento?
+R: No MySQL a collation já ignora acentos; no SQLite o projeto registra
+   uma função Python que remove acentos antes de comparar.
+
+P: Como o site funciona sem MySQL?
+R: O settings.py lê DB_ENGINE do .env e troca para SQLite. O código é o
+   mesmo porque o ORM do Django gera o SQL certo para cada banco.
+
+P: O que acontece se o e-mail falhar?
+R: A ação continua (compra, pergunta...). O erro vai para o log com a
+   explicação, e o usuário pode pedir o reenvio quando for o caso.
+
+P: Por que o código e os dados ficam separados no GitHub?
+R: Senhas (.env) e dados pessoais (dados.json, fotos, banco) nunca vão
+   para o repositório — o .gitignore impede.
+
+================================================================================
+                               FIM DO GUIA
+================================================================================

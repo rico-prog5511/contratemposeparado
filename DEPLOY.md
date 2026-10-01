@@ -38,7 +38,17 @@ As fotos você envia no passo 5.
 2. Na aba **Files**, clique em *Upload a file* e envie o `.zip`.
 3. Em **Consoles > Bash**, rode `unzip contratemposeparado.zip`.
 
-## 3. Criar o banco MySQL
+## 3. Escolher o banco de dados
+
+**Plano gratuito: SQLite (nada a fazer neste passo).** O MySQL do
+PythonAnywhere só está disponível nos planos pagos. No plano grátis o site
+usa SQLite: o banco é um único arquivo
+(`~/contratemposeparado/contratempo/contratempo.sqlite3`), criado sozinho
+no passo 5. Todas as funcionalidades continuam iguais, inclusive a busca
+sem acentos. Pule para o passo 4.
+
+<details>
+<summary><strong>Plano pago: MySQL</strong></summary>
 
 1. Aba **Databases**: defina uma senha para o MySQL e anote-a.
 2. Em *Create a database*, digite `contratempo` e confirme. O nome
@@ -48,13 +58,15 @@ As fotos você envia no passo 5.
 4. Clique no banco para abrir o console do MySQL e rode o comando abaixo,
    para acentos e emojis funcionarem:
 
-```sql
-ALTER DATABASE `SEUUSUARIO$contratempo` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
+   ```sql
+   ALTER DATABASE `SEUUSUARIO$contratempo` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
 
-> No PythonAnywhere as tabelas são criadas pelo `migrate` do Django (passo
-> 5), e não pelo `banco/contratempo_db.sql`. A conta gratuita não tem
-> permissão para o `CREATE DATABASE` que o script usa.
+As tabelas são criadas pelo `migrate` do Django (passo 5), e não pelo
+`banco/contratempo_db.sql`: o PythonAnywhere não dá permissão para o
+`CREATE DATABASE` que o script usa. No `.env` do passo 5, use as linhas
+indicadas para MySQL.
+</details>
 
 ## 4. Instalar os pacotes
 
@@ -86,16 +98,22 @@ DJANGO_DEBUG=0
 DJANGO_ALLOWED_HOSTS=SEUUSUARIO.pythonanywhere.com
 DJANGO_SECRET_KEY=cole-a-chave-gerada-aqui
 
-DB_ENGINE=mysql
-DB_NAME=SEUUSUARIO$contratempo
-DB_USER=SEUUSUARIO
-DB_PASSWORD=a-senha-do-passo-3
-DB_HOST=SEUUSUARIO.mysql.pythonanywhere-services.com
-DB_PORT=3306
+DB_ENGINE=sqlite
 
 EMAIL_HOST_USER=
 EMAIL_HOST_PASSWORD=
 ```
+
+> **Só no plano pago com MySQL:** troque a linha `DB_ENGINE=sqlite` por:
+>
+> ```ini
+> DB_ENGINE=mysql
+> DB_NAME=SEUUSUARIO$contratempo
+> DB_USER=SEUUSUARIO
+> DB_PASSWORD=a-senha-do-passo-3
+> DB_HOST=SEUUSUARIO.mysql.pythonanywhere-services.com
+> DB_PORT=3306
+> ```
 
 Depois crie as tabelas, copie os arquivos estáticos e crie o administrador:
 
@@ -125,21 +143,30 @@ Na aba **Web**:
 3. Em **Code**, informe:
    - Source code: `/home/SEUUSUARIO/contratemposeparado/contratempo`
    - Working directory: `/home/SEUUSUARIO/contratemposeparado/contratempo`
-4. Clique no link do **WSGI configuration file**, **apague tudo** e cole:
+4. Configure o **WSGI configuration file** pelo **Bash**, sem editar à mão.
+   Colar o código no editor costuma deixar espaços no começo das linhas, e
+   isso causa `IndentationError`. Rode o bloco abaixo **sem recuar
+   nenhuma linha**, trocando `SEUUSUARIO` nas duas primeiras linhas:
 
-   ```python
-   import os
-   import sys
+```bash
+cat > /var/www/enaldo_pythonanywhere_com_wsgi.py << 'EOF'
+import os
+import sys
 
-   caminho = "/home/SEUUSUARIO/contratemposeparado/contratempo"
-   if caminho not in sys.path:
-       sys.path.insert(0, caminho)
+caminho = "/home/enaldo/contratemposeparado/contratempo"
+if caminho not in sys.path:
+    sys.path.insert(0, caminho)
 
-   os.environ["DJANGO_SETTINGS_MODULE"] = "contratempo.settings"
+os.environ["DJANGO_SETTINGS_MODULE"] = "contratempo.settings"
 
-   from django.core.wsgi import get_wsgi_application
-   application = get_wsgi_application()
-   ```
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
+EOF
+python /var/www/enaldo_pythonanywhere_com_wsgi.py && echo "WSGI OK"
+```
+
+   O nome exato do arquivo aparece na aba **Web**, em *WSGI configuration
+   file*. A última linha testa o arquivo e deve mostrar `WSGI OK`.
 
 5. Em **Static files**, adicione duas linhas:
 
@@ -154,12 +181,31 @@ Na aba **Web**:
 
 ## 7. Publicar uma nova versão
 
-Depois de alterar o projeto no seu computador:
+1. **No seu computador:** abra o GitHub Desktop, escreva um resumo da
+   alteração, clique em **Commit to main** e depois em **Push origin**.
+2. **No PythonAnywhere (Bash):**
+
+```bash
+bash ~/contratemposeparado/atualizar.sh
+```
+
+O script baixa a versão nova (`git pull`), instala pacotes novos, aplica
+as migrations, atualiza os arquivos estáticos e recarrega o site. Ele não
+mexe no `.env`, nos dados nem nas fotos.
+
+> A **primeira vez** que você rodar o script, o `atualizar.sh` ainda não
+> existe no PythonAnywhere. Rode antes `cd ~/contratemposeparado && git pull`.
+> O `git pull` pede o usuário do GitHub e o **token** no lugar da senha. Para
+> não precisar digitá-lo toda vez, rode uma vez
+> `git config --global credential.helper store`.
+
+Sem o script, os passos manuais são:
 
 ```bash
 workon contratempo
 cd ~/contratemposeparado
-git pull                                  # ou envie os arquivos de novo pela aba Files
+git pull
+pip install -r requirements.txt
 cd contratempo
 python manage.py migrate
 python manage.py collectstatic --noinput
@@ -179,9 +225,12 @@ from today**, na aba **Web**.
 |---|---|
 | "Something went wrong" / erro 500 | Veja o **Error log** na aba **Web**. As causas mais comuns são um erro no `.env` ou esquecer o `migrate`. |
 | `ImproperlyConfigured: defina DJANGO_SECRET_KEY` | Falta `DJANGO_SECRET_KEY` no `.env`. |
+| `IndentationError` no Error log | O arquivo WSGI tem espaços no começo das linhas. Recrie-o com o comando do passo 6.4. |
 | "Bad Request (400)" | O endereço não está em `DJANGO_ALLOWED_HOSTS`. |
 | Site sem estilo (sem CSS) | Faltou o `collectstatic` ou a linha `/static/` em **Static files**. Recarregue depois de corrigir. |
 | Fotos quebradas | Falta a linha `/media/` em **Static files**, ou a pasta `media` não foi enviada. |
-| `Access denied for user` | Confira `DB_USER`, `DB_PASSWORD` e `DB_HOST` no `.env`. |
+| `Access denied for user` (só MySQL) | Confira `DB_USER`, `DB_PASSWORD` e `DB_HOST` no `.env`. |
+| `no such table` (SQLite) | Faltou o `python manage.py migrate` do passo 5. |
+| Fazer backup do banco (SQLite) | Na aba **Files**, baixe o arquivo `contratempo/contratempo.sqlite3`. Ele contém todos os dados do site. |
 | E-mails não chegam | O plano gratuito limita o acesso à internet, e o envio pelo Gmail pode ser bloqueado. O site continua funcionando e o motivo aparece no **Server log**. |
 | Erro 403 "CSRF verification failed" | Acesse sempre pelo endereço com `https://` que está em `DJANGO_ALLOWED_HOSTS`. |
