@@ -1,0 +1,63 @@
+{% comment %}
+Painel de acessibilidade (botão flutuante no canto inferior esquerdo).
+Comportamento: static/js/acessibilidade.js · Estilos: static/css/acessibilidade.css
+As escolhas ficam salvas no navegador (localStorage) e valem em todas as páginas.
+{% endcomment %}
+<button type="button" class="acess-botao" id="acess-botao" aria-expanded="false" aria-controls="acess-painel" aria-label="Abrir opções de acessibilidade">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <circle cx="12" cy="4.2" r="2.2"/>
+        <path d="M20.5 7.6c-2.6.7-5.4 1-8.5 1s-5.9-.3-8.5-1l-.5 1.9c2.1.6 4.4 1 6.8 1.1v3.3L8 21.2l1.9.7 2.1-5.7 2.1 5.7 1.9-.7-1.8-7.3v-3.3c2.4-.1 4.7-.5 6.8-1.1z"/>
+    </svg>
+</button>
+
+<section class="acess-painel" id="acess-painel" role="dialog" aria-modal="false" aria-labelledby="acess-titulo" hidden>
+    <header class="acess-topo">
+        <h2 id="acess-titulo">Acessibilidade</h2>
+        <button type="button" class="acess-fechar" data-acess-fechar aria-label="Fechar opções de acessibilidade">&times;</button>
+    </header>
+
+    <div class="acess-grupo" role="group" aria-labelledby="acess-rotulo-texto">
+        <span class="acess-rotulo" id="acess-rotulo-texto">Tamanho do texto</span>
+        <div class="acess-texto">
+            <button type="button" data-acess-texto="-1" aria-label="Diminuir texto">A−</button>
+            <output id="acess-texto-valor" aria-live="polite">100%</output>
+            <button type="button" data-acess-texto="+1" aria-label="Aumentar texto">A+</button>
+        </div>
+    </div>
+
+    <div class="acess-grupo" role="group" aria-labelledby="acess-rotulo-tema">
+        <span class="acess-rotulo" id="acess-rotulo-tema">Tema</span>
+        <div class="acess-segmentos">
+            <button type="button" data-acess-tema="claro" aria-pressed="true">Claro</button>
+            <button type="button" data-acess-tema="escuro" aria-pressed="false">Escuro</button>
+            <button type="button" data-acess-tema="auto" aria-pressed="false">Do sistema</button>
+        </div>
+    </div>
+
+    <div class="acess-grupo">
+        <span class="acess-rotulo">Leitura</span>
+        <div class="acess-opcoes">
+            <button type="button" class="acess-opcao" data-acess-opcao="contraste" aria-pressed="false">
+                <span class="acess-icone" aria-hidden="true">◐</span> Alto contraste
+            </button>
+            <button type="button" class="acess-opcao" data-acess-opcao="leitura" aria-pressed="false">
+                <span class="acess-icone" aria-hidden="true">Aa</span> Fonte para dislexia
+            </button>
+            <button type="button" class="acess-opcao" data-acess-opcao="links" aria-pressed="false">
+                <span class="acess-icone" aria-hidden="true">🔗</span> Destacar links
+            </button>
+            <button type="button" class="acess-opcao" data-acess-opcao="espacamento" aria-pressed="false">
+                <span class="acess-icone" aria-hidden="true">↕</span> Mais espaçamento
+            </button>
+            <button type="button" class="acess-opcao" data-acess-opcao="animacoes" aria-pressed="false">
+                <span class="acess-icone" aria-hidden="true">❚❚</span> Pausar animações
+            </button>
+        </div>
+    </div>
+
+    <footer class="acess-rodape">
+        <button type="button" class="acess-restaurar" data-acess-restaurar>Restaurar padrão</button>
+        <a href="{% url 'acessibilidade' %}">Sobre a acessibilidade do site</a>
+    </footer>
+    <p class="sr-only" id="acess-aviso" aria-live="polite"></p>
+</section>

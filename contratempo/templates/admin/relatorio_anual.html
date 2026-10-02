@@ -1,0 +1,149 @@
+{% extends "admin/base_site.html" %}
+{% load marketplace_extras %}
+{% comment %}
+Relatório anual do admin. Dados: marketplace/relatorios.py → relatorio_anual().
+"Movimentado" = pedidos não cancelados (produtos + frete), pela data do pedido.
+{% endcomment %}
+
+{% block bodyclass %}{{ block.super }} ct-relatorio-pagina{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Início</a>
+    &rsaquo; <a href="{% url 'admin:marketplace_pedido_changelist' %}">Pedidos</a>
+    &rsaquo; Relatório de {{ ano }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main" class="ct-relatorio">
+
+    <form method="get" class="ct-relatorio-ano">
+        <label for="ano">Ano</label>
+        <select id="ano" name="ano" onchange="this.form.submit()">
+            {% for a in anos %}<option value="{{ a }}" {% if a == ano %}selected{% endif %}>{{ a }}</option>{% endfor %}
+        </select>
+        <noscript><button type="submit" class="button">Ver</button></noscript>
+        <a href="{{ url_ano }}" class="ct-relatorio-link">Ver todos os pedidos de {{ ano }} →</a>
+    </form>
+
+    <!-- TOTAIS -->
+    <section aria-labelledby="ct-totais">
+        <h2 id="ct-totais" class="ct-relatorio-titulo">Totais de {{ ano }}</h2>
+        <ul class="ct-cartoes">
+            <li><div class="ct-cartao ct-cartao--destaque">
+                <span class="ct-cartao-valor">{{ totais.total|brl }}</span>
+                <span class="ct-cartao-rotulo">Movimentado no ano</span>
+                <span class="ct-cartao-ajuda">produtos + frete, sem cancelados</span>
+            </div></li>
+            <li><div class="ct-cartao">
+                <span class="ct-cartao-valor">{{ totais.produtos|brl }}</span>
+                <span class="ct-cartao-rotulo">Em produtos</span>
+                <span class="ct-cartao-ajuda">valor recebido pelos vendedores</span>
+            </div></li>
+            <li><div class="ct-cartao">
+                <span class="ct-cartao-valor">{{ totais.frete|brl }}</span>
+                <span class="ct-cartao-rotulo">Em frete</span>
+                <span class="ct-cartao-ajuda">pago pelos compradores</span>
+            </div></li>
+            <li><div class="ct-cartao">
+                <span class="ct-cartao-valor">{{ totais.pedidos }}</span>
+                <span class="ct-cartao-rotulo">Pedido{{ totais.pedidos|pluralize }}</span>
+                <span class="ct-cartao-ajuda">ticket médio {{ totais.ticket_medio|brl }}</span>
+            </div></li>
+            <li><div class="ct-cartao{% if totais.cancelados %} ct-cartao--alerta{% endif %}">
+                <span class="ct-cartao-valor">{{ totais.valor_cancelado|brl }}</span>
+                <span class="ct-cartao-rotulo">Cancelado</span>
+                <span class="ct-cartao-ajuda">{{ totais.cancelados }} pedido{{ totais.cancelados|pluralize }} (fora do total)</span>
+            </div></li>
+        </ul>
+        {% if melhor_mes %}<p class="ct-relatorio-nota">Melhor mês: <strong>{{ melhor_mes.nome }}</strong>, com {{ melhor_mes.total|brl }}.</p>{% endif %}
+    </section>
+
+    {% if totais.pedidos or totais.cancelados %}
+    <div class="ct-relatorio-grade">
+        <!-- MÊS A MÊS -->
+        <section class="module ct-relatorio-meses" aria-labelledby="ct-meses">
+            <table>
+                <caption id="ct-meses">Mês a mês</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Mês</th>
+                        <th scope="col" class="ct-num">Pedidos</th>
+                        <th scope="col" class="ct-num">Produtos</th>
+                        <th scope="col" class="ct-num">Frete</th>
+                        <th scope="col" class="ct-num">Total</th>
+                        <th scope="col"><span class="visually-hidden">Comparação entre os meses</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mes in meses %}
+                        <tr class="{% if not mes.pedidos and not mes.cancelados %}ct-mes-vazio{% endif %}">
+                            <th scope="row">
+                                {% if mes.pedidos or mes.cancelados %}<a href="{{ mes.url }}">{{ mes.nome }}</a>{% else %}{{ mes.nome }}{% endif %}
+                            </th>
+                            <td class="ct-num">{{ mes.pedidos }}{% if mes.cancelados %} <small>(+{{ mes.cancelados }} canc.)</small>{% endif %}</td>
+                            <td class="ct-num">{{ mes.produtos|brl }}</td>
+                            <td class="ct-num">{{ mes.frete|brl }}</td>
+                            <td class="ct-num"><strong>{{ mes.total|brl }}</strong></td>
+                            <td class="ct-barra-celula" aria-hidden="true"><span class="ct-barra"><span style="width: {{ mes.percentual }}%"></span></span></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th scope="row">Total</th>
+                        <td class="ct-num">{{ totais.pedidos }}</td>
+                        <td class="ct-num">{{ totais.produtos|brl }}</td>
+                        <td class="ct-num">{{ totais.frete|brl }}</td>
+                        <td class="ct-num"><strong>{{ totais.total|brl }}</strong></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </section>
+
+        <div class="ct-relatorio-lateral">
+            <!-- POR STATUS -->
+            <section class="module" aria-labelledby="ct-status">
+                <table>
+                    <caption id="ct-status">Por status</caption>
+                    <thead><tr><th scope="col">Status</th><th scope="col" class="ct-num">Pedidos</th><th scope="col" class="ct-num">Valor</th></tr></thead>
+                    <tbody>
+                        {% for s in status %}
+                            <tr>
+                                <th scope="row"><a href="{{ s.url }}">{{ s.nome }}</a></th>
+                                <td class="ct-num">{{ s.pedidos }}</td>
+                                <td class="ct-num">{{ s.total|brl }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <p class="ct-relatorio-nota ct-relatorio-nota--modulo">“Entregue” é o dinheiro de vendas já concluídas; os demais ainda estão em andamento.</p>
+            </section>
+
+            <!-- TOP VENDEDORES -->
+            {% if top_vendedores %}
+            <section class="module" aria-labelledby="ct-vendedores">
+                <table>
+                    <caption id="ct-vendedores">Vendedores que mais venderam</caption>
+                    <thead><tr><th scope="col">Vendedor</th><th scope="col" class="ct-num">Pedidos</th><th scope="col" class="ct-num">Valor</th></tr></thead>
+                    <tbody>
+                        {% for v in top_vendedores %}
+                            <tr>
+                                <th scope="row"><a href="{{ v.url }}">{{ v.vendedor.nome_completo }}</a></th>
+                                <td class="ct-num">{{ v.pedidos }}</td>
+                                <td class="ct-num">{{ v.total|brl }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+        <p class="ct-relatorio-vazio">Nenhum pedido em {{ ano }}.</p>
+    {% endif %}
+</div>
+{% endblock %}

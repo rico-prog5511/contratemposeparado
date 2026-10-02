@@ -60,8 +60,6 @@
             <a href="#perguntas" class="produto-rating"><span>{{ perguntas|length }} pergunta{{ perguntas|length|pluralize }}</span></a>
         </div>
 
-        <p class="produto-preco">{{ produto.preco|brl }}</p>
-
         <dl class="key-value produto-specs">
             <dt>Categoria</dt>
             <dd><a href="{% url 'produtos' %}?categoria={{ produto.categoria.slug }}">{{ produto.categoria.nome }}</a></dd>
@@ -203,17 +201,17 @@
             <div>
                 <dt>Nota</dt>
                 <dd>{% if vendedor_resumo.media %}{{ vendedor_resumo.media|floatformat:1 }} <span class="stars">★</span>{% else %}—{% endif %}</dd>
-                <small>{{ vendedor_resumo.total_avaliacoes }} avaliaç{{ vendedor_resumo.total_avaliacoes|pluralize:"ão,ões" }}</small>
+                <dd class="seller-stats-nota">{{ vendedor_resumo.total_avaliacoes }} avaliaç{{ vendedor_resumo.total_avaliacoes|pluralize:"ão,ões" }}</dd>
             </div>
             <div>
                 <dt>Vendas</dt>
                 <dd>{{ vendedor_resumo.vendas }}</dd>
-                <small>unidade{{ vendedor_resumo.vendas|pluralize }} vendida{{ vendedor_resumo.vendas|pluralize }}</small>
+                <dd class="seller-stats-nota">unidade{{ vendedor_resumo.vendas|pluralize }} vendida{{ vendedor_resumo.vendas|pluralize }}</dd>
             </div>
             <div>
                 <dt>Anúncios</dt>
                 <dd>{{ vendedor_resumo.anuncios_ativos }}</dd>
-                <small>ativo{{ vendedor_resumo.anuncios_ativos|pluralize }}</small>
+                <dd class="seller-stats-nota">ativo{{ vendedor_resumo.anuncios_ativos|pluralize }}</dd>
             </div>
         </dl>
         <a href="{% url 'vendedor_perfil' produto.vendedor_id %}" class="btn btn-outline">Ver perfil do vendedor</a>

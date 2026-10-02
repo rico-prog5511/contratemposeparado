@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Acessibilidade | Contratempo{% endblock %}
+{% block meta_description %}Recursos de acessibilidade da Contratempo: tamanho do texto, alto contraste, fonte para dislexia, Libras, navegação por teclado e leitores de tela.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/institucional.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="inst-intro">
+    <div class="container">
+        <span class="about-kicker">Para todo mundo</span>
+        <h1>Acessibilidade na <em>Contratempo.</em></h1>
+        <p>Queremos que qualquer pessoa consiga comprar e vender colecionáveis aqui, com ou sem deficiência, em qualquer aparelho.</p>
+    </div>
+</section>
+
+<div class="container legal-layout">
+    <nav class="legal-toc" aria-label="Nesta página">
+        <span class="form-label">Nesta página</span>
+        <ol>
+            <li><a href="#painel">Painel de acessibilidade</a></li>
+            <li><a href="#libras">Libras (VLibras)</a></li>
+            <li><a href="#teclado">Navegação por teclado</a></li>
+            <li><a href="#leitores">Leitores de tela</a></li>
+            <li><a href="#outros">Outros cuidados</a></li>
+            <li><a href="#contato-acessibilidade">Encontrou um problema?</a></li>
+        </ol>
+    </nav>
+
+    <article class="legal-text">
+        <section id="painel">
+            <h2>1. Painel de acessibilidade</h2>
+            <p>Use o <strong>botão redondo azul no canto inferior esquerdo</strong> de qualquer página (o ícone de uma pessoa de braços abertos). Ele abre um painel com:</p>
+            <ul>
+                <li><strong>Tamanho do texto:</strong> de 87% a 150%. Todo o site acompanha.</li>
+                <li><strong>Tema:</strong> claro, escuro ou o mesmo do seu sistema.</li>
+                <li><strong>Alto contraste:</strong> fundo preto com texto branco e links amarelos.</li>
+                <li><strong>Fonte para dislexia:</strong> troca as letras pela Atkinson Hyperlegible, criada para leitura fácil, e tira itálicos e textos em caixa-alta.</li>
+                <li><strong>Destacar links:</strong> todos os links sublinhados e em negrito.</li>
+                <li><strong>Mais espaçamento:</strong> mais espaço entre linhas, letras e palavras.</li>
+                <li><strong>Pausar animações:</strong> desliga movimentos e para a troca automática do banner da página inicial.</li>
+            </ul>
+            <p>Suas escolhas ficam salvas neste navegador e valem em todas as páginas. O botão <strong>“Restaurar padrão”</strong> volta tudo ao normal.</p>
+            <p><button type="button" class="btn btn-primary" onclick="document.getElementById('acess-botao').click()">Abrir o painel agora</button></p>
+        </section>
+
+        <section id="libras">
+            <h2>2. Libras (VLibras)</h2>
+            <p>O site tem o <strong>VLibras</strong>, ferramenta gratuita do Governo Federal que traduz textos para a Língua Brasileira de Sinais. Clique no <strong>botão azul com o símbolo de mãos, no lado direito da tela</strong>, e depois em qualquer texto da página: um avatar 3D faz a tradução.</p>
+            <p>O VLibras é carregado do site do governo (vlibras.gov.br). Se ele estiver fora do ar, o botão não aparece, mas o resto do site funciona normalmente.</p>
+        </section>
+
+        <section id="teclado">
+            <h2>3. Navegação por teclado</h2>
+            <p>Todo o site pode ser usado sem mouse:</p>
+            <ul>
+                <li><kbd>Tab</kbd> e <kbd>Shift</kbd>+<kbd>Tab</kbd> avançam e voltam entre links, botões e campos. O item em foco ganha um contorno bem visível.</li>
+                <li>Ao entrar em qualquer página, o primeiro <kbd>Tab</kbd> mostra o link <strong>“Pular para o conteúdo”</strong>, que evita passar por todo o menu.</li>
+                <li><kbd>Enter</kbd> ou <kbd>Espaço</kbd> ativam botões; <kbd>Esc</kbd> fecha menus, janelas e o painel de acessibilidade.</li>
+                <li>Na busca do topo, use <kbd>↑</kbd> <kbd>↓</kbd> para escolher uma sugestão e <kbd>Enter</kbd> para abri-la.</li>
+                <li>No banner da página inicial e na galeria ampliada de fotos, as setas <kbd>←</kbd> <kbd>→</kbd> trocam de slide ou de foto.</li>
+            </ul>
+        </section>
+
+        <section id="leitores">
+            <h2>4. Leitores de tela</h2>
+            <p>O site foi feito para funcionar com leitores de tela como o NVDA (gratuito, para Windows), o JAWS, o VoiceOver (iPhone e Mac) e o TalkBack (Android):</p>
+            <ul>
+                <li>Imagens com texto alternativo e ícones com descrição.</li>
+                <li>Todos os campos têm nome; a ajuda e as mensagens de erro são lidas junto com o campo, e o cursor vai direto para o primeiro campo com erro.</li>
+                <li>Avisos (“produto adicionado”, “pedido enviado”…) são anunciados automaticamente.</li>
+                <li>Status de pedidos e anúncios são escritos por extenso — nunca indicados só por cor.</li>
+                <li>Títulos, menus e regiões da página marcados para facilitar a navegação.</li>
+            </ul>
+        </section>
+
+        <section id="outros">
+            <h2>5. Outros cuidados</h2>
+            <ul>
+                <li><strong>Contraste:</strong> textos seguem o nível AA das diretrizes WCAG 2.1.</li>
+                <li><strong>Zoom e celular:</strong> o site se adapta a telas a partir de 320 px e ao zoom do navegador até 200%.</li>
+                <li><strong>Movimento:</strong> se o seu sistema estiver configurado para “reduzir movimento”, as animações já começam desligadas.</li>
+                <li><strong>Sem JavaScript:</strong> compra, venda e cadastro funcionam mesmo se ele estiver desativado.</li>
+            </ul>
+            <p>Seguimos como referência as <strong>WCAG 2.1</strong> (Diretrizes de Acessibilidade para Conteúdo Web, do W3C) e o <strong>e-MAG</strong> (Modelo de Acessibilidade em Governo Eletrônico).</p>
+        </section>
+
+        <section id="contato-acessibilidade">
+            <h2>6. Encontrou um problema?</h2>
+            <p>Se alguma parte do site estiver difícil de usar, conte pra gente pela <a href="{% url 'contato' %}">página de contato</a>: diga qual página, o que aconteceu e, se puder, o aparelho e o leitor de tela que você usa. Toda mensagem sobre acessibilidade é tratada com prioridade.</p>
+        </section>
+    </article>
+</div>
+
+{% endblock %}

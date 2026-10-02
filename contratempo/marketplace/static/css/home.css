@@ -1,50 +1,195 @@
 /* static/css/home.css — página inicial */
 
-/* HERO */
-.home-hero {
+/* =====================================================================
+   BANNER EM CARROSSEL (topo da página)
+   Os slides ficam empilhados na mesma célula do grid: a altura do banner
+   é a do slide mais alto e a troca é um fade (opacity). O ativo tem a
+   classe .ativo (o primeiro já vem com ela, para funcionar sem JS).
+   ===================================================================== */
+.home-carrossel {
     position: relative;
     overflow: hidden;
+    border-bottom: 1.5px solid var(--ink);
+    color: #fff;
+}
+.carrossel-trilho { display: grid; }
+.carrossel-slide {
+    grid-area: 1 / 1;
+    display: flex;
+    align-items: center;
+    min-height: 480px;
+    padding: 64px 0 96px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease, visibility 0s linear 0.6s;
+}
+.carrossel-slide.ativo {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.6s ease, visibility 0s;
+}
+
+/* Fundos de cada slide (cores oficiais) */
+.slide--vermelho {
+    background:
+        repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.05) 0 2px, transparent 2px 18px),
+        var(--cor-destaque);
+}
+.slide--azul {
     background:
         repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 28px),
         var(--cor-header);
-    color: #fff;
-    padding: 72px 0 80px;
-    border-bottom: 1.5px solid var(--ink);
 }
-.home-hero-inner {
-    display: grid;
-    grid-template-columns: 1.3fr 0.7fr;
-    gap: 48px;
-    align-items: center;
-}
-.home-hero-text { max-width: 620px; }
-.home-hero-text .about-kicker { color: var(--cor-fundo); }
-.home-hero-text h1 {
-    color: #fff;
-    font-size: clamp(2.3rem, 5.4vw, 3.8rem);
-    margin: 14px 0 18px;
-}
-.home-hero-text h1 em { color: var(--cor-fundo); }
-.home-hero-text p {
-    color: var(--cor-header-claro);
-    font-size: 1.08rem;
-    max-width: 520px;
-    margin-bottom: 28px;
+.slide--escuro {
+    background:
+        radial-gradient(rgba(255, 255, 255, 0.07) 1.2px, transparent 1.3px) 0 0 / 22px 22px,
+        var(--cor-header-escuro);
 }
 
-/* Ingresso decorativo */
-.home-hero-ticket { display: flex; justify-content: center; }
+.slide-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    align-items: center;
+    gap: 48px;
+}
+.slide-texto { max-width: 640px; }
+.slide-tag {
+    display: inline-block;
+    padding: 5px 12px;
+    border: 1.5px solid rgba(255, 255, 255, 0.55);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+.slide-texto h1,
+.slide-texto h2 {
+    color: #fff;
+    font-size: clamp(2.2rem, 5vw, 3.7rem);
+    line-height: 1.03;
+    margin: 18px 0 16px;
+    max-width: 15ch;
+}
+.slide-texto h1 em,
+.slide-texto h2 em { color: var(--cor-fundo); }
+.slide-texto p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.08rem;
+    max-width: 46ch;
+    margin-bottom: 28px;
+}
+/* No slide vermelho, o botão vermelho sumiria: vira azul */
+.slide--vermelho .btn-accent { background: var(--cor-header); border-color: var(--ink); }
+
+.slide-arte { position: relative; height: 300px; }
+
+/* Controles: setas, pontos e pausa (centralizados embaixo) */
+.carrossel-controles {
+    position: absolute;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    background: rgba(27, 26, 51, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: var(--radius-pill);
+    backdrop-filter: blur(4px);
+}
+.carrossel-controles[hidden] { display: none; }
+.carrossel-seta,
+.carrossel-pausa {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: #fff;
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.carrossel-pausa { font-size: 0.62rem; letter-spacing: -0.1em; }
+.carrossel-seta:hover,
+.carrossel-pausa:hover { background: #fff; color: var(--cor-header); }
+.carrossel-pontos { display: flex; gap: 8px; padding: 0 4px; }
+.carrossel-ponto {
+    width: 10px;
+    height: 10px;
+    padding: 0;
+    border: 1.5px solid #fff;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    cursor: pointer;
+    transition: width 0.25s ease, background 0.25s ease;
+}
+.carrossel-ponto.ativo { width: 28px; background: #fff; }
+.carrossel-seta:focus-visible,
+.carrossel-pausa:focus-visible,
+.carrossel-ponto:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* ---------------------------------------------------------------------
+   Ilustração 1 e 3: três "cartas" em leque
+   --------------------------------------------------------------------- */
+.banner-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 136px;
+    height: 188px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: var(--paper);
+    color: var(--txt-azul);
+    border: var(--borda);
+    border-radius: 10px;
+    box-shadow: 5px 5px 0 rgba(27, 26, 51, 0.55);
+    transition: transform 0.35s ease;
+}
+.banner-card svg { width: 60px; height: 60px; }
+.banner-card span {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+}
+.banner-card--1 { transform: translate(-145%, -50%) rotate(-10deg); }
+.banner-card--2 { transform: translate(-50%, -54%); z-index: 1; background: var(--cor-header); color: #fff; }
+.banner-card--2 span { color: #fff; }
+.banner-card--3 { transform: translate(45%, -50%) rotate(10deg); color: var(--txt-vermelho); }
+.slide--escuro .banner-card--2 { background: var(--cor-destaque); }
+.slide-arte:hover .banner-card--1 { transform: translate(-155%, -52%) rotate(-14deg); }
+.slide-arte:hover .banner-card--3 { transform: translate(55%, -52%) rotate(14deg); }
+
+/* ---------------------------------------------------------------------
+   Ilustração 2: ingresso
+   --------------------------------------------------------------------- */
+.home-hero-ticket { display: flex; align-items: center; justify-content: center; }
 .ticket {
     position: relative;
-    width: 260px;
+    width: 280px;
     padding: 30px 28px;
     background: var(--cor-destaque);
     border: 1.5px solid var(--ink);
-    box-shadow: 10px 10px 0 var(--ink);
+    box-shadow: 10px 10px 0 var(--sombra);
     transform: rotate(-4deg);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 .ticket::before,
 .ticket::after {
@@ -68,17 +213,17 @@
     color: var(--cor-fundo);
 }
 .ticket strong {
-    font-family: var(--font-display);
-    font-size: 2.3rem;
-    line-height: 0.95;
-    letter-spacing: 0.02em;
+    font-family: var(--font-marca);
+    font-size: 2rem;
+    line-height: 1;
 }
-.ticket strong em { display: block; font-weight: 500; color: var(--cor-fundo); }
+/* No ingresso vermelho, o "tempo" vermelho sumiria: fica lilás */
+.ticket .marca-tempo { color: var(--cor-fundo); }
 .ticket-line { padding-top: 12px; border-top: 1.5px dashed rgba(255, 255, 255, 0.4); }
 .ticket-stamp {
     position: absolute;
-    right: -26px;
-    bottom: -26px;
+    right: -30px;
+    bottom: -58px;
     width: 86px;
     height: 86px;
     border-radius: 50%;
@@ -97,7 +242,9 @@
     transform: rotate(14deg);
 }
 
-/* FAIXA */
+/* =====================================================================
+   FAIXA "COMO FUNCIONA"
+   ===================================================================== */
 .home-strip {
     background: var(--paper);
     border-bottom: 1.5px solid var(--ink);
@@ -114,9 +261,11 @@
     border-left: 1px dashed var(--line);
 }
 .home-strip-inner > div:first-child { border-left: 0; padding-left: 0; }
-.home-strip-inner .mono { color: var(--cor-destaque); font-weight: 700; margin-right: 8px; }
+.home-strip-inner .mono { color: var(--txt-vermelho); font-weight: 700; margin-right: 8px; }
 
-/* CATEGORIAS */
+/* =====================================================================
+   CATEGORIAS
+   ===================================================================== */
 .home-categories {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -145,10 +294,12 @@
     font-weight: 600;
     color: var(--ink);
 }
-.home-category-index { font-size: 0.72rem; color: var(--cor-destaque); font-weight: 700; }
+.home-category-index { font-size: 0.72rem; color: var(--txt-vermelho); font-weight: 700; }
 .home-category-count { font-size: 0.8rem; color: var(--ink-muted); }
 
-/* CTA VENDER */
+/* =====================================================================
+   CHAMADA PARA VENDER
+   ===================================================================== */
 .home-sell {
     display: flex;
     align-items: center;
@@ -164,23 +315,36 @@
 .home-sell p { margin: 0; max-width: 520px; }
 .home-sell .btn { flex-shrink: 0; }
 
-/* Classes antigas mantidas por compatibilidade */
-.home-section { margin: 56px auto; }
-.home-section-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 20px; }
-
+/* =====================================================================
+   RESPONSIVO
+   ===================================================================== */
 @media (max-width: 960px) {
-    .home-hero-inner { grid-template-columns: 1fr; }
+    .slide-inner { grid-template-columns: 1fr; gap: 24px; }
+    .carrossel-slide { min-height: 0; padding: 48px 0 92px; }
+    .slide-arte { height: 220px; }
     .home-hero-ticket { display: none; }
     .home-categories { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 640px) {
-    .home-hero { padding: 48px 0 56px; }
-    .home-hero .cluster .btn { flex: 1; }
+    .carrossel-slide { padding: 36px 0 84px; }
+    .slide-texto h1,
+    .slide-texto h2 { font-size: 2.1rem; }
+    .slide-texto p { font-size: 0.98rem; margin-bottom: 22px; }
+    .slide-texto .cluster .btn { flex: 1; }
+    .slide-arte { height: 170px; }
+    .banner-card { width: 96px; height: 132px; gap: 10px; }
+    .banner-card svg { width: 42px; height: 42px; }
+    .carrossel-controles { bottom: 18px; }
     .home-strip-inner { grid-template-columns: 1fr; }
     .home-strip-inner > div { border-left: 0; border-top: 1px dashed var(--line); padding: 12px 0; }
     .home-strip-inner > div:first-child { border-top: 0; }
     .home-category-pill { min-height: 100px; padding: 14px; }
     .home-category-pill strong { font-size: 1.05rem; }
     .home-sell { flex-direction: column; align-items: stretch; padding: 26px 22px; box-shadow: 5px 5px 0 var(--cor-destaque); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .carrossel-slide,
+    .carrossel-slide.ativo { transition: none; }
 }

@@ -29,6 +29,21 @@
 /* =====================================================================
    01. TOKENS
    ===================================================================== */
+
+/* Fonte do logotipo [contratempo]: Adult Swim.
+   Coloque o arquivo da fonte em static/fonts/ com um destes nomes:
+   adult-swim.woff2, adult-swim.woff, adult-swim.ttf ou adult-swim.otf.
+   Sem o arquivo, o logo usa Helvetica/Arial em negrito (base do logo
+   original do Adult Swim). */
+@font-face {
+    font-family: "Adult Swim";
+    src: url("../fonts/adult-swim.woff2") format("woff2"),
+         url("../fonts/adult-swim.woff") format("woff"),
+         url("../fonts/adult-swim.ttf") format("truetype"),
+         url("../fonts/adult-swim.otf") format("opentype");
+    font-display: swap;
+}
+
 :root {
     /* Cores oficiais do Contratempo */
     --cor-header: #313170;
@@ -40,14 +55,26 @@
     /* Tons derivados das cores oficiais (claros/escuros para contraste) */
     --cor-header-escuro: #24245A;
     --cor-header-claro: #E4E3EE;
-    --paper: #F4F2F7;            /* superfície de cards e painéis */
-    --paper-2: #E8E6EE;          /* superfície secundária / hover */
+    --page-bg: #F4F3F8;
+    /* "tempo" do logo. Sobre o azul do cabeçalho, o vermelho escuro
+       (#6D191D) quase some; o vermelho claro oficial mantém a leitura. */
+    --marca-tempo: var(--cor-acento);          /* fundo das páginas (versão bem clara do lilás oficial) */
+    --paper: #FFFFFF;            /* superfície de cards e painéis */
+    --paper-2: #EEECF4;          /* superfície secundária / hover */
     --ink: #1B1A33;              /* texto principal e bordas fortes */
     --ink-muted: #545166;        /* texto secundário (contraste AA sobre paper e fundo) */
     --line: rgba(27, 26, 51, 0.18);
 
+    /* Cores "por função" — mudam no tema escuro (ver 01b) */
+    --txt-azul: var(--cor-header);       /* azul usado como TEXTO */
+    --txt-vermelho: var(--cor-destaque); /* vermelho usado como TEXTO (preços, rótulos) */
+    --txt-acento: var(--cor-acento);
+    --borda-azul: var(--cor-header);     /* azul usado como BORDA */
+    --surface: #FFFFFF;                  /* caixas internas e campos */
+    --sombra: var(--ink);                /* sombras deslocadas */
+
     /* Aliases usados pelos templates/CSS existentes — não remover */
-    --color-bg: var(--cor-fundo);
+    --color-bg: var(--page-bg);
     --color-surface: var(--paper);
     --color-text: var(--ink);
     --color-text-muted: var(--ink-muted);
@@ -64,9 +91,10 @@
     --font-body: "Work Sans", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     --font-mono: "Space Mono", ui-monospace, "Courier New", monospace;
     --font-heading: var(--font-display);
+    --font-marca: "Adult Swim", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
     /* Forma */
-    --radius: 4px;
+    --radius: 6px;
     --radius-pill: 999px;
     --borda: 1.5px solid var(--ink);
     --shadow-card: 5px 5px 0 var(--cor-header);
@@ -77,6 +105,32 @@
     --header-height: 72px;
     --container-width: 1200px;
     --gutter: 24px;
+}
+
+
+/* =====================================================================
+   01b. TEMA ESCURO
+   Ativado pelo painel de acessibilidade (html[data-tema="escuro"]), que
+   também pode seguir o tema do sistema. O azul do cabeçalho/rodapé e os
+   vermelhos dos botões continuam os mesmos; mudam fundos, textos e bordas.
+   ===================================================================== */
+:root[data-tema="escuro"] {
+    color-scheme: dark;
+    --page-bg: #121120;
+    --paper: #1C1B31;
+    --paper-2: #26253F;
+    --surface: #222139;
+    --ink: #ECEBF3;
+    --ink-muted: #B7B4C8;
+    --line: rgba(236, 235, 243, 0.2);
+    --txt-azul: #C3C1F5;
+    --txt-vermelho: #F2A9A5;
+    --txt-acento: #F2A9A5;
+    --borda-azul: #8E8CD8;
+    --sombra: #05040C;
+    --borda: 1.5px solid #5D5B84;
+    --shadow-card: 5px 5px 0 #05040C;
+    --shadow-hover: 7px 7px 0 var(--cor-acento);
 }
 
 
@@ -100,8 +154,8 @@ body {
     display: flex;
     flex-direction: column;
     font-family: var(--font-body);
-    font-size: 15px;
-    background: var(--cor-fundo);
+    font-size: 0.9375rem;   /* 15px; em rem para acompanhar o "aumentar texto" */
+    background: var(--page-bg);
     color: var(--ink);
     line-height: 1.55;
 }
@@ -117,12 +171,13 @@ h1, h2, h3, h4 {
     line-height: 1.12;
     color: var(--ink);
     text-wrap: balance;
+    overflow-wrap: break-word;
 }
 
 h1 em, h2 em, h3 em {
     font-style: italic;
     font-weight: 500;
-    color: var(--cor-destaque);
+    color: var(--txt-vermelho);
 }
 
 p {
@@ -223,10 +278,12 @@ textarea {
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--cor-destaque);
+    color: var(--txt-vermelho);
 }
 
-.section { margin: 56px 0; }
+/* Só vertical: com "margin: 56px 0" a seção perdia o "margin: 0 auto" do
+   .container e ficava encostada à esquerda. */
+.section { margin-top: 56px; margin-bottom: 56px; }
 .section-head {
     display: flex;
     flex-wrap: wrap;
@@ -243,11 +300,11 @@ textarea {
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--cor-header);
+    color: var(--txt-azul);
     border-bottom: 1.5px solid currentColor;
     padding-bottom: 2px;
 }
-.link-arrow:hover { color: var(--cor-destaque); }
+.link-arrow:hover { color: var(--txt-vermelho); }
 
 .muted { color: var(--ink-muted); }
 .mono { font-family: var(--font-mono); }
@@ -305,26 +362,26 @@ textarea {
     background: var(--cor-destaque);
     border-color: var(--cor-destaque);
     color: #fff;
-    box-shadow: 3px 3px 0 var(--ink);
+    box-shadow: 3px 3px 0 var(--sombra);
 }
 .btn-accent:hover {
     background: var(--cor-acento);
     border-color: var(--cor-acento);
     transform: translate(-1px, -1px);
-    box-shadow: 4px 4px 0 var(--ink);
+    box-shadow: 4px 4px 0 var(--sombra);
 }
 
 .btn-outline {
     background: transparent;
-    border-color: var(--cor-header);
-    color: var(--cor-header);
+    border-color: var(--borda-azul);
+    color: var(--txt-azul);
 }
 .btn-outline:hover { background: var(--cor-header); color: #fff; }
 
 .btn-ghost {
     background: transparent;
     border-color: transparent;
-    color: var(--cor-header);
+    color: var(--txt-azul);
     padding-left: 10px;
     padding-right: 10px;
 }
@@ -333,16 +390,16 @@ textarea {
 .btn-danger {
     background: transparent;
     border-color: var(--cor-destaque);
-    color: var(--cor-destaque);
+    color: var(--txt-vermelho);
 }
 .btn-danger:hover { background: var(--cor-destaque); color: #fff; }
 
 .btn-light {
     background: var(--paper);
     border-color: var(--paper);
-    color: var(--cor-header);
+    color: var(--txt-azul);
 }
-.btn-light:hover { background: #fff; }
+.btn-light:hover { background: var(--surface); }
 
 .btn-sm { min-height: 34px; padding: 6px 12px; font-size: 0.7rem; }
 .btn-lg { min-height: 52px; padding: 14px 28px; font-size: 0.85rem; }
@@ -354,13 +411,13 @@ textarea {
     background: none;
     border: 0;
     padding: 0;
-    color: var(--cor-destaque);
+    color: var(--txt-vermelho);
     font-size: 0.82rem;
     text-decoration: underline;
     text-underline-offset: 3px;
     cursor: pointer;
 }
-.link-button:hover { color: var(--cor-acento); }
+.link-button:hover { color: var(--txt-acento); }
 
 .inline-form { display: inline; margin: 0; }
 
@@ -383,18 +440,23 @@ textarea {
 }
 
 .logo {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.35rem;
-    letter-spacing: 0.04em;
+    font-size: 1.55rem;
     color: #fff;
     white-space: nowrap;
 }
-.logo span {
-    color: var(--cor-fundo);
-    font-style: italic;
-    font-weight: 500;
+
+/* Logotipo em texto: [contratempo] (partials/marca.html), na fonte
+   Adult Swim. O tamanho vem do elemento onde ele é usado. */
+.marca {
+    font-family: var(--font-marca);
+    font-weight: 700;
+    font-style: normal;
+    letter-spacing: -0.03em;
+    text-transform: lowercase;
+    white-space: nowrap;
 }
+.marca-colchete { color: inherit; }
+.marca-tempo { color: var(--marca-tempo); }
 
 .main-nav { flex: 1; }
 .main-nav > ul {
@@ -496,7 +558,7 @@ textarea {
 .dropdown-menu li a:hover,
 .dropdown-menu li button:hover {
     background: var(--paper-2);
-    color: var(--cor-destaque);
+    color: var(--txt-vermelho);
 }
 .dropdown-menu .dropdown-head {
     padding: 6px 18px 10px;
@@ -521,7 +583,7 @@ textarea {
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--cor-header);
+    color: var(--txt-azul);
 }
 
 .header-right {
@@ -590,7 +652,7 @@ textarea {
     min-width: 18px;
     height: 18px;
     border-radius: 9px;
-    border: 1.5px solid var(--cor-header);
+    border: 1.5px solid var(--borda-azul);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -638,7 +700,7 @@ textarea {
     flex-wrap: wrap;
 }
 .breadcrumb a { color: var(--ink-muted); text-decoration: underline; text-underline-offset: 3px; }
-.breadcrumb a:hover { color: var(--cor-destaque); }
+.breadcrumb a:hover { color: var(--txt-vermelho); }
 .breadcrumb span.current {
     color: var(--ink);
     font-weight: 700;
@@ -692,10 +754,10 @@ textarea {
 }
 .messages .message-close:hover { opacity: 1; }
 
-.messages .success, .alert-success { border-color: var(--cor-header); color: var(--cor-header); }
-.messages .error, .alert-error { border-color: var(--cor-destaque); color: var(--cor-destaque); }
+.messages .success, .alert-success { border-color: var(--borda-azul); color: var(--txt-azul); }
+.messages .error, .alert-error { border-color: var(--cor-destaque); color: var(--txt-vermelho); }
 .messages .info, .alert-info { border-color: var(--cor-secundaria); color: var(--ink); }
-.messages .warning, .alert-warning { border-color: var(--cor-acento); color: var(--cor-destaque); }
+.messages .warning, .alert-warning { border-color: var(--cor-acento); color: var(--txt-vermelho); }
 .alert p { margin: 0; color: inherit; }
 
 
@@ -742,7 +804,7 @@ textarea {
     letter-spacing: 0.08em;
     text-transform: uppercase;
     white-space: nowrap;
-    color: var(--cor-header);
+    color: var(--txt-azul);
     background: transparent;
 }
 .badge::before {
@@ -761,16 +823,16 @@ textarea {
 .badge--encerrado { color: var(--ink-muted); border-style: dashed; }
 
 /* Status de pedidos */
-.badge--aguardando_pagamento { color: var(--cor-acento); }
+.badge--aguardando_pagamento { color: var(--txt-acento); }
 .badge--pagamento_aprovado,
-.badge--processamento { color: var(--cor-header); }
+.badge--processamento { color: var(--txt-azul); }
 .badge--enviado { color: #fff; background: var(--cor-header); border-color: var(--cor-header); }
-.badge--entregue { color: #fff; background: var(--ink); border-color: var(--ink); }
-.badge--cancelado { color: var(--cor-destaque); border-style: dashed; }
+.badge--entregue { color: var(--page-bg); background: var(--ink); border-color: var(--ink); }
+.badge--cancelado { color: var(--txt-vermelho); border-style: dashed; }
 
 /* Condição do produto */
-.badge--novo { color: var(--cor-header); }
-.badge--semi_novo { color: var(--cor-acento); }
+.badge--novo { color: var(--txt-azul); }
+.badge--semi_novo { color: var(--txt-acento); }
 .badge--usado { color: var(--ink-muted); }
 
 .tag {
@@ -782,7 +844,7 @@ textarea {
     color: var(--ink);
 }
 
-.stars { color: var(--cor-acento); letter-spacing: 1px; }
+.stars { color: var(--txt-acento); letter-spacing: 1px; }
 .stars .off { color: var(--cor-fundo); }
 
 .thumb {
@@ -892,7 +954,7 @@ textarea {
     letter-spacing: 0.1em;
     color: var(--ink-muted);
 }
-.product-card .product-category { color: var(--cor-destaque); }
+.product-card .product-category { color: var(--txt-vermelho); }
 .product-card .product-name {
     font-size: 0.95rem;
     font-weight: 600;
@@ -904,13 +966,13 @@ textarea {
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
-.product-card .product-name:hover { color: var(--cor-destaque); }
+.product-card .product-name:hover { color: var(--txt-vermelho); }
 .product-card .product-franchise { font-size: 0.8rem; color: var(--ink-muted); }
 .product-card .product-price {
     font-family: var(--font-mono);
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--cor-destaque);
+    color: var(--txt-vermelho);
     margin-top: auto;
     padding-top: 6px;
 }
@@ -938,7 +1000,7 @@ textarea {
     border: var(--borda);
     border-radius: 50%;
     background: var(--cor-header-claro);
-    color: var(--cor-header);
+    color: var(--txt-azul);
 }
 .empty-state .empty-icon svg { width: 28px; height: 28px; }
 .empty-state h3 { color: var(--ink); margin-bottom: 8px; font-size: 1.3rem; }
@@ -963,6 +1025,9 @@ textarea {
 .form-card h1 { text-align: center; font-size: 1.6rem; }
 
 .form-group { margin-bottom: 18px; }
+/* Opções de rádio agrupadas em <fieldset>/<legend> (partials/form_field.html) */
+.form-fieldset { border: 0; padding: 0; margin-left: 0; margin-right: 0; min-width: 0; }
+.form-fieldset > legend { padding: 0; }
 .form-group > label,
 .form-label {
     display: block;
@@ -974,7 +1039,7 @@ textarea {
     margin-bottom: 7px;
     color: var(--ink);
 }
-.form-group .required-mark { color: var(--cor-destaque); }
+.form-group .required-mark { color: var(--txt-vermelho); }
 
 .form-group input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
 .form-group select,
@@ -988,7 +1053,7 @@ textarea {
     font-size: 0.95rem;
     font-family: var(--font-body);
     color: var(--ink);
-    background: #fff;
+    background: var(--surface);
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .form-group textarea { resize: vertical; min-height: 110px; }
@@ -1000,7 +1065,7 @@ textarea {
 .form-group textarea:focus,
 .input:focus {
     outline: none;
-    border-color: var(--cor-header);
+    border-color: var(--borda-azul);
     box-shadow: 3px 3px 0 var(--cor-fundo);
 }
 .form-group.has-error input,
@@ -1012,7 +1077,7 @@ textarea {
     padding: 10px;
     border: 1.5px dashed var(--cor-secundaria);
     border-radius: var(--radius);
-    background: #fff;
+    background: var(--surface);
     font-size: 0.85rem;
 }
 
@@ -1026,7 +1091,7 @@ textarea {
     list-style: none;
     padding: 0;
     margin: 6px 0 0;
-    color: var(--cor-destaque);
+    color: var(--txt-vermelho);
     font-size: 0.82rem;
     font-weight: 500;
 }
@@ -1065,7 +1130,7 @@ textarea {
     font-size: 0.88rem;
     color: var(--ink-muted);
 }
-.form-footer a { color: var(--cor-destaque); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.form-footer a { color: var(--txt-vermelho); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
 /* Checkbox e radio */
 .check {
@@ -1086,7 +1151,7 @@ textarea {
     accent-color: var(--cor-header);
     cursor: pointer;
 }
-.check a { color: var(--cor-destaque); text-decoration: underline; }
+.check a { color: var(--txt-vermelho); text-decoration: underline; }
 .form-group > label.check {
     display: flex;
     margin: 0;
@@ -1110,7 +1175,7 @@ textarea {
     padding: 9px 14px;
     border: 1.5px solid var(--cor-secundaria);
     border-radius: var(--radius-pill);
-    background: #fff;
+    background: var(--surface);
     font-size: 0.88rem;
     cursor: pointer;
 }
@@ -1137,7 +1202,7 @@ textarea {
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--cor-header);
+    color: var(--txt-azul);
     cursor: pointer;
 }
 
@@ -1192,7 +1257,7 @@ textarea {
     min-width: 220px;
 }
 .data-table .cell-product a { font-weight: 600; }
-.data-table .cell-product a:hover { color: var(--cor-destaque); }
+.data-table .cell-product a:hover { color: var(--txt-vermelho); }
 .data-table .cell-actions { white-space: nowrap; text-align: right; }
 .data-table .num { font-family: var(--font-mono); white-space: nowrap; }
 
@@ -1229,7 +1294,7 @@ textarea {
 .tab.active {
     background: var(--paper);
     border-color: var(--ink);
-    color: var(--cor-destaque);
+    color: var(--txt-vermelho);
 }
 .tab .tab-count {
     min-width: 22px;
@@ -1332,10 +1397,10 @@ textarea {
 .account-nav a.active {
     border-left-color: var(--cor-destaque);
     background: var(--paper-2);
-    color: var(--cor-destaque);
+    color: var(--txt-vermelho);
     font-weight: 600;
 }
-.account-nav a.active svg { color: var(--cor-destaque); }
+.account-nav a.active svg { color: var(--txt-vermelho); }
 
 .avatar {
     width: 44px;
@@ -1387,7 +1452,7 @@ textarea {
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }
-.summary-row.total strong { font-size: 1.35rem; color: var(--cor-destaque); letter-spacing: 0; }
+.summary-row.total strong { font-size: 1.35rem; color: var(--txt-vermelho); letter-spacing: 0; }
 .summary .btn { margin-top: 16px; }
 .summary-note { margin: 12px 0 0; font-size: 0.78rem; text-align: center; }
 .summary-items { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
@@ -1406,13 +1471,13 @@ textarea {
     align-items: flex-start;
     gap: 14px;
     padding: 16px 18px;
-    background: #fff;
+    background: var(--surface);
     border: 1.5px solid var(--cor-secundaria);
     border-radius: var(--radius);
     cursor: pointer;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-.option-card:hover { border-color: var(--cor-header); }
+.option-card:hover { border-color: var(--borda-azul); }
 .option-card input[type="radio"] {
     width: 18px;
     height: 18px;
@@ -1428,7 +1493,7 @@ textarea {
 .option-card .option-title { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-weight: 600; color: var(--ink); }
 .option-card p { margin: 4px 0 0; font-size: 0.88rem; }
 .option-card .option-actions { display: flex; gap: 12px; margin-top: 8px; font-size: 0.82rem; }
-.option-card .option-actions a { color: var(--cor-header); text-decoration: underline; text-underline-offset: 3px; }
+.option-card .option-actions a { color: var(--txt-azul); text-decoration: underline; text-underline-offset: 3px; }
 
 .item-card {
     display: flex;
@@ -1510,15 +1575,33 @@ textarea {
 }
 .site-footer .footer-links a { color: var(--cor-header-claro); width: fit-content; }
 .site-footer .footer-links a:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
-.payment-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-.payment-chips span {
-    padding: 4px 9px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: var(--radius);
+/* Logos das formas de pagamento (partials/pagamentos.html) */
+.payment-logos { margin-top: 18px; }
+.payment-logos-title {
+    display: block;
+    margin-bottom: 8px;
     font-family: var(--font-mono);
     font-size: 0.66rem;
-    letter-spacing: 0.04em;
-    color: #fff;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cor-fundo);
+}
+.payment-logos-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: 360px;
+}
+.payment-logos-list svg {
+    display: block;
+    width: 52px;
+    height: 34px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
 }
 .site-footer .footer-bottom {
     display: flex;
@@ -1730,7 +1813,7 @@ textarea {
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--cor-destaque);
+    color: var(--txt-vermelho);
 }
 .search-suggest a {
     display: flex;
@@ -1747,7 +1830,7 @@ textarea {
 .search-suggest a:hover .search-suggest-price,
 .search-suggest a.ativa .search-suggest-price { color: var(--cor-fundo); }
 .search-suggest-cat { font-weight: 600; font-size: 0.9rem; }
-.search-suggest-cat::before { content: "#"; font-family: var(--font-mono); color: var(--cor-acento); }
+.search-suggest-cat::before { content: "#"; font-family: var(--font-mono); color: var(--txt-acento); }
 .search-suggest-item img {
     width: 42px;
     height: 42px;
@@ -1766,7 +1849,7 @@ textarea {
     text-overflow: ellipsis;
 }
 .search-suggest-info small { font-size: 0.72rem; color: var(--ink-muted); }
-.search-suggest-price { font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; color: var(--cor-destaque); white-space: nowrap; }
+.search-suggest-price { font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700; color: var(--txt-vermelho); white-space: nowrap; }
 .search-suggest a.search-suggest-all {
     margin-top: 4px;
     border-top: 1px dashed var(--line);
@@ -1774,5 +1857,5 @@ textarea {
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.04em;
-    color: var(--cor-header);
+    color: var(--txt-azul);
 }

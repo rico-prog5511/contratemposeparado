@@ -378,3 +378,16 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+
+/* ---------------------------------------------------------------
+   ERROS DE FORMULÁRIO: ao voltar do envio com erro, o foco vai para
+   o primeiro campo inválido (o leitor de tela lê o rótulo e o erro,
+   ligados pelo aria-describedby que o Django gera).
+   --------------------------------------------------------------- */
+document.addEventListener("DOMContentLoaded", function () {
+    var invalido = document.querySelector("main [aria-invalid='true']");
+    if (!invalido) return;
+    invalido.focus({ preventScroll: true });
+    invalido.scrollIntoView({ block: "center", behavior: "auto" });
+});

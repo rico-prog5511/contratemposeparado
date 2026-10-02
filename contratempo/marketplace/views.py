@@ -116,6 +116,12 @@ def sobre_nos(request):
     })
 
 
+def acessibilidade(request):
+    return render(request, "acessibilidade.html", {
+        "breadcrumbs": [{"label": "Acessibilidade", "url": None}],
+    })
+
+
 def privacidade(request):
     return render(request, "privacidade.html", {
         "breadcrumbs": [{"label": "Política de privacidade", "url": None}],

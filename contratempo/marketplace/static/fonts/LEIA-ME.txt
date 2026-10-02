@@ -1,0 +1,19 @@
+﻿FONTE DO LOGOTIPO [contratempo] — Adult Swim
+
+Coloque aqui o arquivo da fonte Adult Swim com UM destes nomes
+(em minúsculas, com hífen):
+
+    adult-swim.woff2   (o melhor para sites)
+    adult-swim.woff
+    adult-swim.ttf
+    adult-swim.otf
+
+O CSS (static/css/styles-retro.css, regra @font-face) já procura esses
+arquivos. Sem eles, o logo usa Helvetica/Arial em negrito.
+
+Depois de colocar o arquivo:
+  - no computador: atualize a página com Ctrl+F5;
+  - no PythonAnywhere: faça Commit/Push e rode o atualizar.sh
+    (ele roda o collectstatic, que copia a fonte).
+
+Confira a licença da fonte antes de publicar o site.

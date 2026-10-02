@@ -13,6 +13,9 @@
 
     <link rel="stylesheet" href="{% static 'css/styles-retro.css' %}">
     {% block extra_css %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'css/acessibilidade.css' %}">
+    {# Aplica as preferências de acessibilidade antes da página aparecer (sem "piscar") #}
+    <script src="{% static 'js/acessibilidade.js' %}"></script>
 </head>
 <body class="{% block body_class %}{% endblock %}">
 
@@ -28,6 +31,8 @@
 
     {% include "partials/footer.html" %}
     {% include "partials/confirm_dialog.html" %}
+    {% include "partials/acessibilidade.html" %}
+    {% include "partials/vlibras.html" %}
 
     <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}

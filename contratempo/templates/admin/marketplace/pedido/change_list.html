@@ -1,0 +1,7 @@
+{% extends "admin/change_list.html" %}
+{% comment %}Lista de pedidos do admin com o atalho para o relatório anual.{% endcomment %}
+
+{% block object-tools-items %}
+    <li><a href="{% url 'admin:marketplace_pedido_relatorio' %}" class="ct-botao-relatorio">Relatório anual</a></li>
+    {{ block.super }}
+{% endblock %}

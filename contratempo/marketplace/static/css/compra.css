@@ -33,15 +33,15 @@
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--cor-destaque);
+    color: var(--txt-vermelho);
 }
 .cart-item-info h2 { font-size: 1.1rem; margin: 4px 0; }
-.cart-item-info h2 a:hover { color: var(--cor-destaque); }
+.cart-item-info h2 a:hover { color: var(--txt-vermelho); }
 .cart-item-info p { margin: 0; font-size: 0.85rem; }
-.cart-item-note { color: var(--cor-header) !important; font-weight: 500; }
+.cart-item-note { color: var(--txt-azul) !important; font-weight: 500; }
 .cart-item-alert {
     margin-top: 6px !important;
-    color: var(--cor-destaque) !important;
+    color: var(--txt-vermelho) !important;
     font-weight: 600;
 }
 
@@ -56,7 +56,7 @@
     gap: 6px;
     min-width: 110px;
 }
-.cart-item-price strong { font-family: var(--font-mono); font-size: 1.05rem; color: var(--cor-destaque); }
+.cart-item-price strong { font-family: var(--font-mono); font-size: 1.05rem; color: var(--txt-vermelho); }
 .cart-continue { align-self: flex-start; margin-top: 6px; }
 
 /* =====================================================================
@@ -113,7 +113,7 @@
 .checkout-steps .current .step-num { background: var(--cor-destaque); border-color: var(--cor-destaque); color: #fff; }
 .checkout-steps .current .step-label { color: var(--ink); }
 .checkout-steps .done .step-num { background: var(--cor-header); border-color: var(--cor-header); color: #fff; }
-.checkout-steps .done .step-label { color: var(--cor-header); text-decoration: underline; text-underline-offset: 3px; }
+.checkout-steps .done .step-label { color: var(--txt-azul); text-decoration: underline; text-underline-offset: 3px; }
 
 .add-option { margin-top: 14px; }
 
@@ -233,7 +233,7 @@
     padding: 16px 18px;
 }
 .order-thumbs { display: flex; }
-.order-thumbs .thumb { margin-left: -14px; box-shadow: 2px 2px 0 var(--ink); }
+.order-thumbs .thumb { margin-left: -14px; box-shadow: 2px 2px 0 var(--sombra); }
 .order-thumbs .thumb:first-child { margin-left: 0; }
 .order-thumbs .more {
     width: 48px;
@@ -292,7 +292,7 @@
 .timeline li:first-child::after { display: none; }
 .timeline li.feito { color: var(--ink); font-weight: 600; }
 .timeline li.feito::before { background: var(--cor-header); border-color: var(--cor-header); }
-.timeline li.feito::after { border-top-style: solid; border-color: var(--cor-header); }
+.timeline li.feito::after { border-top-style: solid; border-color: var(--borda-azul); }
 .timeline li.atual::before { background: var(--cor-destaque); border-color: var(--cor-destaque); box-shadow: 0 0 0 4px var(--cor-fundo); }
 
 .order-items-detail .review-items li { align-items: flex-start; }
@@ -301,7 +301,7 @@
 .rating-form {
     margin-top: 12px;
     padding: 14px;
-    background: #fff;
+    background: var(--surface);
     border: 1.5px dashed var(--cor-secundaria);
     border-radius: var(--radius);
 }
@@ -312,7 +312,7 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--cor-destaque);
+    color: var(--txt-vermelho);
 }
 .rating-form[open] summary { margin-bottom: 12px; }
 
@@ -336,7 +336,7 @@
 }
 .star-input label:hover,
 .star-input label:hover ~ label,
-.star-input input:checked ~ label { color: var(--cor-acento); }
+.star-input input:checked ~ label { color: var(--txt-acento); }
 .star-input input:focus-visible + label { outline: 2px solid var(--cor-destaque); outline-offset: 2px; }
 
 @media (max-width: 860px) {
@@ -375,8 +375,8 @@
    FRETE, PACOTES POR VENDEDOR E RASTREIO
    ===================================================================== */
 .option-frete { margin-top: 8px !important; font-size: 0.85rem; color: var(--ink) !important; }
-.option-frete strong { font-family: var(--font-mono); color: var(--cor-destaque); }
-.option-frete--off { color: var(--cor-destaque) !important; font-weight: 600; }
+.option-frete strong { font-family: var(--font-mono); color: var(--txt-vermelho); }
+.option-frete--off { color: var(--txt-vermelho) !important; font-weight: 600; }
 .option-card--off { opacity: 0.6; cursor: not-allowed; background: var(--paper-2); }
 
 .summary-group { padding: 12px 0; border-top: 1px dashed var(--line); }
@@ -389,7 +389,7 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--cor-header);
+    color: var(--txt-azul);
 }
 .summary-group .summary-items { margin-bottom: 8px; }
 .summary-row-sm { margin-bottom: 0; font-size: 0.8rem; }
@@ -405,12 +405,12 @@
     gap: 14px;
     margin-top: 20px;
     padding: 14px 18px;
-    background: #fff;
-    border: 1.5px dashed var(--cor-header);
+    background: var(--surface);
+    border: 1.5px dashed var(--borda-azul);
     border-radius: var(--radius);
 }
 .tracking-box .form-label { margin-bottom: 2px; }
-.tracking-box strong { display: block; font-size: 1.2rem; color: var(--cor-destaque); letter-spacing: 0.06em; }
+.tracking-box strong { display: block; font-size: 1.2rem; color: var(--txt-vermelho); letter-spacing: 0.06em; }
 .tracking-box small { color: var(--ink-muted); font-size: 0.8rem; }
 
 /* Próximo passo do vendedor */
@@ -432,14 +432,14 @@
 .next-step p { color: var(--cor-header-claro); margin: 0; }
 .next-step-form { display: flex; flex-direction: column; gap: 8px; }
 .next-step-form .form-label { color: var(--cor-fundo); margin: 0; }
-.next-step-form .input { background: #fff; }
+.next-step-form .input { background: var(--surface); }
 .ship-to p { color: var(--ink); }
 
 /* Compra concluída com vários pedidos */
 .done-order {
     margin-top: 16px;
     padding: 16px 18px;
-    background: #fff;
+    background: var(--surface);
     border: 1.5px solid var(--ink);
     border-radius: var(--radius);
 }

@@ -1,0 +1,549 @@
+/* =====================================================================
+   CONTRATEMPO — tema do painel administrativo (/admin/)
+   Carregado por contratempo/templates/admin/base_site.html, depois dos
+   CSS do próprio Django. O admin usa variáveis CSS; aqui elas recebem
+   as cores oficiais do site, nos temas claro e escuro.
+
+   Sumário
+   01. Fonte do logo
+   02. Cores — tema claro
+   03. Cores — tema escuro
+   04. Base e acessibilidade
+   05. Cabeçalho e logo
+   06. Tabelas, módulos e formulários
+   07. Botões
+   08. Painel de resumo (página inicial)
+   09. Selos, miniaturas e estrelas
+   ===================================================================== */
+
+/* 01. FONTE DO LOGO (mesma do site; ver static/fonts/LEIA-ME.txt) */
+@font-face {
+    font-family: "Adult Swim";
+    src: url("../fonts/adult-swim.woff2") format("woff2"),
+         url("../fonts/adult-swim.woff") format("woff"),
+         url("../fonts/adult-swim.ttf") format("truetype"),
+         url("../fonts/adult-swim.otf") format("opentype");
+    font-display: swap;
+}
+
+/* =====================================================================
+   02. CORES — TEMA CLARO
+   Todas as combinações de texto/fundo atendem ao contraste WCAG AA.
+   ===================================================================== */
+html[data-theme="light"],
+:root {
+    --ct-azul: #313170;
+    --ct-azul-escuro: #24245A;
+    --ct-vermelho: #6D191D;
+    --ct-vermelho-claro: #A54C49;
+    --ct-lilas: #ACA9BB;
+    --ct-foco: #A54C49;
+
+    --primary: #313170;
+    --secondary: #313170;
+    --accent: #ACA9BB;
+    --primary-fg: #FFFFFF;
+
+    --body-fg: #1B1A33;
+    --body-bg: #FFFFFF;
+    --body-quiet-color: #545166;
+    --body-medium-color: #36344D;
+    --body-loud-color: #1B1A33;
+
+    --header-color: #E4E3EE;
+    --header-branding-color: #FFFFFF;
+    --header-bg: #313170;
+    --header-link-color: #FFFFFF;
+
+    --breadcrumbs-fg: #E4E3EE;
+    --breadcrumbs-link-fg: #FFFFFF;
+    --breadcrumbs-bg: #24245A;
+
+    --link-fg: #313170;
+    --link-hover-color: #6D191D;
+    --link-selected-fg: #6D191D;
+
+    --hairline-color: #E6E4EE;
+    --border-color: #C9C6D6;
+
+    --error-fg: #6D191D;
+
+    --message-success-bg: #E6E5F3;
+    --message-warning-bg: #FFF2D9;
+    --message-error-bg: #F7E4E4;
+
+    --darkened-bg: #F4F3F8;
+    --selected-bg: #E4E3EE;
+    --selected-row: #EEECF4;
+
+    --button-fg: #FFFFFF;
+    --button-bg: #313170;
+    --button-hover-bg: #24245A;
+    --default-button-bg: #6D191D;
+    --default-button-hover-bg: #551317;
+    --close-button-bg: #5F5C70;
+    --close-button-hover-bg: #36344D;
+    --delete-button-bg: #6D191D;
+    --delete-button-hover-bg: #551317;
+
+    --object-tools-fg: #FFFFFF;
+    --object-tools-bg: #5F5C70;
+    --object-tools-hover-bg: #313170;
+
+    --font-family-primary: "Work Sans", "Segoe UI", system-ui, Roboto, Arial, sans-serif;
+    --font-family-monospace: "Space Mono", ui-monospace, Menlo, Consolas, monospace;
+    --ct-fonte-marca: "Adult Swim", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+    --ct-cartao-bg: #FFFFFF;
+    --ct-sombra: #313170;
+}
+
+/* =====================================================================
+   03. CORES — TEMA ESCURO
+   (segue a preferência do sistema ou o botão de tema do admin)
+   ===================================================================== */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --ct-foco: #F0A5A1;
+
+        --primary: #3B3B86;
+        --secondary: #3B3B86;
+        --accent: #ACA9BB;
+        --primary-fg: #F4F3F8;
+
+        --body-fg: #ECEBF3;
+        --body-bg: #16152B;
+        --body-quiet-color: #B7B4C8;
+        --body-medium-color: #D6D4E2;
+        --body-loud-color: #FFFFFF;
+
+        --header-color: #E4E3EE;
+        --header-bg: #24245A;
+        --breadcrumbs-fg: #D6D4E2;
+        --breadcrumbs-bg: #1D1C3A;
+
+        --link-fg: #C9C7F2;
+        --link-hover-color: #F0A5A1;
+        --link-selected-fg: #F0A5A1;
+
+        --hairline-color: #2A2948;
+        --border-color: #3D3B5C;
+        --error-fg: #F0A5A1;
+
+        --message-success-bg: #252456;
+        --message-warning-bg: #4A3A12;
+        --message-error-bg: #4A1A1C;
+
+        --darkened-bg: #1D1C34;
+        --selected-bg: #2C2B4F;
+        --selected-row: #2C2B4F;
+
+        --button-bg: #3B3B86;
+        --button-hover-bg: #4C4CA6;
+        --default-button-bg: #8E2A2F;
+        --default-button-hover-bg: #A5363B;
+        --close-button-bg: #4D4B66;
+        --close-button-hover-bg: #64627F;
+        --delete-button-bg: #8E2A2F;
+        --delete-button-hover-bg: #A5363B;
+        --object-tools-bg: #4D4B66;
+        --object-tools-hover-bg: #3B3B86;
+
+        --ct-cartao-bg: #1D1C34;
+        --ct-sombra: #0D0C1C;
+    }
+}
+
+html[data-theme="dark"] {
+    --ct-foco: #F0A5A1;
+
+    --primary: #3B3B86;
+    --secondary: #3B3B86;
+    --accent: #ACA9BB;
+    --primary-fg: #F4F3F8;
+
+    --body-fg: #ECEBF3;
+    --body-bg: #16152B;
+    --body-quiet-color: #B7B4C8;
+    --body-medium-color: #D6D4E2;
+    --body-loud-color: #FFFFFF;
+
+    --header-color: #E4E3EE;
+    --header-bg: #24245A;
+    --breadcrumbs-fg: #D6D4E2;
+    --breadcrumbs-bg: #1D1C3A;
+
+    --link-fg: #C9C7F2;
+    --link-hover-color: #F0A5A1;
+    --link-selected-fg: #F0A5A1;
+
+    --hairline-color: #2A2948;
+    --border-color: #3D3B5C;
+    --error-fg: #F0A5A1;
+
+    --message-success-bg: #252456;
+    --message-warning-bg: #4A3A12;
+    --message-error-bg: #4A1A1C;
+
+    --darkened-bg: #1D1C34;
+    --selected-bg: #2C2B4F;
+    --selected-row: #2C2B4F;
+
+    --button-bg: #3B3B86;
+    --button-hover-bg: #4C4CA6;
+    --default-button-bg: #8E2A2F;
+    --default-button-hover-bg: #A5363B;
+    --close-button-bg: #4D4B66;
+    --close-button-hover-bg: #64627F;
+    --delete-button-bg: #8E2A2F;
+    --delete-button-hover-bg: #A5363B;
+    --object-tools-bg: #4D4B66;
+    --object-tools-hover-bg: #3B3B86;
+
+    --ct-cartao-bg: #1D1C34;
+    --ct-sombra: #0D0C1C;
+}
+
+/* =====================================================================
+   04. BASE E ACESSIBILIDADE
+   ===================================================================== */
+body {
+    font-size: 0.9375rem;          /* 15px (o padrão do admin é 14px) */
+    line-height: 1.5;
+}
+
+/* Foco sempre visível ao navegar pelo teclado (Tab) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+    outline: 3px solid var(--ct-foco);
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
+/* Link "Pular para o conteúdo" do admin, bem visível quando focado */
+.skip-to-content-link:focus {
+    z-index: 100;
+    padding: 10px 16px;
+    background: var(--ct-vermelho);
+    color: #fff;
+    font-weight: 700;
+}
+
+/* Áreas de clique maiores */
+input[type="checkbox"],
+input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--ct-azul);
+}
+input[type="text"], input[type="email"], input[type="password"], input[type="number"],
+input[type="url"], input[type="search"], input[type="tel"], select, textarea,
+.vTextField, .vURLField, .vIntegerField {
+    min-height: 36px;
+    border-radius: 6px;
+}
+
+/* Links dentro do conteúdo sublinhados ao passar o mouse */
+#content a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* =====================================================================
+   05. CABEÇALHO E LOGO
+   ===================================================================== */
+#header {
+    border-bottom: 3px solid var(--ct-vermelho);
+    padding: 12px 40px;
+}
+#branding #site-name { margin: 0; }
+#branding #site-name a.ct-marca {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    color: #fff;
+    text-decoration: none;
+}
+.ct-marca .marca {
+    font-family: var(--ct-fonte-marca);
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+}
+.ct-marca .marca-tempo { color: var(--ct-vermelho-claro); }
+.ct-marca-painel {
+    padding: 2px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 999px;
+    font-family: var(--font-family-monospace);
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ct-lilas);
+}
+#user-tools { font-size: 0.8rem; letter-spacing: 0.02em; }
+
+/* Trilha (breadcrumb) */
+div.breadcrumbs { padding: 12px 40px; font-size: 0.85rem; }
+
+/* Página de login do admin */
+.login #header { justify-content: center; }
+.login #container { border-radius: 10px; border: 1.5px solid var(--border-color); box-shadow: 8px 8px 0 var(--ct-sombra); }
+
+/* =====================================================================
+   06. TABELAS, MÓDULOS E FORMULÁRIOS
+   ===================================================================== */
+.module {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+.module h2,
+.module caption,
+.inline-group h2 {
+    font-family: var(--font-family-monospace);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+}
+.module caption a { color: inherit; }
+
+#content h1 { font-weight: 600; font-size: 1.6rem; color: var(--body-loud-color); }
+#content h2.subhead { color: var(--body-quiet-color); }
+
+/* Tabelas de listagem: linhas mais altas, zebra suave */
+#changelist table thead th { font-size: 0.72rem; letter-spacing: 0.08em; }
+#result_list tbody td,
+#result_list tbody th { padding: 10px 10px; vertical-align: middle; }
+#result_list tbody tr:nth-child(even) { background: var(--darkened-bg); }
+#result_list tbody tr:hover { background: var(--selected-row); }
+
+/* Filtros laterais e busca */
+#changelist-filter { border-radius: 10px; }
+#changelist-filter h2 { border-radius: 10px 10px 0 0; }
+#changelist-filter li.selected a { font-weight: 700; }
+#changelist #toolbar { border-radius: 10px; padding: 10px 12px; }
+
+/* Grupos de campos (fieldsets) */
+fieldset.module h2 { background: var(--primary); }
+.form-row { padding: 12px 14px; }
+.aligned label { font-weight: 600; }
+.help, p.help, form .help { color: var(--body-quiet-color); font-size: 0.8rem; }
+.errornote { border-radius: 8px; border-width: 2px; }
+
+/* Mensagens */
+ul.messagelist li { border-radius: 8px; margin-bottom: 8px; font-weight: 500; }
+
+/* =====================================================================
+   07. BOTÕES
+   ===================================================================== */
+.button, input[type="submit"], input[type="button"], .submit-row input, a.button {
+    border-radius: 6px;
+    font-weight: 600;
+    padding: 9px 16px;
+    min-height: 38px;
+}
+.submit-row { border-radius: 10px; }
+.object-tools a {
+    border-radius: 999px;
+    font-family: var(--font-family-monospace);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+.object-tools a.viewsitelink { background: var(--ct-vermelho); }
+
+/* =====================================================================
+   08. PAINEL DE RESUMO (página inicial)
+   ===================================================================== */
+.dashboard #content { width: auto; max-width: 1400px; }
+.ct-painel { margin-bottom: 28px; }
+.ct-painel h2 {
+    margin: 0 0 12px;
+    font-size: 1.15rem;
+    color: var(--body-loud-color);
+}
+.ct-cartoes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 14px;
+}
+.ct-cartoes li { list-style: none; padding: 0; }
+a.ct-cartao {
+    box-sizing: border-box;      /* o admin não usa border-box por padrão */
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    height: 100%;
+    padding: 16px 18px;
+    background: var(--ct-cartao-bg);
+    border: 1.5px solid var(--border-color);
+    border-left: 5px solid var(--primary);
+    border-radius: 10px;
+    color: var(--body-fg);
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+a.ct-cartao:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--ct-sombra);
+    text-decoration: none;
+}
+.ct-cartao--alerta { border-left-color: var(--ct-vermelho-claro) !important; }
+.ct-cartao-valor {
+    font-family: var(--font-family-monospace);
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--body-loud-color);
+}
+.ct-cartao--alerta .ct-cartao-valor { color: var(--error-fg); }
+.ct-cartao-rotulo { font-weight: 600; }
+.ct-cartao-ajuda { font-size: 0.78rem; color: var(--body-quiet-color); }
+
+/* =====================================================================
+   09. SELOS, MINIATURAS E ESTRELAS
+   ===================================================================== */
+.ct-selo {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1.5px solid currentColor;
+    font-size: 0.74rem;
+    font-weight: 700;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+.ct-selo--azul     { color: #313170; background: #E6E5F3; }
+.ct-selo--alerta   { color: #7A2E2B; background: #FBE9E7; }
+.ct-selo--vermelho { color: #FFFFFF; background: #6D191D; border-color: #6D191D; }
+.ct-selo--cinza    { color: #4A4760; background: #EEEDF2; }
+.ct-selo--lilas    { color: #36344D; background: #DCDAE6; }
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .ct-selo--azul   { color: #DCDBFA; background: #2C2B5E; }
+    :root:not([data-theme="light"]) .ct-selo--alerta { color: #F6C3BF; background: #4A1F1E; }
+    :root:not([data-theme="light"]) .ct-selo--cinza  { color: #D6D4E2; background: #2E2D45; }
+    :root:not([data-theme="light"]) .ct-selo--lilas  { color: #ECEBF3; background: #44425E; }
+}
+html[data-theme="dark"] .ct-selo--azul   { color: #DCDBFA; background: #2C2B5E; }
+html[data-theme="dark"] .ct-selo--alerta { color: #F6C3BF; background: #4A1F1E; }
+html[data-theme="dark"] .ct-selo--cinza  { color: #D6D4E2; background: #2E2D45; }
+html[data-theme="dark"] .ct-selo--lilas  { color: #ECEBF3; background: #44425E; }
+
+.ct-miniatura {
+    display: block;
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: #fff;
+}
+
+.ct-estrelas { color: #A54C49; letter-spacing: 1px; white-space: nowrap; }
+.ct-estrelas-vazias { color: var(--border-color); }
+
+@media (max-width: 1024px) {
+    #header { padding: 10px 16px; }
+    div.breadcrumbs { padding: 10px 16px; }
+}
+
+
+/* =====================================================================
+   10. RELATÓRIO ANUAL (/admin/marketplace/pedido/relatorio-anual/)
+   ===================================================================== */
+.ct-relatorio-pagina #content { max-width: 1400px; }
+.ct-relatorio-ano {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+}
+.ct-relatorio-ano label { font-weight: 700; }
+.ct-relatorio-ano select { min-width: 110px; font-size: 1rem; }
+.ct-relatorio-link { margin-left: auto; font-weight: 600; }
+.ct-relatorio-titulo { margin: 0 0 12px; font-size: 1.15rem; color: var(--body-loud-color); }
+.ct-relatorio-nota { margin: 12px 0 0; color: var(--body-quiet-color); }
+.ct-relatorio-nota--modulo { padding: 0 14px 12px; font-size: 0.8rem; }
+.ct-relatorio-vazio { margin-top: 24px; font-size: 1rem; color: var(--body-quiet-color); }
+
+/* Cartões sem link (div) com o mesmo visual dos do painel */
+div.ct-cartao {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    height: 100%;
+    padding: 16px 18px;
+    background: var(--ct-cartao-bg);
+    border: 1.5px solid var(--border-color);
+    border-left: 5px solid var(--primary);
+    border-radius: 10px;
+}
+.ct-cartao--destaque { background: var(--primary) !important; border-color: var(--primary) !important; }
+.ct-cartao--destaque .ct-cartao-valor,
+.ct-cartao--destaque .ct-cartao-rotulo { color: #fff; }
+.ct-cartao--destaque .ct-cartao-ajuda { color: #D6D4E2; }
+
+.ct-relatorio-grade {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr);
+    gap: 24px;
+    align-items: start;
+    margin-top: 28px;
+}
+.ct-relatorio-grade > * { min-width: 0; }   /* deixa a tabela rolar em vez de alargar a página */
+.ct-relatorio-lateral { display: flex; flex-direction: column; gap: 24px; }
+/* Tabela rola dentro da caixa no celular. O "relative" segura o texto
+   oculto para leitores de tela (position: absolute) dentro da caixa. */
+.ct-relatorio .module { position: relative; margin: 0; overflow-x: auto; }
+.ct-relatorio tfoot th,
+.ct-relatorio tfoot td { font-size: inherit; color: var(--body-fg); }
+.ct-relatorio table { width: 100%; }
+.ct-relatorio caption { text-align: left; }
+.ct-relatorio th[scope="row"] { font-weight: 600; }
+.ct-relatorio tbody td,
+.ct-relatorio tbody th,
+.ct-relatorio tfoot td,
+.ct-relatorio tfoot th { padding: 9px 12px; vertical-align: middle; }
+.ct-relatorio tfoot th,
+.ct-relatorio tfoot td { border-top: 2px solid var(--border-color); background: var(--darkened-bg); }
+.ct-num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ct-relatorio small { color: var(--body-quiet-color); }
+.ct-mes-vazio th,
+.ct-mes-vazio td { color: var(--body-quiet-color); }
+
+/* Barra proporcional do mês */
+.ct-barra-celula { width: 26%; }
+.ct-barra {
+    display: block;
+    height: 12px;
+    background: var(--darkened-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    overflow: hidden;
+}
+.ct-barra span { display: block; height: 100%; background: var(--ct-vermelho-claro); border-radius: 999px; }
+
+.object-tools a.ct-botao-relatorio { background: var(--primary); }
+
+@media (max-width: 1024px) {
+    .ct-relatorio-grade { grid-template-columns: minmax(0, 1fr); }
+    .ct-barra-celula { display: none; }
+    .ct-relatorio-link { margin-left: 0; }
+}

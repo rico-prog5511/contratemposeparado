@@ -1,0 +1,31 @@
+{% extends "admin/index.html" %}
+{% load admin_painel %}
+{% comment %}
+Página inicial do admin: um resumo com o que precisa de atenção (denúncias,
+mensagens, pedidos, perguntas) antes da lista de tabelas. Cada cartão leva
+à lista já filtrada. Os números vêm de templatetags/admin_painel.py.
+{% endcomment %}
+
+{% block content %}
+<div id="content-main">
+    {% painel_resumo as cartoes %}
+    {% if cartoes %}
+    <section class="ct-painel" aria-labelledby="ct-painel-titulo">
+        <h2 id="ct-painel-titulo">Resumo da loja</h2>
+        <ul class="ct-cartoes">
+            {% for cartao in cartoes %}
+                <li>
+                    <a href="{{ cartao.url }}" class="ct-cartao{% if cartao.alerta %} ct-cartao--alerta{% endif %}">
+                        <span class="ct-cartao-valor">{{ cartao.valor }}</span>
+                        <span class="ct-cartao-rotulo">{{ cartao.titulo }}</span>
+                        <span class="ct-cartao-ajuda">{% if cartao.alerta %}Precisa de atenção · {% endif %}{{ cartao.ajuda }}</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+</div>
+{% endblock %}

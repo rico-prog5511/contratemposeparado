@@ -5,7 +5,22 @@ Uso:
     {% include "partials/form_field.html" with field=form.senha senha=True %}
     {% include "partials/form_field.html" with field=form.tipo classe="radio-pills" %}
 Checkbox (BooleanField) é detectado automaticamente.
+
+Acessibilidade: o Django já põe no campo aria-invalid="true" (quando há
+erro) e aria-describedby apontando para "<id>_helptext" e "<id>_error".
+Aqui a ajuda recebe esse id, e a lista de erros do Django já sai com o
+id certo — assim o leitor de tela lê a ajuda e o erro ao focar o campo.
+Opções de rádio ficam num <fieldset> com <legend> (o leitor anuncia a
+pergunta junto com cada opção).
 {% endcomment %}
+{% if field.widget_type == "radioselect" %}
+<fieldset class="form-group form-fieldset {{ classe|default:'' }}{% if field.errors %} has-error{% endif %}"{% if field.help_text or field.errors %} aria-describedby="{% if field.help_text %}{{ field.auto_id }}_helptext{% endif %}{% if field.help_text and field.errors %} {% endif %}{% if field.errors %}{{ field.auto_id }}_error{% endif %}"{% endif %}>
+    <legend class="form-label">{{ field.label }}{% if field.field.required %} <span class="required-mark" aria-hidden="true">*</span><span class="sr-only">(obrigatório)</span>{% endif %}</legend>
+    {{ field }}
+    {% if field.help_text %}<div class="form-help" id="{{ field.auto_id }}_helptext">{{ field.help_text|safe }}</div>{% endif %}
+    {% if field.errors %}{{ field.errors }}{% endif %}
+</fieldset>
+{% else %}
 <div class="form-group {{ classe|default:'' }}{% if field.errors %} has-error{% endif %}">
     {% if field.widget_type == "checkbox" %}
         <label class="check" for="{{ field.id_for_label }}">
@@ -13,11 +28,7 @@ Checkbox (BooleanField) é detectado automaticamente.
             <span>{{ field.label }}</span>
         </label>
     {% else %}
-        {% if field.widget_type == "radioselect" %}
-            <span class="form-label">{{ field.label }}{% if field.field.required %} <span class="required-mark" aria-hidden="true">*</span>{% endif %}</span>
-        {% else %}
-            <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="required-mark" aria-hidden="true">*</span>{% endif %}</label>
-        {% endif %}
+        <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="required-mark" aria-hidden="true">*</span>{% endif %}</label>
         {% if senha %}
             <div class="password-wrap">
                 {{ field }}
@@ -27,6 +38,7 @@ Checkbox (BooleanField) é detectado automaticamente.
             {{ field }}
         {% endif %}
     {% endif %}
-    {% if field.help_text %}<div class="form-help">{{ field.help_text|safe }}</div>{% endif %}
+    {% if field.help_text %}<div class="form-help" id="{{ field.auto_id }}_helptext">{{ field.help_text|safe }}</div>{% endif %}
     {% if field.errors %}{{ field.errors }}{% endif %}
 </div>
+{% endif %}

@@ -40,7 +40,7 @@
     background: var(--paper);
     border: var(--borda);
     border-radius: var(--radius);
-    color: var(--cor-header);
+    color: var(--txt-azul);
 }
 .contact-icon svg { width: 22px; height: 22px; }
 .contact-item span {
@@ -54,7 +54,7 @@
     color: var(--ink-muted);
 }
 .contact-item p { margin: 0; color: var(--ink); }
-.contact-item a { color: var(--cor-destaque); text-decoration: underline; text-underline-offset: 3px; }
+.contact-item a { color: var(--txt-vermelho); text-decoration: underline; text-underline-offset: 3px; }
 
 .contact-form-box {
     padding: 32px;
@@ -83,7 +83,7 @@
     border-radius: var(--radius);
 }
 .legal-toc ol { margin: 8px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 0.88rem; }
-.legal-toc a:hover { color: var(--cor-destaque); text-decoration: underline; }
+.legal-toc a:hover { color: var(--txt-vermelho); text-decoration: underline; }
 .legal-text {
     max-width: 720px;
     padding: 36px 40px;
@@ -97,7 +97,7 @@
 .legal-text p,
 .legal-text li { color: var(--ink); line-height: 1.75; }
 .legal-text ul { padding-left: 20px; margin: 0; display: flex; flex-direction: column; gap: 6px; }
-.legal-text a { color: var(--cor-destaque); text-decoration: underline; text-underline-offset: 3px; }
+.legal-text a { color: var(--txt-vermelho); text-decoration: underline; text-underline-offset: 3px; }
 
 /* =====================================================================
    PÁGINAS DE ERRO (403 / 404 / 500)
@@ -113,11 +113,11 @@
     font-size: clamp(6rem, 22vw, 10rem);
     font-weight: 600;
     line-height: 0.9;
-    color: var(--cor-header);
+    color: var(--txt-azul);
     text-shadow: 6px 6px 0 var(--ink);
     margin-bottom: 24px;
 }
-.error-code span { color: var(--cor-destaque); font-style: italic; font-weight: 500; }
+.error-code span { color: var(--txt-vermelho); font-style: italic; font-weight: 500; }
 .error-page h1 { font-size: clamp(1.8rem, 4.5vw, 2.6rem); margin: 10px 0 12px; }
 .error-page p { font-size: 1.02rem; }
 .error-search {
@@ -161,7 +161,7 @@
 }
 .faq-empty { grid-column: 1 / -1; }
 .faq-result { margin: 0 0 20px; color: var(--ink); }
-.faq-result a { color: var(--cor-destaque); text-decoration: underline; }
+.faq-result a { color: var(--txt-vermelho); text-decoration: underline; }
 .faq-group { scroll-margin-top: calc(var(--header-height) + 20px); }
 .faq-group + .faq-group { margin-top: 36px; }
 .faq-group h2 { font-size: 1.5rem; margin-bottom: 14px; }
@@ -206,7 +206,7 @@
     border-color: var(--cor-destaque);
     color: #fff;
 }
-.faq-item summary:hover { color: var(--cor-destaque); }
+.faq-item summary:hover { color: var(--txt-vermelho); }
 .faq-answer {
     padding: 0 20px 18px;
     border-top: 1px dashed var(--line);
@@ -236,4 +236,19 @@
 @media (max-width: 640px) {
     .faq-search { flex-direction: column; }
     .faq-cta { flex-direction: column; align-items: stretch; padding: 24px 20px; }
+}
+
+/* Teclas citadas no texto (página de acessibilidade) */
+.legal-text kbd {
+    display: inline-block;
+    min-width: 1.6em;
+    padding: 1px 6px;
+    border: 1.5px solid var(--ink);
+    border-bottom-width: 3px;
+    border-radius: 5px;
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    line-height: 1.5;
+    text-align: center;
 }

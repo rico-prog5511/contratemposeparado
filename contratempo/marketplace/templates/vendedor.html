@@ -33,22 +33,22 @@
             <div>
                 <dt>Nota</dt>
                 <dd>{% if resumo.media %}{{ resumo.media|floatformat:1 }} <span class="stars">★</span>{% else %}—{% endif %}</dd>
-                <small>{{ resumo.total_avaliacoes }} avaliaç{{ resumo.total_avaliacoes|pluralize:"ão,ões" }}</small>
+                <dd class="seller-stats-nota">{{ resumo.total_avaliacoes }} avaliaç{{ resumo.total_avaliacoes|pluralize:"ão,ões" }}</dd>
             </div>
             <div>
                 <dt>Vendas</dt>
                 <dd>{{ resumo.vendas }}</dd>
-                <small>unidade{{ resumo.vendas|pluralize }}</small>
+                <dd class="seller-stats-nota">unidade{{ resumo.vendas|pluralize }}</dd>
             </div>
             <div>
                 <dt>Anúncios</dt>
                 <dd>{{ resumo.anuncios_ativos }}</dd>
-                <small>ativo{{ resumo.anuncios_ativos|pluralize }}</small>
+                <dd class="seller-stats-nota">ativo{{ resumo.anuncios_ativos|pluralize }}</dd>
             </div>
             <div>
                 <dt>Respostas</dt>
                 <dd>{% if taxa_resposta is not None %}{{ taxa_resposta }}%{% else %}—{% endif %}</dd>
-                <small>das perguntas</small>
+                <dd class="seller-stats-nota">das perguntas</dd>
             </div>
         </dl>
     </section>

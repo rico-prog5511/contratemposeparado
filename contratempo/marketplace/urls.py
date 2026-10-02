@@ -20,6 +20,7 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("sobre-nos/", views.sobre_nos, name="sobre_nos"),
     path("privacidade/", views.privacidade, name="privacidade"),
+    path("acessibilidade/", views.acessibilidade, name="acessibilidade"),
     path("contato/", views.contato, name="contato"),
     path("duvidas-frequentes/", views.faq, name="faq"),
 

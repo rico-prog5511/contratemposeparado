@@ -1,7 +1,7 @@
 /* static/css/anuncios.css — área do vendedor */
 
 .cell-sub { font-size: 0.8rem; color: var(--ink-muted); margin-top: 2px; }
-.stock-zero { color: var(--cor-destaque); font-weight: 700; }
+.stock-zero { color: var(--txt-vermelho); font-weight: 700; }
 .row-alert td:first-child { box-shadow: inset 4px 0 0 var(--cor-destaque); }
 
 /* =====================================================================
@@ -17,17 +17,17 @@
     gap: 6px;
     padding: 28px 20px;
     text-align: center;
-    background: #fff;
+    background: var(--surface);
     border: 1.5px dashed var(--cor-secundaria);
     border-radius: var(--radius);
     transition: border-color 0.15s ease, background 0.15s ease;
 }
 .upload-area.dragging,
-.upload-area:focus-within { border-color: var(--cor-header); background: var(--cor-header-claro); }
+.upload-area:focus-within { border-color: var(--borda-azul); background: var(--cor-header-claro); }
 .upload-area.has-error { border-color: var(--cor-destaque); }
-.upload-area svg { width: 36px; height: 36px; color: var(--cor-header); }
+.upload-area svg { width: 36px; height: 36px; color: var(--txt-azul); }
 .upload-area label { cursor: pointer; font-size: 0.95rem; color: var(--ink); }
-.upload-area label strong { color: var(--cor-destaque); text-decoration: underline; text-underline-offset: 3px; }
+.upload-area label strong { color: var(--txt-vermelho); text-decoration: underline; text-underline-offset: 3px; }
 .upload-area input[type="file"] {
     position: absolute;
     inset: 0;
@@ -37,7 +37,7 @@
     cursor: pointer;
 }
 .upload-area small { color: var(--ink-muted); font-size: 0.8rem; }
-.upload-aviso { color: var(--cor-destaque) !important; font-weight: 600; }
+.upload-aviso { color: var(--txt-vermelho) !important; font-weight: 600; }
 .upload-area .errorlist { position: relative; z-index: 1; }
 
 .upload-preview,
@@ -65,7 +65,7 @@
 .image-manage-item {
     display: flex;
     flex-direction: column;
-    background: #fff;
+    background: var(--surface);
     border: 1.5px solid var(--ink);
     border-radius: var(--radius);
     overflow: hidden;
@@ -89,7 +89,7 @@
     bottom: 0;
     z-index: 5;
     padding: 14px 0;
-    background: var(--cor-fundo);
+    background: var(--page-bg);
     border-top: 1.5px solid var(--ink);
 }
 
@@ -117,7 +117,7 @@
     font-family: var(--font-mono);
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--cor-destaque);
+    color: var(--txt-vermelho);
     white-space: nowrap;
 }
 .stat-box-label {
@@ -171,7 +171,7 @@
     position: sticky;
     bottom: 0;
     padding: 14px 0;
-    background: var(--cor-fundo);
+    background: var(--page-bg);
     border-top: 1.5px solid var(--ink);
 }
 
@@ -205,7 +205,7 @@
     margin-bottom: 12px;
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--cor-header);
+    color: var(--txt-azul);
 }
-.qa-product:hover { color: var(--cor-destaque); text-decoration: underline; }
+.qa-product:hover { color: var(--txt-vermelho); text-decoration: underline; }
 .qa-meta { margin: 4px 0 0 36px; font-size: 0.78rem; }

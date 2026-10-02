@@ -41,7 +41,7 @@
                 {% for item in itens %}
                     {% with produto=item.produto imagem=item.produto|imagem_principal %}
                     <article class="cart-item {% if item.problema %}cart-item--problema{% endif %}">
-                        <a href="{% url 'produto_detalhe' produto.id %}" class="cart-item-image">
+                        <a href="{% url 'produto_detalhe' produto.id %}" class="cart-item-image" tabindex="-1" aria-hidden="true">
                             <img src="{% if imagem %}{{ imagem }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt="">
                         </a>
 

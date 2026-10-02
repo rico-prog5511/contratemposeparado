@@ -2,11 +2,9 @@
     <div class="container">
         <div class="footer-grid">
             <div class="footer-brand">
-                <a href="{% url 'home' %}" class="logo">CONTRA<span>TEMPO</span></a>
+                <a href="{% url 'home' %}" class="logo" aria-label="Contratempo — página inicial">{% include "partials/marca.html" %}</a>
                 <p>Colecionáveis para quem valoriza histórias, nostalgia e peças únicas.</p>
-                <div class="payment-chips" aria-label="Formas de pagamento aceitas">
-                    <span>Crédito</span><span>Débito</span><span>PIX</span><span>Boleto</span>
-                </div>
+                {% include "partials/pagamentos.html" %}
             </div>
 
             <div>
@@ -42,6 +40,7 @@
                     <a href="{% url 'faq' %}">Dúvidas frequentes</a>
                     <a href="{% url 'contato' %}">Contato</a>
                     <a href="{% url 'privacidade' %}">Política de privacidade</a>
+                    <a href="{% url 'acessibilidade' %}">Acessibilidade</a>
                 </nav>
             </div>
         </div>
