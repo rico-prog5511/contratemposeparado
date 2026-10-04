@@ -77,10 +77,12 @@ CREATE TABLE `enderecos` (
 CREATE TABLE `formas_pagamento` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `usuario_id` bigint NOT NULL,
-  `tipo` enum('cartao_credito','cartao_debito','pix','boleto','outro') NOT NULL,
+  `tipo` enum('cartao_credito','cartao_debito') NOT NULL COMMENT 'PIX e boleto são escolhidos no checkout, sem cadastro',
   `apelido` varchar(60) DEFAULT NULL,
   `ultimos_digitos` char(4) DEFAULT NULL,
-  `bandeira` varchar(30) DEFAULT NULL,
+  `bandeira` varchar(30) DEFAULT NULL COMMENT 'Visa, Mastercard, Elo, American Express ou Hipercard',
+  `validade_mes` smallint unsigned DEFAULT NULL,
+  `validade_ano` smallint unsigned DEFAULT NULL COMMENT 'com 4 dígitos; número completo e CVV nunca são guardados',
   `token_externo` varchar(255) DEFAULT NULL COMMENT 'identificador tokenizado do gateway de pagamento',
   `principal` tinyint(1) NOT NULL DEFAULT '0',
   `data_cadastro` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -555,6 +557,7 @@ INSERT INTO `django_migrations` (`app`, `name`, `applied`) VALUES
   ('sessions', '0001_initial', NOW(6)),
   ('marketplace', '0002_frete_vendas_perguntas', NOW(6)),
   ('marketplace', '0003_dados_iniciais', NOW(6)),
-  ('marketplace', '0004_denuncias', NOW(6));
+  ('marketplace', '0004_denuncias', NOW(6)),
+  ('marketplace', '0005_cartoes_validade', NOW(6));
 
 SET FOREIGN_KEY_CHECKS = 1;

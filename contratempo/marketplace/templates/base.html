@@ -16,10 +16,12 @@
     <link rel="stylesheet" href="{% static 'css/acessibilidade.css' %}">
     {# Aplica as preferências de acessibilidade antes da página aparecer (sem "piscar") #}
     <script src="{% static 'js/acessibilidade.js' %}"></script>
+    <script src="{% static 'js/cookies.js' %}"></script>
 </head>
 <body class="{% block body_class %}{% endblock %}">
 
     <a href="#conteudo" class="skip-link">Pular para o conteúdo</a>
+    {% include "partials/cookies.html" %}
 
     {% include "partials/header.html" %}
     {% include "partials/breadcrumb.html" %}

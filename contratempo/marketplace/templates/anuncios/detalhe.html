@@ -66,7 +66,7 @@
                     <dl class="key-value">
                         <dt>Categoria</dt><dd>{{ produto.categoria.nome }}</dd>
                         <dt>Franquia</dt><dd>{{ produto.franquia.nome|default:"—" }}</dd>
-                        <dt>Marca</dt><dd>{{ produto.marca|default:"—" }}</dd>
+                        <dt>{{ produto.categoria.rotulo_marca }}</dt><dd>{{ produto.marca|default:"—" }}</dd>
                         <dt>Ano</dt><dd>{{ produto.ano|default:"—" }}</dd>
                         <dt>SKU</dt><dd class="mono">{{ produto.sku|default:"—" }}</dd>
                         <dt>Atualizado</dt><dd>{{ produto.data_atualizacao|date:"d/m/Y H:i" }}</dd>

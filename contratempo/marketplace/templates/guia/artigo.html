@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ artigo.titulo }} | Guia do colecionador | Contratempo{% endblock %}
+{% block meta_description %}{{ artigo.resumo }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/institucional.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="inst-intro">
+    <div class="container">
+        <span class="about-kicker">Guia do colecionador · {{ artigo.assunto }}</span>
+        <h1>{{ artigo.titulo }}</h1>
+        <p>{{ artigo.resumo }} <span class="mono guia-tempo">{{ artigo.minutos }} min de leitura</span></p>
+    </div>
+</section>
+
+<div class="container guia-artigo">
+    <article class="legal-text">
+        {% include texto %}
+    </article>
+</div>
+
+{% if outros %}
+<section class="container section" aria-labelledby="continue-lendo">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Guia do colecionador</span>
+            <h2 id="continue-lendo">Continue lendo</h2>
+        </div>
+        <a href="{% url 'guia' %}" class="link-arrow">Todos os artigos →</a>
+    </div>
+    <div class="guia-grid">
+        {% for artigo in outros %}
+            {% include "partials/guia_card.html" %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}

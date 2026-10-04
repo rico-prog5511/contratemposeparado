@@ -1,8 +1,8 @@
 {% if messages %}
 <ul class="messages" aria-live="polite">
     {% for message in messages %}
-        <li class="{{ message.tags }}" role="{% if message.tags == 'error' %}alert{% else %}status{% endif %}">
-            <span class="message-text">{{ message }}</span>
+        <li class="{{ message.tags }}">
+            <span class="message-text"{% if message.tags == 'error' %} role="alert"{% endif %}>{{ message }}</span>
             <button type="button" class="message-close" aria-label="Fechar mensagem">&times;</button>
         </li>
     {% endfor %}

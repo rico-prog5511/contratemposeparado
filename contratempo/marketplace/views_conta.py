@@ -23,7 +23,7 @@ from django.utils.http import url_has_allowed_host_and_scheme, urlsafe_base64_de
 from django.views.decorators.http import require_POST
 
 from .emails import enviar_confirmacao_cadastro, token_confirmacao
-from .forms import CadastroForm, EnderecoForm, FormaPagamentoForm, LoginForm, PerfilForm
+from .forms import CadastroForm, CartaoEdicaoForm, CartaoForm, EnderecoForm, LoginForm, PerfilForm
 from .models import Endereco, FormaPagamento, Pedido, Produto, Usuario
 
 SESSAO_REENVIO = "ultimo_envio_confirmacao"
@@ -384,7 +384,8 @@ def pagamento_form(request, forma_id=None):
     if forma_id:
         forma = get_object_or_404(FormaPagamento, pk=forma_id, usuario=request.user)
 
-    form = FormaPagamentoForm(request.POST or None, instance=forma)
+    Formulario = CartaoEdicaoForm if forma else CartaoForm
+    form = Formulario(request.POST or None, instance=forma)
     if request.method == "POST" and form.is_valid():
         with transaction.atomic():
             nova = form.save(commit=False)
@@ -393,10 +394,10 @@ def pagamento_form(request, forma_id=None):
             nova.save()
             if nova.principal or primeira:
                 _definir_pagamento_principal(nova)
-        messages.success(request, "Forma de pagamento salva.")
+        messages.success(request, "Cartão salvo.")
         return redirect(_proximo(request, "pagamentos"))
 
-    titulo = "Editar forma de pagamento" if forma else "Nova forma de pagamento"
+    titulo = "Editar cartão" if forma else "Novo cartão"
     return render(request, "conta/pagamento_form.html", {
         "form": form,
         "forma": forma,

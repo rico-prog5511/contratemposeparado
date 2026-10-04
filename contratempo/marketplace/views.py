@@ -15,18 +15,20 @@ from decimal import Decimal, InvalidOperation
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.staticfiles import finders
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Q, Sum
-from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.templatetags.static import static
 
 from .busca import filtrar as filtrar_busca
+from .guia import ARTIGOS as ARTIGOS_GUIA
+from .guia import POR_SLUG as ARTIGOS_GUIA_POR_SLUG
 from .busca import palavras as palavras_busca
 from .emails import enviar_nova_pergunta
 from .forms import ContatoForm
@@ -91,28 +93,123 @@ def home(request):
         .order_by("nome")
     )
 
-    # "Mais vendidos": soma das quantidades em pedidos não cancelados.
-    produtos_destaque = (
-        produtos_ativos()
-        .annotate(total_vendido=Coalesce(
-            Sum("itens_pedido__quantidade", filter=~Q(itens_pedido__pedido__status_pedido="cancelado")),
-            0,
-        ))
-        .order_by("-total_vendido", "-data_criacao")[:8]
-    )
-
     produtos_recentes = produtos_ativos().order_by("-data_criacao")[:4]
 
     return render(request, "home.html", {
+        "banner_foto": _foto_banner(),
         "categorias": categorias,
-        "produtos_destaque": produtos_destaque,
+        "faixas_preco": _faixas_preco(),
         "produtos_recentes": produtos_recentes,
+        "artigos_guia": ARTIGOS_GUIA[:3],
     })
+
+
+# Foto de fundo do 1º slide do banner da home. Para usar/trocar: coloque o
+# arquivo em marketplace/static/img/banner/ com o nome banner-1 (.jpg,
+# .jpeg, .png ou .webp). Sem o arquivo, o slide fica com o fundo vermelho.
+FOTO_BANNER = "img/banner/banner-1"
+
+
+def _foto_banner():
+    for extensao in ("webp", "jpg", "jpeg", "png"):
+        caminho = f"{FOTO_BANNER}.{extensao}"
+        if finders.find(caminho):
+            return static(caminho)
+    return None
+
+
+# Faixas de preço da home: (nome, preço mínimo exclusivo, preço máximo inclusivo).
+# Os limites batem com o filtro do catálogo (preco_min usa >=, por isso o +0,01).
+FAIXAS_PRECO = [
+    ("Pra começar a coleção", None, 50),
+    ("Achados", 50, 200),
+    ("Peças de respeito", 200, 500),
+    ("Raridades", 500, None),
+]
+
+
+def _faixas_preco():
+    """Faixas com quantos anúncios ativos cada uma tem. Faixas vazias não aparecem."""
+    def filtro(acima_de, ate):
+        q = Q()
+        if acima_de is not None:
+            q &= Q(preco__gt=acima_de)
+        if ate is not None:
+            q &= Q(preco__lte=ate)
+        return q
+
+    totais = Produto.objects.filter(status_anuncio="ativo").aggregate(**{
+        f"f{i}": Count("id", filter=filtro(acima_de, ate))
+        for i, (_, acima_de, ate) in enumerate(FAIXAS_PRECO)
+    })
+
+    faixas = []
+    for i, (nome, acima_de, ate) in enumerate(FAIXAS_PRECO):
+        if not totais[f"f{i}"]:
+            continue
+        parametros = []
+        if acima_de is not None:
+            parametros.append(f"preco_min={Decimal(acima_de) + Decimal('0.01')}")
+        if ate is not None:
+            parametros.append(f"preco_max={ate}")
+        if acima_de is None:
+            intervalo = f"Até R$ {ate}"
+        elif ate is None:
+            intervalo = f"Acima de R$ {acima_de}"
+        else:
+            intervalo = f"R$ {acima_de} a R$ {ate}"
+        faixas.append({
+            "nome": nome,
+            "intervalo": intervalo,
+            "total": totais[f"f{i}"],
+            "url": f"{reverse('produtos')}?{'&'.join(parametros)}&ordenar=menor_preco",
+        })
+    return faixas
+
+
+def produtos_vistos(request):
+    """
+    Cards dos "Vistos recentemente" da home. Os ids vêm do navegador
+    (localStorage, ver vistos.js) na ordem do mais recente; aqui só entram
+    anúncios ainda ativos, e no máximo 4.
+    """
+    ids = [int(i) for i in request.GET.get("ids", "").split(",")[:12] if i.isdigit()]
+    por_id = {p.id: p for p in produtos_ativos().filter(id__in=ids)}
+    produtos = [por_id[i] for i in ids if i in por_id][:4]
+    return render(request, "partials/product_cards.html", {"produtos": produtos})
 
 
 def sobre_nos(request):
     return render(request, "sobre_nos.html", {
         "breadcrumbs": [{"label": "Sobre nós", "url": None}],
+    })
+
+
+def guia(request):
+    return render(request, "guia/lista.html", {
+        "artigos": ARTIGOS_GUIA,
+        "breadcrumbs": [{"label": "Guia do colecionador", "url": None}],
+    })
+
+
+def guia_artigo(request, slug):
+    artigo = ARTIGOS_GUIA_POR_SLUG.get(slug)
+    if artigo is None:
+        raise Http404("Artigo não encontrado.")
+    return render(request, "guia/artigo.html", {
+        "artigo": artigo,
+        "texto": f"guia/textos/{slug}.html",
+        "outros": [a for a in ARTIGOS_GUIA if a["slug"] != slug][:3],
+        "breadcrumbs": [
+            {"label": "Guia do colecionador", "url": reverse("guia")},
+            {"label": artigo["titulo"], "url": None},
+        ],
+    })
+
+
+def politica_cookies(request):
+    return render(request, "cookies.html", {
+        "breadcrumbs": [{"label": "Política de cookies", "url": None}],
     })
 
 

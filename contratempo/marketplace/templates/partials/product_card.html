@@ -13,7 +13,9 @@
             <span class="product-condition">· {{ produto.get_condicao_display }}</span>
         </div>
         <a href="{% url 'produto_detalhe' produto.id %}" class="product-name">{{ produto.nome }}</a>
-        {% if produto.franquia %}<span class="product-franchise">{{ produto.franquia.nome }}</span>{% endif %}
+        {% if produto.franquia or produto.marca %}
+            <span class="product-franchise">{{ produto.franquia.nome|default:"" }}{% if produto.franquia and produto.marca %} · {% endif %}{% if produto.marca %}<span class="sr-only">{{ produto.categoria.rotulo_marca }}: </span>{{ produto.marca }}{% endif %}</span>
+        {% endif %}
         <span class="product-price">{{ produto.preco|brl }}</span>
     </div>
     <a href="{% url 'produto_detalhe' produto.id %}" class="btn btn-outline btn-block">Ver produto</a>

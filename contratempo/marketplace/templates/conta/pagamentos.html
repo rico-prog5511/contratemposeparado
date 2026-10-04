@@ -17,11 +17,11 @@
                 <div>
                     <span class="eyebrow">Pagamento</span>
                     <h1>Formas de pagamento</h1>
-                    <p>Guardamos apenas o tipo, a bandeira e os 4 últimos dígitos — nunca o número completo do cartão.</p>
+                    <p>Seus cartões salvos. Guardamos só a bandeira, os 4 últimos dígitos e a validade — nunca o número completo nem o CVV. PIX e boleto são escolhidos na hora da compra.</p>
                 </div>
                 {% if formas %}
                     <div class="page-header-actions">
-                        <a href="{% url 'pagamento_criar' %}" class="btn btn-accent">+ Nova forma</a>
+                        <a href="{% url 'pagamento_criar' %}" class="btn btn-accent">+ Novo cartão</a>
                     </div>
                 {% endif %}
             </header>
@@ -35,11 +35,11 @@
                                 <div class="item-card-title">
                                     {% if forma.apelido %}{{ forma.apelido }}{% else %}{{ forma.get_tipo_display }}{% endif %}
                                     {% if forma.principal %}<span class="badge badge--ativo">Principal</span>{% endif %}
+                                    {% if forma.vencido %}<span class="badge badge--vendido">Vencido</span>{% endif %}
                                 </div>
-                                {% if forma.ultimos_digitos %}
-                                    <p class="payment-number mono">•••• •••• •••• {{ forma.ultimos_digitos }}</p>
-                                    <p>{{ forma.bandeira }}</p>
-                                {% endif %}
+                                <p class="payment-number mono">•••• •••• •••• {{ forma.ultimos_digitos }}</p>
+                                <p>{{ forma.bandeira }}{% if forma.validade_texto %} · validade <span class="mono">{{ forma.validade_texto }}</span>{% endif %}</p>
+                                {% if forma.vencido %}<p class="payment-aviso">Este cartão venceu. Atualize a validade em “Editar” para voltar a usá-lo.</p>{% endif %}
 
                                 <div class="item-card-actions">
                                     <a href="{% url 'pagamento_editar' forma.id %}" class="btn btn-outline btn-sm">Editar</a>
@@ -60,7 +60,7 @@
                 </div>
             {% else %}
                 {% url 'pagamento_criar' as url_novo %}
-                {% include "partials/empty_state.html" with icone="cartao" titulo="Nenhuma forma de pagamento" texto="Cadastre cartão, PIX ou boleto para finalizar compras mais rápido." link_url=url_novo link_label="Adicionar forma de pagamento" %}
+                {% include "partials/empty_state.html" with icone="cartao" titulo="Nenhum cartão salvo" texto="Salve um cartão para finalizar compras mais rápido. PIX e boleto não precisam de cadastro: escolha na hora da compra." link_url=url_novo link_label="Adicionar cartão" %}
             {% endif %}
         </section>
     </div>

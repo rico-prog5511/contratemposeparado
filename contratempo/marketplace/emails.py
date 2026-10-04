@@ -75,7 +75,25 @@ def enviar_email(request, assunto, template, contexto, para):
 
 
 def explicar_erro_email(erro):
-    """Tradução, para quem administra o site, dos erros mais comuns do Gmail."""
+    """Tradução, para quem administra o site, dos erros mais comuns do Gmail e do Brevo."""
+    from .email_brevo import BrevoErro
+
+    if isinstance(erro, BrevoErro):
+        if erro.status == 401:
+            return "O Brevo não reconheceu a chave. Confira BREVO_API_KEY no .env (gere outra em Brevo > SMTP & API > API Keys)."
+        if "sender" in (erro.mensagem or "").lower():
+            return (
+                "O Brevo recusou o remetente. O e-mail de EMAIL_HOST_USER precisa estar confirmado no Brevo "
+                "(Senders, domains & IPs > Senders > Add a sender)."
+            )
+        if erro.status == 403:
+            return "A conta do Brevo ainda não foi liberada para enviar (ativação pendente) ou passou do limite diário."
+        return "O Brevo recusou o envio; a mensagem dele está acima."
+    if isinstance(erro, smtplib.SMTPServerDisconnected):
+        return (
+            "O Gmail derrubou a conexão no login. No PythonAnywhere grátis isso acontece mesmo com a senha certa: "
+            "use o Brevo (coloque BREVO_API_KEY no .env; veja .env.exemplo)."
+        )
     if isinstance(erro, smtplib.SMTPAuthenticationError):
         return (
             "O Gmail recusou o login. Use uma SENHA DE APP de 16 letras (Conta Google > Segurança > "

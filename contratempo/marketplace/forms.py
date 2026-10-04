@@ -18,7 +18,11 @@ from .models import (
     Franquia,
     Produto,
     Usuario,
+    rotulo_marca,
 )
+from .sku import EXEMPLO as EXEMPLO_SKU
+from .sku import PADRAO as PADRAO_SKU
+from .sku import normalizar_sku
 
 LIMITE_IMAGENS_ANUNCIO = 8
 TAMANHO_MAXIMO_IMAGEM = 5 * 1024 * 1024  # 5 MB
@@ -209,46 +213,140 @@ class EnderecoForm(forms.ModelForm):
         return f"{digitos[:5]}-{digitos[5:]}"
 
 
-class FormaPagamentoForm(forms.ModelForm):
+def _so_digitos(valor):
+    return "".join(c for c in (valor or "") if c.isdigit())
+
+
+def validar_cvv(valor, bandeira):
+    """Devolve o CVV só com dígitos: 4 no American Express, 3 nos demais."""
+    cvv = (valor or "").strip()
+    tamanho = 4 if bandeira == "American Express" else 3
+    if not (cvv.isdigit() and len(cvv) == tamanho):
+        raise forms.ValidationError(f"O código de segurança tem {tamanho} dígitos.")
+    return cvv
+
+
+class ValidadeField(forms.CharField):
+    """Validade no formato MM/AA (ou MM/AAAA). Devolve (mês, ano com 4 dígitos)."""
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault("label", "Validade")
+        kwargs.setdefault("max_length", 7)
+        kwargs.setdefault("widget", forms.TextInput(attrs={
+            "placeholder": "MM/AA", "inputmode": "numeric", "autocomplete": "cc-exp",
+            "data-mascara": "validade",
+        }))
+        super().__init__(**kwargs)
+
+    def prepare_value(self, value):
+        if isinstance(value, tuple):
+            return f"{value[0]:02d}/{value[1] % 100:02d}"
+        return value
+
+    def clean(self, value):
+        texto = super().clean(value)
+        if texto in self.empty_values:
+            return None
+        partes = texto.replace(" ", "").split("/")
+        if len(partes) != 2 or not all(p.isdigit() for p in partes) or len(partes[1]) not in (2, 4):
+            raise forms.ValidationError("Use o formato MM/AA, como está no cartão.")
+        mes, ano = int(partes[0]), int(partes[1])
+        if not 1 <= mes <= 12:
+            raise forms.ValidationError("O mês da validade vai de 01 a 12.")
+        return mes, (2000 + ano if ano < 100 else ano)
+
+
+class CartaoForm(forms.ModelForm):
     """
-    Guarda apenas dados NÃO sensíveis (apelido, bandeira e últimos 4
-    dígitos). O número completo do cartão nunca passa pelo Contratempo:
-    `token_externo` deve ser preenchido pela integração com o gateway de
-    pagamento, quando ela existir.
+    Cadastro de cartão. Pede os dados como uma loja de verdade, mas o
+    número completo e o CVV só são conferidos e DESCARTADOS: o banco
+    guarda apenas bandeira, 4 últimos dígitos e validade.
+    `token_externo` fica para a integração com um gateway de pagamento.
     """
+
+    tipo = forms.ChoiceField(
+        label="Tipo", choices=FormaPagamento.TIPO_CHOICES, initial="cartao_credito", widget=forms.RadioSelect,
+    )
+    numero = forms.CharField(
+        label="Número do cartão", max_length=23,
+        widget=forms.TextInput(attrs={
+            "placeholder": "0000 0000 0000 0000", "inputmode": "numeric",
+            "autocomplete": "cc-number", "data-mascara": "cartao",
+        }),
+    )
+    nome_titular = forms.CharField(
+        label="Nome impresso no cartão", max_length=60,
+        widget=forms.TextInput(attrs={"autocomplete": "cc-name", "placeholder": "Como aparece no cartão"}),
+    )
+    bandeira = forms.ChoiceField(
+        label="Bandeira", choices=[("", "Selecione")] + FormaPagamento.BANDEIRA_CHOICES,
+        widget=forms.Select(attrs={"autocomplete": "off"}),
+    )
+    validade = ValidadeField()
+    cvv = forms.CharField(
+        label="CVV", max_length=4, help_text="3 dígitos no verso (4 na frente, no American Express).",
+        widget=forms.PasswordInput(attrs={
+            "inputmode": "numeric", "autocomplete": "cc-csc", "placeholder": "•••", "data-mascara": "cvv",
+        }),
+    )
 
     class Meta:
         model = FormaPagamento
-        fields = ["tipo", "apelido", "bandeira", "ultimos_digitos", "principal"]
+        fields = ["tipo", "bandeira", "apelido", "principal"]
         labels = {
-            "tipo": "Tipo",
-            "apelido": "Apelido",
-            "bandeira": "Bandeira",
-            "ultimos_digitos": "Últimos 4 dígitos",
+            "apelido": "Apelido (opcional)",
             "principal": "Usar como forma de pagamento principal",
         }
         widgets = {
-            "tipo": forms.RadioSelect,
             "apelido": forms.TextInput(attrs={"placeholder": "Ex.: Cartão do banco X"}),
-            "bandeira": forms.TextInput(attrs={"placeholder": "Ex.: Visa, Mastercard"}),
-            "ultimos_digitos": forms.TextInput(attrs={
-                "placeholder": "0000", "inputmode": "numeric", "maxlength": 4,
-            }),
         }
+
+    def clean_numero(self):
+        numero = _so_digitos(self.cleaned_data["numero"])
+        if not 13 <= len(numero) <= 19:
+            raise forms.ValidationError("O número do cartão tem de 13 a 19 dígitos.")
+        return numero
 
     def clean(self):
         dados = super().clean()
-        tipo = dados.get("tipo")
-        digitos = (dados.get("ultimos_digitos") or "").strip()
-        if tipo in ("cartao_credito", "cartao_debito"):
-            if not (len(digitos) == 4 and digitos.isdigit()):
-                self.add_error("ultimos_digitos", "Informe os 4 últimos dígitos do cartão.")
-            if not (dados.get("bandeira") or "").strip():
-                self.add_error("bandeira", "Informe a bandeira do cartão.")
-        else:
-            dados["ultimos_digitos"] = None
-            dados["bandeira"] = None
+        if "cvv" in dados and dados.get("bandeira"):
+            try:
+                validar_cvv(dados["cvv"], dados["bandeira"])
+            except forms.ValidationError as erro:
+                self.add_error("cvv", erro)
         return dados
+
+    def save(self, commit=True):
+        cartao = super().save(commit=False)
+        cartao.ultimos_digitos = self.cleaned_data["numero"][-4:]
+        cartao.validade_mes, cartao.validade_ano = self.cleaned_data["validade"]
+        if commit:
+            cartao.save()
+        return cartao
+
+
+class CartaoEdicaoForm(forms.ModelForm):
+    """Edição de um cartão salvo: o número não muda, só apelido, validade e principal."""
+
+    validade = ValidadeField(help_text="Atualize quando chegar o cartão novo.")
+
+    class Meta:
+        model = FormaPagamento
+        fields = ["apelido", "principal"]
+        labels = CartaoForm.Meta.labels
+        widgets = CartaoForm.Meta.widgets
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.validade_mes and self.instance.validade_ano:
+            self.initial["validade"] = (self.instance.validade_mes, self.instance.validade_ano)
+
+    def save(self, commit=True):
+        cartao = super().save(commit=False)
+        cartao.validade_mes, cartao.validade_ano = self.cleaned_data["validade"]
+        if commit:
+            cartao.save()
+        return cartao
 
 
 # =====================================================================
@@ -288,7 +386,8 @@ class ProdutoForm(forms.ModelForm):
     imagens = MultipleImageField(
         label="Adicionar imagens",
         required=False,
-        help_text=f"Até {LIMITE_IMAGENS_ANUNCIO} imagens (JPG, PNG ou WEBP, máx. 5 MB cada).",
+        help_text=f"Até {LIMITE_IMAGENS_ANUNCIO} imagens (JPG, PNG ou WEBP, máx. 5 MB cada). "
+                  "Pode escolher uma por vez ou várias juntas: elas vão se somando.",
     )
 
     class Meta:
@@ -303,7 +402,7 @@ class ProdutoForm(forms.ModelForm):
             "franquia": "Franquia",
             "descricao": "Descrição",
             "condicao": "Condição",
-            "marca": "Marca / fabricante",
+            "marca": "Marca / autor",  # muda conforme a categoria (ver __init__)
             "ano": "Ano",
             "preco": "Preço (R$)",
             "quantidade_disponivel": "Estoque",
@@ -311,8 +410,11 @@ class ProdutoForm(forms.ModelForm):
             "status_anuncio": "Status",
         }
         help_texts = {
-            "sku": "Opcional. Código interno para você identificar o item.",
             "quantidade_disponivel": "Quantas unidades você tem para vender.",
+        }
+        error_messages = {
+            # O banco não deixa dois anúncios (de qualquer vendedor) com o mesmo código.
+            "sku": {"unique": "Este código já está em uso. Escolha outro ou deixe em branco para o site gerar um."},
         }
         widgets = {
             "nome": forms.TextInput(attrs={"placeholder": "Ex.: Action Figure Naruto — Bandai, 17 cm"}),
@@ -329,8 +431,36 @@ class ProdutoForm(forms.ModelForm):
     def __init__(self, *args, imagens_existentes=0, **kwargs):
         super().__init__(*args, **kwargs)
         self.imagens_existentes = imagens_existentes
-        self.fields["categoria"].queryset = Categoria.objects.filter(ativo=True).order_by("nome")
+        self.tamanho_maximo_imagem = TAMANHO_MAXIMO_IMAGEM  # o upload.js avisa antes de enviar
+
+        # SKU no padrão XXX-XXX-XXX (ver sku.py). Ao criar, em branco = gerado pelo site.
+        self.fields["sku"].help_text = (
+            f"Opcional. Formato: 3 partes de 3 letras ou números, como {EXEMPLO_SKU}. "
+            + ("Deixe em branco para o anúncio ficar sem código." if self.instance.pk
+               else "Se deixar em branco, o site gera um automaticamente.")
+        )
+        self.fields["sku"].widget.attrs.update({
+            # 11 = XXX-XXX-XXX; um código antigo mais longo continua cabendo no campo.
+            "placeholder": f"Ex.: {EXEMPLO_SKU}", "maxlength": max(11, len(self.instance.sku or "")),
+            "autocapitalize": "characters", "spellcheck": "false", "class": "mono",
+        })
+
+        categorias = Categoria.objects.filter(ativo=True).order_by("nome")
+        self.fields["categoria"].queryset = categorias
         self.fields["categoria"].empty_label = "Selecione uma categoria"
+
+        # Nome do campo "marca" conforme a categoria: "Autor / editora" em
+        # Quadrinhos, "Artista / banda" em Discos... O JavaScript troca na
+        # hora (anuncios/form.html); aqui vale para a página já carregada.
+        self.rotulos_marca = {
+            str(c.id): dict(zip(("rotulo", "exemplo"), rotulo_marca(c))) for c in categorias
+        }
+        self.rotulos_marca[""] = dict(zip(("rotulo", "exemplo"), rotulo_marca(None)))
+        escolhida = str(self.data.get("categoria", "") if self.is_bound
+                        else self.initial.get("categoria") or self.instance.categoria_id or "")
+        atual = self.rotulos_marca.get(escolhida, self.rotulos_marca[""])
+        self.fields["marca"].label = atual["rotulo"]
+        self.fields["marca"].widget.attrs.update({"placeholder": atual["exemplo"], "data-marca-campo": ""})
         self.fields["franquia"].queryset = Franquia.objects.filter(ativo=True).order_by("nome")
         self.fields["franquia"].empty_label = "Nenhuma / não se aplica"
         # "vendido" é definido pelo sistema quando o estoque zera.
@@ -352,8 +482,19 @@ class ProdutoForm(forms.ModelForm):
 
     def clean_sku(self):
         # SKU é UNIQUE e aceita NULL: string vazia viraria duplicata.
-        sku = (self.cleaned_data.get("sku") or "").strip()
-        return sku or None
+        digitado = (self.cleaned_data.get("sku") or "").strip()
+        if not digitado:
+            return None
+        # Anúncio antigo com código fora do padrão: continua valendo se não mudou.
+        if self.instance.pk and digitado == self.instance.sku:
+            return digitado
+        sku = normalizar_sku(digitado)
+        if not PADRAO_SKU.match(sku):
+            raise forms.ValidationError(
+                f"Use o formato XXX-XXX-XXX: 3 partes de 3 letras ou números separadas por hífen "
+                f"(ex.: {EXEMPLO_SKU}). Ou deixe em branco."
+            )
+        return sku
 
     def clean_imagens(self):
         imagens = self.cleaned_data.get("imagens") or []

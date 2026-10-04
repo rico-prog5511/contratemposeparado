@@ -19,6 +19,8 @@ html[data-texto="1"]  { font-size: 112.5%; }
 html[data-texto="2"]  { font-size: 125%; }
 html[data-texto="3"]  { font-size: 137.5%; }
 html[data-texto="4"]  { font-size: 150%; }
+/* Alto contraste: a foto do banner sai, fica o fundo liso */
+html[data-contraste="alto"] .slide--foto { background: #000; }
 /* Com letras grandes em tela estreita, palavras longas nos títulos são hifenizadas. */
 html[data-texto="3"] :is(h1, h2, h3),
 html[data-texto="4"] :is(h1, h2, h3) { hyphens: auto; }

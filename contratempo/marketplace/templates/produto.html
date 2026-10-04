@@ -64,7 +64,7 @@
             <dt>Categoria</dt>
             <dd><a href="{% url 'produtos' %}?categoria={{ produto.categoria.slug }}">{{ produto.categoria.nome }}</a></dd>
             <dt>Condição</dt><dd>{{ produto.get_condicao_display }}</dd>
-            {% if produto.marca %}<dt>Marca</dt><dd>{{ produto.marca }}</dd>{% endif %}
+            {% if produto.marca %}<dt>{{ produto.categoria.rotulo_marca }}</dt><dd>{{ produto.marca }}</dd>{% endif %}
             {% if produto.ano %}<dt>Ano</dt><dd>{{ produto.ano }}</dd>{% endif %}
             {% if produto.sku %}<dt>Código</dt><dd class="mono">{{ produto.sku }}</dd>{% endif %}
         </dl>
@@ -347,4 +347,5 @@
 
 {% block extra_js %}
 <script src="{% static 'js/produto.js' %}"></script>
+{% if produto.status_anuncio == "ativo" %}<script src="{% static 'js/vistos.js' %}" data-visto-id="{{ produto.id }}"></script>{% endif %}
 {% endblock %}

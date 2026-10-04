@@ -63,9 +63,13 @@
 
                 <section class="panel">
                     <h2 class="panel-title">Pagamento <a href="{% url 'checkout_pagamento' %}" class="link-button">Alterar</a></h2>
-                    <p class="mb-0"><strong>{{ forma.get_tipo_display }}</strong></p>
-                    {% if forma.apelido %}<p class="mb-0">{{ forma.apelido }}</p>{% endif %}
-                    {% if forma.ultimos_digitos %}<p class="mb-0">{{ forma.bandeira }} final <span class="mono">{{ forma.ultimos_digitos }}</span></p>{% endif %}
+                    {% if cartao %}
+                        <p class="mb-0"><strong>{{ cartao.get_tipo_display }}</strong></p>
+                        {% if cartao.apelido %}<p class="mb-0">{{ cartao.apelido }}</p>{% endif %}
+                        <p class="mb-0">{{ cartao.bandeira }} final <span class="mono">{{ cartao.ultimos_digitos }}</span></p>
+                    {% else %}
+                        <p class="mb-0"><strong>{{ rotulo_pagamento }}</strong></p>
+                    {% endif %}
                 </section>
             </div>
         </div>

@@ -22,10 +22,20 @@ class Command(BaseCommand):
         backend = settings.EMAIL_BACKEND.rsplit(".", 2)[-2]
         senha = settings.EMAIL_HOST_PASSWORD
         self.stdout.write(f"Backend ........ {backend}")
-        self.stdout.write(f"Conta Gmail .... {settings.EMAIL_HOST_USER or '(não definida)'}")
-        self.stdout.write(f"Senha de app ... {'(não definida)' if not senha else f'{len(senha)} caracteres'}")
+        if backend == "email_brevo":
+            self.stdout.write(f"Remetente ...... {settings.DEFAULT_FROM_EMAIL}  (precisa estar confirmado no Brevo)")
+            self.stdout.write(f"Chave Brevo .... {len(settings.BREVO_API_KEY)} caracteres")
+        else:
+            self.stdout.write(f"Conta Gmail .... {settings.EMAIL_HOST_USER or '(não definida)'}")
+            self.stdout.write(f"Senha de app ... {'(não definida)' if not senha else f'{len(senha)} caracteres'}")
 
-        if backend == "console":
+        if backend == "email_brevo":
+            if not settings.EMAIL_HOST_USER:
+                self.stdout.write(self.style.WARNING(
+                    "\nEMAIL_HOST_USER está vazio: o Brevo precisa de um remetente confirmado. "
+                    "Coloque no .env o e-mail que você confirmou no Brevo."
+                ))
+        elif backend == "console":
             self.stdout.write(self.style.WARNING(
                 "\nEMAIL_HOST_USER e/ou EMAIL_HOST_PASSWORD não estão definidas NESTE terminal, então os "
                 "e-mails só são impressos aqui, não enviados. Defina as duas no mesmo terminal em que "

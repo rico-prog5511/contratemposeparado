@@ -1,0 +1,21 @@
+FOTO DO BANNER DA PÁGINA INICIAL
+================================
+
+Coloque aqui a foto de fundo do 1º slide do banner ("Peças raras que
+não voltam ao estoque"), com o nome:
+
+    banner-1.jpg      (ou banner-1.png, banner-1.webp, banner-1.jpeg)
+
+Use só UM arquivo com esse nome. Se houver mais de um, vale o primeiro
+desta ordem: .webp, .jpg, .jpeg, .png.
+
+Dicas para a foto
+- Deitada (paisagem), com pelo menos 1920 x 800 pixels.
+- Até uns 500 KB, para a página abrir rápido no celular (dá para
+  diminuir em sites como squoosh.app ou tinypng.com).
+- O texto do banner fica do lado ESQUERDO, sobre uma camada escura:
+  o que for importante na foto deve ficar do centro para a direita.
+- No celular a foto é cortada (aparece mais o centro).
+
+Para trocar: substitua o arquivo, mantendo o nome, e faça Commit/Push
++ atualizar.sh. Para voltar ao fundo vermelho: apague o arquivo.

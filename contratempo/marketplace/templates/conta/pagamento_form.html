@@ -17,34 +17,41 @@
                 <div>
                     <span class="eyebrow">Pagamento</span>
                     <h1>{{ titulo }}</h1>
+                    {% if forma %}<p>{{ forma.descricao }}</p>{% endif %}
                 </div>
             </header>
 
-            <form method="post" class="panel form-narrow" novalidate data-payment-form>
+            <form method="post" class="panel form-narrow" novalidate>
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{{ next }}">
                 {% include "partials/form_errors.html" %}
 
-                {% include "partials/form_field.html" with field=form.tipo classe="radio-pills" %}
+                {% if forma %}
+                    {% include "partials/form_field.html" with field=form.validade %}
+                {% else %}
+                    {% include "partials/form_field.html" with field=form.tipo classe="radio-pills" %}
+                    {% include "partials/form_field.html" with field=form.numero %}
+                    {% include "partials/form_field.html" with field=form.nome_titular %}
+                    <div class="form-row form-row-3">
+                        {% include "partials/form_field.html" with field=form.bandeira %}
+                        {% include "partials/form_field.html" with field=form.validade %}
+                        {% include "partials/form_field.html" with field=form.cvv %}
+                    </div>
+                {% endif %}
+
                 {% include "partials/form_field.html" with field=form.apelido %}
-
-                <div class="form-row" data-card-fields>
-                    {% include "partials/form_field.html" with field=form.bandeira %}
-                    {% include "partials/form_field.html" with field=form.ultimos_digitos %}
-                </div>
-
                 {% include "partials/form_field.html" with field=form.principal %}
 
                 <div class="alert alert-info">
                     <div class="alert-text">
-                        <p>Por segurança, o Contratempo não armazena número completo, validade nem código de segurança do cartão. Esses dados serão pedidos pelo processador de pagamento.</p>
+                        <p>Por segurança, o número completo e o código de segurança (CVV) servem só para conferir o cartão e <strong>não ficam guardados</strong>. Guardamos apenas a bandeira, os 4 últimos dígitos e a validade.</p>
                     </div>
                 </div>
 
                 <div class="form-actions">
                     <a href="{% if next %}{{ next }}{% else %}{% url 'pagamentos' %}{% endif %}" class="btn btn-outline">Cancelar</a>
                     <span class="spacer"></span>
-                    <button type="submit" class="btn btn-accent">Salvar</button>
+                    <button type="submit" class="btn btn-accent">Salvar cartão</button>
                 </div>
             </form>
         </section>
@@ -52,20 +59,4 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
-<script>
-/* Mostra bandeira/últimos dígitos só para cartões. */
-document.addEventListener("DOMContentLoaded", function () {
-    var form = document.querySelector("[data-payment-form]");
-    var campos = form && form.querySelector("[data-card-fields]");
-    if (!campos) return;
-    function atualizar() {
-        var marcado = form.querySelector("input[name='tipo']:checked");
-        var cartao = marcado && marcado.value.indexOf("cartao") === 0;
-        campos.hidden = !cartao;
-    }
-    form.querySelectorAll("input[name='tipo']").forEach(function (r) { r.addEventListener("change", atualizar); });
-    atualizar();
-});
-</script>
-{% endblock %}
+{% block extra_js %}<script src="{% static 'js/cartao.js' %}"></script>{% endblock %}

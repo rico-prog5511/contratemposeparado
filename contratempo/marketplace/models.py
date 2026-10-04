@@ -13,6 +13,7 @@ from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+from django.utils import timezone
 
 
 # =====================================================================
@@ -151,12 +152,23 @@ class Endereco(models.Model):
 
 
 class FormaPagamento(models.Model):
+    """
+    Cartão salvo do usuário. PIX e boleto não são cadastrados: são
+    escolhidos direto no checkout (ver views_checkout.OPCOES_SEM_CADASTRO).
+    Nunca guarda o número completo nem o CVV — só bandeira, 4 últimos
+    dígitos e validade.
+    """
+
     TIPO_CHOICES = [
         ("cartao_credito", "Cartão de crédito"),
         ("cartao_debito", "Cartão de débito"),
-        ("pix", "PIX"),
-        ("boleto", "Boleto"),
-        ("outro", "Outro"),
+    ]
+    BANDEIRA_CHOICES = [
+        ("Visa", "Visa"),
+        ("Mastercard", "Mastercard"),
+        ("Elo", "Elo"),
+        ("American Express", "American Express"),
+        ("Hipercard", "Hipercard"),
     ]
 
     id = models.BigAutoField(primary_key=True)
@@ -169,7 +181,9 @@ class FormaPagamento(models.Model):
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
     apelido = models.CharField(max_length=60, null=True, blank=True)
     ultimos_digitos = models.CharField(max_length=4, null=True, blank=True)
-    bandeira = models.CharField(max_length=30, null=True, blank=True)
+    bandeira = models.CharField(max_length=30, choices=BANDEIRA_CHOICES, null=True, blank=True)
+    validade_mes = models.PositiveSmallIntegerField(null=True, blank=True)
+    validade_ano = models.PositiveSmallIntegerField(null=True, blank=True)
     token_externo = models.CharField(max_length=255, null=True, blank=True)
     principal = models.BooleanField(default=False)
     data_cadastro = models.DateTimeField(auto_now_add=True)
@@ -182,10 +196,57 @@ class FormaPagamento(models.Model):
     def __str__(self):
         return self.apelido or f"{self.get_tipo_display()} ****{self.ultimos_digitos or ''}"
 
+    @property
+    def descricao(self):
+        """Ex.: "Cartão de crédito Visa final 4242" (vai para o pedido)."""
+        final = f"final {self.ultimos_digitos}" if self.ultimos_digitos else ""
+        return " ".join(p for p in (self.get_tipo_display(), self.bandeira, final) if p)
+
+    @property
+    def validade_texto(self):
+        if not (self.validade_mes and self.validade_ano):
+            return ""
+        return f"{self.validade_mes:02d}/{self.validade_ano % 100:02d}"
+
+    @property
+    def vencido(self):
+        """O cartão vale até o último dia do mês da validade."""
+        if not (self.validade_mes and self.validade_ano):
+            return False
+        hoje = timezone.localdate()
+        return (self.validade_ano, self.validade_mes) < (hoje.year, hoje.month)
+
 
 # =====================================================================
 # CATEGORIAS E FRANQUIAS
 # =====================================================================
+
+# Como o campo `marca` do produto é chamado em cada categoria. A escolha é
+# pelas palavras do nome/slug da categoria (sem acento), então funciona
+# também para categorias novas criadas no admin. Vale a primeira que bater.
+# (começos de palavra, rótulo, exemplo para o campo)
+ROTULOS_MARCA = [
+    (("livro", "quadrinho", "hq", "manga", "gibi", "revista"), "Autor / editora", "Ex.: Frank Miller, Panini"),
+    (("music", "disco", "vini", "cd", "fita", "lp"), "Artista / banda", "Ex.: Legião Urbana"),
+    (("filme", "cinema", "dvd", "blu", "serie"), "Diretor / estúdio", "Ex.: Studio Ghibli"),
+    (("jogo", "game", "video", "console", "brinquedo", "action", "figure", "boneco", "carta", "card",
+      "colecionav", "miniatura", "roupa", "vestuario"), "Marca / fabricante", "Ex.: Bandai, Nintendo"),
+]
+ROTULO_MARCA_PADRAO = ("Marca / autor", "Ex.: Bandai, Frank Miller")
+
+
+def rotulo_marca(categoria):
+    """(rótulo, exemplo) do campo marca para a categoria (ou o padrão, sem categoria)."""
+    if categoria is None:
+        return ROTULO_MARCA_PADRAO
+    from .busca import normalizar
+    texto = normalizar(f"{categoria.nome} {categoria.slug}").replace("-", " ")
+    palavras_categoria = texto.split()
+    for comecos, rotulo, exemplo in ROTULOS_MARCA:
+        if any(p.startswith(comecos) for p in palavras_categoria):
+            return rotulo, exemplo
+    return ROTULO_MARCA_PADRAO
+
 
 class Categoria(models.Model):
     id = models.AutoField(primary_key=True)
@@ -201,6 +262,11 @@ class Categoria(models.Model):
 
     def __str__(self):
         return self.nome
+
+    @property
+    def rotulo_marca(self):
+        """Ex.: "Autor / editora" para Quadrinhos, "Artista / banda" para Discos."""
+        return rotulo_marca(self)[0]
 
 
 class Franquia(models.Model):

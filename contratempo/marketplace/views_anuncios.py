@@ -11,7 +11,7 @@ vai para ProdutoImagem.url_imagem (coluna VARCHAR já existente).
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import Avg, Count, Q, Sum
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404, redirect, render
@@ -20,6 +20,7 @@ from django.views.decorators.http import require_POST
 
 from .forms import LIMITE_IMAGENS_ANUNCIO, ProdutoForm
 from .models import ItemPedido, Produto, ProdutoImagem
+from .sku import gerar_sku
 from .views_conta import _proximo, salvar_upload
 
 VENDAS_VALIDAS = ~Q(itens_pedido__pedido__status_pedido="cancelado")
@@ -97,6 +98,22 @@ def anuncios(request):
 # CRIAR / EDITAR
 # =====================================================================
 
+def _salvar_com_sku_gerado(produto, tentativas=5):
+    """
+    Salva o anúncio novo com o próximo SKU livre (sku.gerar_sku). Se outra
+    pessoa publicar ao mesmo tempo e pegar o mesmo código, o banco recusa
+    (coluna UNIQUE) e tentamos o seguinte.
+    """
+    for tentativa in range(tentativas):
+        produto.sku = gerar_sku(produto.categoria, produto.franquia, produto.marca)
+        try:
+            with transaction.atomic():
+                produto.save()
+            return
+        except IntegrityError:
+            if tentativa == tentativas - 1:
+                raise
+
 @login_required
 def anuncio_criar(request):
     form = ProdutoForm(request.POST or None, request.FILES or None)
@@ -104,9 +121,14 @@ def anuncio_criar(request):
         with transaction.atomic():
             produto = form.save(commit=False)
             produto.vendedor = request.user
-            produto.save()
+            gerado = not produto.sku
+            if gerado:
+                _salvar_com_sku_gerado(produto)
+            else:
+                produto.save()
             _salvar_imagens(produto, form.cleaned_data["imagens"])
-        messages.success(request, f'Anúncio "{produto.nome}" publicado.')
+        aviso = f" Código gerado: {produto.sku}." if gerado else ""
+        messages.success(request, f'Anúncio "{produto.nome}" publicado.{aviso}')
         return redirect("anuncio_detalhe", produto_id=produto.id)
 
     return render(request, "anuncios/form.html", {

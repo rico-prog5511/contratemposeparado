@@ -54,7 +54,7 @@
                         </ul>
                     {% endif %}
 
-                    <div class="upload-area {% if form.imagens.errors %}has-error{% endif %}" data-upload-area data-limite="{{ limite_imagens }}">
+                    <div class="upload-area {% if form.imagens.errors %}has-error{% endif %}" data-upload-area data-limite="{{ limite_imagens }}" data-tamanho-max="{{ form.tamanho_maximo_imagem }}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                         <label for="{{ form.imagens.id_for_label }}">
                             <strong>Clique para escolher</strong> ou arraste as imagens aqui
@@ -107,4 +107,20 @@
 
 {% block extra_js %}
 <script src="{% static 'js/upload.js' %}"></script>
+{{ form.rotulos_marca|json_script:"rotulos-marca" }}
+<script>
+/* Troca o nome do campo "marca" conforme a categoria (Autor / editora, Artista / banda...). */
+(function () {
+    var categoria = document.getElementById("{{ form.categoria.id_for_label }}");
+    var campo = document.querySelector("[data-marca-campo]");
+    var rotulo = campo && document.querySelector("label[for='" + campo.id + "']");
+    if (!categoria || !rotulo) return;
+    var rotulos = JSON.parse(document.getElementById("rotulos-marca").textContent);
+    categoria.addEventListener("change", function () {
+        var atual = rotulos[categoria.value] || rotulos[""];
+        rotulo.firstChild.nodeValue = atual.rotulo;
+        campo.placeholder = atual.exemplo;
+    });
+})();
+</script>
 {% endblock %}

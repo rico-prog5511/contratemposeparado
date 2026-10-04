@@ -214,10 +214,14 @@ class EnderecoAdmin(admin.ModelAdmin):
 
 @admin.register(FormaPagamento)
 class FormaPagamentoAdmin(admin.ModelAdmin):
-    list_display = ("usuario", "tipo", "apelido", "ultimos_digitos", "principal")
-    list_filter = ("tipo", "principal")
+    list_display = ("usuario", "tipo", "bandeira", "ultimos_digitos", "validade", "principal")
+    list_filter = ("tipo", "bandeira", "principal")
     search_fields = ("usuario__email", "apelido")
     autocomplete_fields = ("usuario",)
+
+    @admin.display(description="Validade")
+    def validade(self, obj):
+        return f"{obj.validade_texto} (vencido)" if obj.vencido else obj.validade_texto
 
 
 # =====================================================================

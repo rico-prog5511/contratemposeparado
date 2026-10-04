@@ -116,6 +116,7 @@
 .checkout-steps .done .step-label { color: var(--txt-azul); text-decoration: underline; text-underline-offset: 3px; }
 
 .add-option { margin-top: 14px; }
+.checkout-cvv { max-width: 260px; margin: 18px 0 0; }
 
 .checkout-recap {
     display: flex;

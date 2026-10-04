@@ -46,6 +46,17 @@
         var(--cor-header-escuro);
 }
 
+/* 1º slide com foto (static/img/banner/banner-1.*): a foto cobre o fundo e
+   uma camada escura do lado do texto garante a leitura em qualquer foto.
+   O vermelho fica por baixo, caso a imagem não carregue. */
+.slide--foto {
+    background:
+        linear-gradient(90deg, rgba(18, 10, 14, 0.9) 0%, rgba(18, 10, 14, 0.75) 50%, rgba(18, 10, 14, 0.25) 100%),
+        var(--slide-foto) center / cover no-repeat,
+        var(--cor-destaque);
+}
+.slide--foto .slide-texto :is(h2, p, .slide-tag) { text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45); }
+
 .slide-inner {
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
@@ -298,6 +309,36 @@
 .home-category-count { font-size: 0.8rem; color: var(--ink-muted); }
 
 /* =====================================================================
+   FAIXAS DE PREÇO
+   ===================================================================== */
+.home-faixas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.home-faixa {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    height: 100%;
+    padding: 22px 22px 20px;
+    background: var(--paper);
+    border: var(--borda);
+    border-radius: var(--radius);
+    color: var(--ink);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.home-faixa:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-card); }
+.home-faixas li:nth-child(even) .home-faixa:hover { box-shadow: var(--shadow-hover); }
+.home-faixa-intervalo { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; color: var(--txt-vermelho); }
+.home-faixa strong { margin-top: 18px; font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; line-height: 1.15; }
+.home-faixa-total { font-size: 0.85rem; color: var(--ink-muted); }
+.home-faixa-total::after { content: " →"; color: var(--txt-azul); }
+
+/* =====================================================================
    CHAMADA PARA VENDER
    ===================================================================== */
 .home-sell {
@@ -323,6 +364,13 @@
     .carrossel-slide { min-height: 0; padding: 48px 0 92px; }
     .slide-arte { height: 220px; }
     .home-hero-ticket { display: none; }
+    /* No celular o texto ocupa a largura toda: a camada escura também */
+    .slide--foto {
+        background:
+            linear-gradient(rgba(18, 10, 14, 0.72), rgba(18, 10, 14, 0.82)),
+            var(--slide-foto) center / cover no-repeat,
+            var(--cor-destaque);
+    }
     .home-categories { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
@@ -341,6 +389,9 @@
     .home-strip-inner > div:first-child { border-top: 0; }
     .home-category-pill { min-height: 100px; padding: 14px; }
     .home-category-pill strong { font-size: 1.05rem; }
+    .home-faixas { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .home-faixa { padding: 16px 14px; }
+    .home-faixa strong { margin-top: 10px; font-size: 1.1rem; }
     .home-sell { flex-direction: column; align-items: stretch; padding: 26px 22px; box-shadow: 5px 5px 0 var(--cor-destaque); }
 }
 

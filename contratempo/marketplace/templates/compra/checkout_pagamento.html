@@ -31,40 +31,58 @@
             <section class="panel">
                 <h2 class="panel-title">Forma de pagamento</h2>
 
-                {% if formas %}
-                    <form method="post">
-                        {% csrf_token %}
-                        <fieldset class="option-list">
-                            <legend class="sr-only">Escolha uma forma de pagamento</legend>
-                            {% for forma in formas %}
-                                <label class="option-card">
-                                    <input type="radio" name="forma_pagamento" value="{{ forma.id }}" {% if forma.id == selecionado %}checked{% endif %} required>
-                                    <span class="option-body">
-                                        <span class="option-title">
-                                            {{ forma.get_tipo_display }}
-                                            {% if forma.principal %}<span class="badge badge-plain">Principal</span>{% endif %}
-                                        </span>
-                                        <p>
-                                            {% if forma.apelido %}{{ forma.apelido }}{% endif %}
-                                            {% if forma.ultimos_digitos %}{% if forma.apelido %} · {% endif %}{{ forma.bandeira }} final <span class="mono">{{ forma.ultimos_digitos }}</span>{% endif %}
-                                        </p>
+                <form method="post" data-checkout-pagamento novalidate>
+                    {% csrf_token %}
+                    <fieldset class="option-list">
+                        <legend class="sr-only">Escolha uma forma de pagamento</legend>
+
+                        {% for cartao in cartoes %}
+                            <label class="option-card{% if cartao.vencido %} option-card--off{% endif %}">
+                                <input type="radio" name="forma_pagamento" value="{{ cartao.id }}"
+                                       data-cartao="{{ cartao.bandeira }} final {{ cartao.ultimos_digitos }}" data-bandeira="{{ cartao.bandeira }}"
+                                       {% if cartao.vencido %}disabled{% elif selecionado == cartao.id|stringformat:"s" %}checked{% endif %}>
+                                <span class="option-body">
+                                    <span class="option-title">
+                                        {{ cartao.get_tipo_display }}
+                                        {% if cartao.principal %}<span class="badge badge-plain">Principal</span>{% endif %}
+                                        {% if cartao.vencido %}<span class="badge badge--cancelado">Vencido</span>{% endif %}
                                     </span>
-                                </label>
-                            {% endfor %}
-                        </fieldset>
+                                    <p>
+                                        {% if cartao.apelido %}{{ cartao.apelido }} · {% endif %}{{ cartao.bandeira }} final <span class="mono">{{ cartao.ultimos_digitos }}</span>
+                                        {% if cartao.validade_texto %} · validade <span class="mono">{{ cartao.validade_texto }}</span>{% endif %}
+                                    </p>
+                                    {% if cartao.vencido %}<p><a href="{% url 'pagamento_editar' cartao.id %}?next={{ request.path }}">Atualizar a validade</a> para usar este cartão.</p>{% endif %}
+                                </span>
+                            </label>
+                        {% endfor %}
 
-                        <a href="{% url 'pagamento_criar' %}?next={% url 'checkout_pagamento' %}" class="btn btn-ghost add-option">+ Adicionar forma de pagamento</a>
+                        {% for valor, opcao in opcoes_sem_cadastro %}
+                            <label class="option-card">
+                                <input type="radio" name="forma_pagamento" value="{{ valor }}" {% if selecionado == valor %}checked{% endif %}>
+                                <span class="option-body">
+                                    <span class="option-title">{{ opcao.0 }}</span>
+                                    <p>{{ opcao.1 }}</p>
+                                </span>
+                            </label>
+                        {% endfor %}
+                    </fieldset>
 
-                        <div class="form-actions">
-                            <a href="{% url 'checkout_endereco' %}" class="btn btn-outline">Voltar</a>
-                            <span class="spacer"></span>
-                            <button type="submit" class="btn btn-accent">Revisar pedido</button>
-                        </div>
-                    </form>
-                {% else %}
-                    {% url 'pagamento_criar' as url_novo %}
-                    {% include "partials/empty_state.html" with icone="cartao" titulo="Nenhuma forma de pagamento" texto="Cadastre um cartão, PIX ou boleto para continuar a compra." link_url=url_novo|add:"?next="|add:request.path link_label="Cadastrar forma de pagamento" %}
-                {% endif %}
+                    <div class="form-group checkout-cvv{% if erro_cvv %} has-error{% endif %}" data-cvv-campo>
+                        <label for="id_cvv">Código de segurança (CVV) do cartão <span class="required-mark" aria-hidden="true">*</span></label>
+                        <input type="password" name="cvv" id="id_cvv" inputmode="numeric" autocomplete="cc-csc" maxlength="4" placeholder="•••" data-mascara="cvv"
+                               aria-describedby="id_cvv_helptext{% if erro_cvv %} id_cvv_error{% endif %}"{% if erro_cvv %} aria-invalid="true"{% endif %}>
+                        <div class="form-help" id="id_cvv_helptext">Só para pagamento com cartão: 3 dígitos no verso (4 na frente, no American Express). O código não fica guardado.</div>
+                        {% if erro_cvv %}<ul class="errorlist" id="id_cvv_error"><li>{{ erro_cvv }}</li></ul>{% endif %}
+                    </div>
+
+                    <a href="{% url 'pagamento_criar' %}?next={% url 'checkout_pagamento' %}" class="btn btn-ghost add-option">+ Adicionar cartão</a>
+
+                    <div class="form-actions">
+                        <a href="{% url 'checkout_endereco' %}" class="btn btn-outline">Voltar</a>
+                        <span class="spacer"></span>
+                        <button type="submit" class="btn btn-accent">Revisar pedido</button>
+                    </div>
+                </form>
             </section>
         </div>
 
@@ -72,3 +90,5 @@
     </div>
 </div>
 {% endblock %}
+
+{% block extra_js %}<script src="{% static 'js/cartao.js' %}"></script>{% endblock %}

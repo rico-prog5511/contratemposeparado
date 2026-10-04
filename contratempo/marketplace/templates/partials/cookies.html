@@ -1,0 +1,49 @@
+{% comment %}
+Aviso de cookies (LGPD) e janela de preferências — ver static/js/cookies.js.
+O aviso aparece até a pessoa escolher; sem JavaScript ele não aparece
+(e nada opcional é usado, porque os opcionais dependem de JavaScript).
+{% endcomment %}
+<section class="cookie-aviso" id="cookie-aviso" aria-labelledby="cookie-aviso-titulo" hidden>
+    <div class="cookie-aviso-texto">
+        <h2 id="cookie-aviso-titulo">Cookies na Contratempo</h2>
+        <p>Usamos cookies essenciais para o login e a segurança do site funcionarem. Com a sua permissão, guardamos também os produtos que você viu, para mostrar em “Vistos recentemente”. Não usamos cookies de propaganda. <a href="{% url 'politica_cookies' %}">Saiba mais</a>.</p>
+    </div>
+    <div class="cookie-aviso-acoes">
+        <button type="button" class="btn btn-ghost btn-sm" data-cookies-abrir hidden>Personalizar</button>
+        <button type="button" class="btn btn-outline btn-sm" data-cookies-recusar>Só os essenciais</button>
+        <button type="button" class="btn btn-accent btn-sm" data-cookies-aceitar>Aceitar todos</button>
+    </div>
+</section>
+
+<dialog class="confirm-dialog cookie-preferencias" id="cookie-preferencias" aria-labelledby="cookie-preferencias-titulo">
+    <form method="dialog">
+        <div class="confirm-dialog-body">
+            <span class="eyebrow">Privacidade</span>
+            <h2 id="cookie-preferencias-titulo">Preferências de cookies</h2>
+            <p>Escolha o que o site pode guardar no seu navegador. Você pode mudar isso quando quiser pelo link no rodapé.</p>
+
+            <div class="cookie-categoria">
+                <label class="check">
+                    <input type="checkbox" checked disabled aria-describedby="cookie-essenciais-desc">
+                    <span>Essenciais <small>(sempre ligados)</small></span>
+                </label>
+                <p id="cookie-essenciais-desc">Manter você logado, proteger os formulários, mostrar avisos e lembrar suas preferências de acessibilidade e esta escolha.</p>
+            </div>
+
+            <div class="cookie-categoria">
+                <label class="check">
+                    <input type="checkbox" name="funcionais" aria-describedby="cookie-funcionais-desc">
+                    <span>Funcionais</span>
+                </label>
+                <p id="cookie-funcionais-desc">Guardar os produtos que você abriu para mostrar em “Vistos recentemente” na página inicial. Ao desligar, o histórico é apagado.</p>
+            </div>
+
+            <p class="cookie-link"><a href="{% url 'politica_cookies' %}">Ver a política de cookies completa</a></p>
+        </div>
+        <div class="confirm-dialog-actions">
+            <button type="submit" value="cancelar" class="btn btn-ghost">Cancelar</button>
+            <button type="submit" value="salvar" class="btn btn-outline">Salvar escolhas</button>
+            <button type="submit" value="todos" class="btn btn-accent">Aceitar todos</button>
+        </div>
+    </form>
+</dialog>

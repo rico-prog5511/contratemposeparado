@@ -151,6 +151,7 @@ contratemposeparado/                  (raiz do projeto / repositório)
 │   ├── contratempo_db.sql            cria o banco MySQL completo do zero
 │   ├── atualizacao_v2.sql            atualiza um banco da versão 1 para a 2
 │   ├── atualizacao_v3.sql            atualiza da versão 2 para a 3 (denúncias)
+│   ├── atualizacao_v4.sql            atualiza da versão 3 para a 4 (cartões com validade)
 │   ├── criar_banco.py                usado pelo instalar.bat
 │   └── dados.json                    seus dados exportados (não vai pro GitHub)
 │
@@ -191,7 +192,7 @@ contratemposeparado/                  (raiz do projeto / repositório)
         │                             |imagem_principal, |to_range, url_replace
         ├── management/commands/
         │   └── testar_email.py       comando "python manage.py testar_email"
-        ├── migrations/               0001 a 0004 (histórico do banco)
+        ├── migrations/               0001 a 0005 (histórico do banco)
         ├── templates/                as páginas HTML (lista na seção 8)
         │   ├── base.html             esqueleto comum a todas as páginas
         │   ├── partials/             pedaços reutilizáveis: header, footer,
@@ -229,6 +230,12 @@ Variáveis do .env:
   EMAIL_HOST_USER ........ conta Gmail que envia os e-mails
   EMAIL_HOST_PASSWORD .... SENHA DE APP do Gmail (16 letras), não a senha
                            normal. Vazio = e-mails aparecem no terminal.
+  BREVO_API_KEY .......... chave do Brevo (brevo.com). Se preenchida, os
+                           e-mails saem pelo Brevo em vez do Gmail, com o
+                           remetente EMAIL_HOST_USER (confirmado no Brevo).
+                           Necessária no PythonAnywhere grátis, onde o
+                           Gmail recusa o login vindo do servidor.
+                           Código: marketplace/email_brevo.py.
 
 Diferenças entre os modos:
 
@@ -296,9 +303,13 @@ Cada classe em models.py = uma tabela. Nome da classe -> nome da tabela
   Se o usuário for apagado, os endereços vão junto (CASCADE).
 
 [formas_pagamento]  — model FormaPagamento
-  tipo (crédito, débito, PIX, boleto, outro), apelido, bandeira,
-  ultimos_digitos, principal, token_externo.
-  NUNCA guarda o número completo, validade ou CVV do cartão.
+  Só CARTÕES salvos: tipo (crédito ou débito), apelido, bandeira (Visa,
+  Mastercard, Elo, American Express, Hipercard), ultimos_digitos,
+  validade_mes, validade_ano, principal, token_externo.
+  NUNCA guarda o número completo nem o CVV: o formulário pede os dois,
+  confere e descarta. PIX e boleto não são cadastrados — são escolhidos
+  direto no checkout (o pedido fica com forma_pagamento_id NULL e o
+  texto "PIX" ou "Boleto" no snapshot).
   token_externo: reservado para quando houver um gateway de pagamento.
 
 --------------------------------------------------------------------------------
@@ -316,7 +327,21 @@ Cada classe em models.py = uma tabela. Nome da classe -> nome da tabela
   nome, descricao, preco (decimal 10,2)
   quantidade_disponivel ... estoque
   condicao .......... novo / usado / semi-novo
-  marca, ano, sku (código interno; único, mas pode ficar vazio)
+  marca, ano, sku (código interno; único no site inteiro, mas pode ficar vazio)
+  SKU no padrão XXX-XXX-XXX (3 partes de 3 letras ou números), ex.:
+  COL-NAR-001 — regras em marketplace/sku.py. Ao CRIAR um anúncio com o
+  campo em branco, o site gera: categoria (COL) + franquia, ou marca, ou
+  GEN (NAR) + o próximo número livre no site (001). Se o vendedor digitar,
+  o formulário ajusta (maiúsculas, hífen) e confere o formato. Anúncios
+  antigos ficam como estão: um código antigo fora do padrão continua
+  aceito enquanto não for alterado. Nada mudou no banco.
+  "marca" guarda marca, autor ou artista: na tela o nome do campo muda
+  conforme a categoria (ROTULOS_MARCA em models.py, escolhido pelas
+  palavras do nome da categoria): Quadrinhos/Livros -> "Autor / editora",
+  Música/Discos -> "Artista / banda", Filmes -> "Diretor / estúdio",
+  Jogos/Brinquedos/Colecionáveis... -> "Marca / fabricante", outras ->
+  "Marca / autor". Categoria nova no admin já pega o nome certo se tiver
+  uma dessas palavras; senão, acrescente a palavra em ROTULOS_MARCA.
   status_anuncio .... ativo / pausado / vendido / encerrado
   data_criacao, data_atualizacao
 
@@ -473,6 +498,8 @@ Regras de exclusão (on_delete), e o porquê:
   0003_dados_iniciais ......... preenche o frete das 27 UFs e 17 perguntas
                                 frequentes; liga pedidos antigos ao vendedor
   0004_denuncias .............. tabela denuncias
+  0005_cartoes_validade ....... validade do cartão; apaga PIX/boleto/outro
+                                salvos (agora escolhidos no checkout)
 
 --------------------------------------------------------------------------------
 6.10  ARQUIVOS DE BANCO (pasta banco/)
@@ -520,10 +547,44 @@ Formato:  URL  —  quem acessa  —  arquivo da view  —  template
 --------------------------------------------------------------------------------
 
 /  — todos — views.home — home.html
-  Destaque inicial, faixa "como funciona", até 8 categorias com a
-  quantidade de anúncios, "Mais vendidos" (8 produtos ordenados pelas
-  unidades vendidas), "Chegou agora" (4 mais recentes) e chamada para
-  vender.
+  Na ordem:
+  - banner (carrossel) e faixa "como funciona". O 1º slide pode ter uma
+    FOTO DE FUNDO: basta colocar o arquivo banner-1.jpg (ou .png/.webp)
+    em marketplace/static/img/banner/ (instruções no LEIA-ME.txt de lá).
+    Sem o arquivo, o slide fica com o fundo vermelho e os 3 cartões;
+  - "Vistos recentemente": os últimos produtos que a pessoa abriu NESTE
+    navegador (static/js/vistos.js guarda os ids no localStorage; os cards
+    vêm de /produtos/vistos/?ids=..., só anúncios ativos, até 4). Sem
+    histórico, a seção não aparece. Tem botão "Limpar histórico". Só
+    funciona se a pessoa aceitou os cookies FUNCIONAIS (ver /cookies/);
+  - até 8 categorias com a quantidade de anúncios;
+  - "Quanto você quer investir?": faixas de preço (FAIXAS_PRECO em
+    views.py) com quantas peças cada uma tem; levam ao catálogo filtrado
+    por preço. Faixas vazias não aparecem;
+  - "Chegou agora" (4 mais recentes);
+  - 3 artigos do Guia do colecionador;
+  - chamada para vender.
+
+/guia/  e  /guia/<slug>/  — views.guia / views.guia_artigo — guia/
+  Guia do colecionador. Os artigos NÃO ficam no banco: a lista está em
+  marketplace/guia.py e o texto de cada um em
+  templates/guia/textos/<slug>.html. Artigo novo = um item na lista +
+  um template com o mesmo slug.
+
+/cookies/  — views.politica_cookies — cookies.html
+  Política de cookies: lista cada cookie, para que serve e quanto dura.
+  AVISO DE COOKIES (todas as páginas): partials/cookies.html +
+  static/js/cookies.js. Aparece na primeira visita com "Aceitar todos",
+  "Só os essenciais" e "Personalizar". A escolha fica no cookie
+  ct_cookies por 12 meses. Categorias: essenciais (sempre ligados:
+  sessionid, csrftoken, messages, ct_cookies, preferências de
+  acessibilidade) e funcionais (opcional: Vistos recentemente). Enquanto
+  a pessoa não escolhe, os funcionais ficam DESLIGADOS. O rodapé tem o
+  botão "Preferências de cookies" para mudar a escolha.
+  Para um recurso novo depender de permissão, use no JavaScript:
+      window.ctCookies.permitido("funcionais")
+  Se criar uma categoria nova (ex.: estatísticas), aumente VERSAO em
+  cookies.js para o aviso aparecer de novo para todo mundo.
 
 /produtos/  — todos — views.produtos — produtos/lista.html
   Catálogo. Filtros na lateral: franquias, condição, preço mínimo e
@@ -622,9 +683,14 @@ Formato:  URL  —  quem acessa  —  arquivo da view  —  template
 /conta/enderecos/novo/  e  /conta/enderecos/<id>/editar/ — endereco_form.html
   Ao digitar o CEP, o site busca rua, bairro, cidade e UF no ViaCEP.
 
-/conta/pagamentos/  — pagamentos.html   Cartões com cada forma.
-/conta/pagamentos/novo/  e  /<id>/editar/ — pagamento_form.html
-  Tipo; bandeira e 4 últimos dígitos só aparecem para cartão.
+/conta/pagamentos/  — pagamentos.html   Cartões salvos, com validade e
+  o aviso "Vencido" quando passar do mês da validade.
+/conta/pagamentos/novo/  — pagamento_form.html
+  Crédito ou débito, número, nome impresso, bandeira, validade (MM/AA) e
+  CVV, com máscaras de digitação (static/js/cartao.js). Número e CVV são
+  conferidos e descartados.
+/conta/pagamentos/<id>/editar/ — o mesmo template, só com validade,
+  apelido e "principal" (o número do cartão não muda).
 
 Todas as páginas /conta/... têm o MENU DA CONTA na lateral
 (partials/account_nav.html), dividido em Compras, Vendas e Conta.
@@ -643,6 +709,9 @@ Todas as páginas /conta/... têm o MENU DA CONTA na lateral
   Escolha do endereço; cada endereço mostra o frete e o prazo. Estados sem
   frete ficam desabilitados.
 /checkout/pagamento/  — etapa 2 — checkout_pagamento.html
+  Cartões salvos (vencidos ficam desabilitados), PIX e Boleto. Com cartão,
+  pede o CVV (3 dígitos; 4 no American Express), que é conferido e
+  descartado. Com PIX ou boleto o campo do CVV some.
 /checkout/revisao/  — etapa 3 — checkout_revisao.html
   Mostra um "Pacote" por vendedor, com frete e total de cada um.
   "Confirmar pedido" cria os pedidos.
@@ -737,7 +806,8 @@ Todas as páginas /conta/... têm o MENU DA CONTA na lateral
      anúncio.
   2. Carrinho -> confere preço e disponibilidade de novo.
   3. Checkout 1: endereço (guardado na SESSÃO). Calcula o frete.
-  4. Checkout 2: forma de pagamento (guardada na sessão).
+  4. Checkout 2: cartão (+ CVV), PIX ou boleto. Na sessão fica só a
+     escolha ("pix", "boleto" ou o id do cartão) — nunca o CVV.
   5. Checkout 3: revisão -> "Confirmar pedido".
   6. Dentro de uma TRANSAÇÃO (tudo ou nada):
        - trava os produtos no banco (select_for_update), para duas pessoas
@@ -813,7 +883,9 @@ Todas as páginas /conta/... têm o MENU DA CONTA na lateral
   - Anúncio com vendas não pode ser excluído (só encerrado).
   - Só avalia quem recebeu; uma avaliação por produto por pedido.
   - Endereços: um principal; apagar o principal promove outro.
-  - Formas de pagamento: idem; cartão exige bandeira e 4 dígitos.
+  - Cartões: um principal (apagar o principal promove outro). Número com
+    13 a 19 dígitos, validade MM/AA, CVV com 3 dígitos (4 no Amex).
+    Cartão vencido não pode ser usado no checkout.
   - CEP com 8 dígitos; UF com 2 letras.
   - Conta só é desativada sem anúncios ativos; usuário nunca é apagado.
 
@@ -979,6 +1051,12 @@ COMANDOS (dentro da pasta contratempo, com a venv ativa):
   python manage.py testar_email email ...... testa o e-mail
   python manage.py check --deploy .......... confere segurança de produção
   python manage.py collectstatic ........... reúne CSS/JS (produção)
+       Em produção (DEBUG desligado) cada CSS/JS ganha uma "impressão
+       digital" no nome, ex.: styles-retro.3f9a1c2b.css (ver
+       marketplace/estaticos.py). Assim o navegador nunca fica preso a um
+       CSS velho em cache depois de uma atualização. Por isso o
+       collectstatic precisa rodar SEMPRE que o site é atualizado — o
+       atualizar.sh já faz.
 
 EXPORTAR / IMPORTAR DADOS (na raiz do projeto):
   venv\Scripts\python.exe -X utf8 contratempo\manage.py dumpdata

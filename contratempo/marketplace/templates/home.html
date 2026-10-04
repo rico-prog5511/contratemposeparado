@@ -9,6 +9,7 @@
 
 {% block extra_js %}
 <script src="{% static 'js/home.js' %}"></script>
+<script src="{% static 'js/vistos.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -17,8 +18,8 @@
 <section class="home-carrossel" aria-roledescription="carrossel" aria-label="Destaques" data-carrossel>
     <div class="carrossel-trilho" aria-live="off">
 
-        <!-- 1. Garimpo -->
-        <article class="carrossel-slide slide--vermelho ativo" aria-roledescription="slide" aria-label="1 de 3">
+        <!-- 1. Garimpo — a foto de fundo vem de static/img/banner/banner-1.* (ver views._foto_banner) -->
+        <article class="carrossel-slide slide--vermelho{% if banner_foto %} slide--foto{% endif %} ativo" aria-roledescription="slide" aria-label="1 de 3"{% if banner_foto %} style="--slide-foto: url('{{ banner_foto }}')"{% endif %}>
             <div class="container slide-inner">
                 <div class="slide-texto">
                     <span class="slide-tag">Garimpo de colecionador</span>
@@ -28,6 +29,7 @@
                         <a href="{% url 'produtos' %}?ordenar=recentes" class="btn btn-light btn-lg">Ver o que chegou →</a>
                     </div>
                 </div>
+                {% if not banner_foto %}
                 <div class="slide-arte home-banner-art" aria-hidden="true">
                     <div class="banner-card banner-card--1">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="7" width="20" height="11" rx="5"/><line x1="7" y1="10.5" x2="7" y2="14.5"/><line x1="5" y1="12.5" x2="9" y2="12.5"/><circle cx="16" cy="11.5" r="1"/><circle cx="18" cy="13.5" r="1"/></svg>
@@ -42,6 +44,7 @@
                         <span>Cartas</span>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </article>
 
@@ -119,6 +122,18 @@
     </div>
 </section>
 
+<!-- VISTOS RECENTEMENTE: preenchido por vistos.js com o histórico deste navegador; some se estiver vazio -->
+<section class="container section home-vistos" aria-labelledby="vistos-titulo" data-vistos data-url="{% url 'produtos_vistos' %}" hidden>
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Continue de onde parou</span>
+            <h2 id="vistos-titulo">Vistos recentemente</h2>
+        </div>
+        <button type="button" class="link-button" data-vistos-limpar>Limpar histórico</button>
+    </div>
+    <div class="product-grid" data-vistos-lista></div>
+</section>
+
 <!-- CATEGORIAS -->
 {% if categorias %}
 <section class="container section">
@@ -141,23 +156,31 @@
 </section>
 {% endif %}
 
-<!-- MAIS VENDIDOS -->
-<section class="container section">
+<!-- FAIXAS DE PREÇO -->
+<section class="container section" aria-labelledby="faixas-titulo">
     <div class="section-head">
         <div>
-            <span class="eyebrow">Destaques</span>
-            <h2>Mais vendidos</h2>
+            <span class="eyebrow">Do seu jeito</span>
+            <h2 id="faixas-titulo">Quanto você quer investir?</h2>
         </div>
         <a href="{% url 'produtos' %}" class="link-arrow">Ver todos →</a>
     </div>
-    <div class="product-grid">
-        {% for produto in produtos_destaque %}
-            {% include "partials/product_card.html" %}
-        {% empty %}
-            {% url 'anuncio_criar' as url_anunciar %}
-            {% include "partials/empty_state.html" with titulo="Nenhum produto por aqui ainda" texto="Seja a primeira pessoa a anunciar um colecionável na Contratempo." link_url=url_anunciar link_label="Criar anúncio" %}
-        {% endfor %}
-    </div>
+    {% if faixas_preco %}
+        <ul class="home-faixas" role="list">
+            {% for faixa in faixas_preco %}
+                <li>
+                    <a href="{{ faixa.url }}" class="home-faixa">
+                        <span class="home-faixa-intervalo mono">{{ faixa.intervalo }}</span>
+                        <strong>{{ faixa.nome }}</strong>
+                        <span class="home-faixa-total">{{ faixa.total }} peça{{ faixa.total|pluralize }}</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        {% url 'anuncio_criar' as url_anunciar %}
+        {% include "partials/empty_state.html" with titulo="Nenhum produto por aqui ainda" texto="Seja a primeira pessoa a anunciar um colecionável na Contratempo." link_url=url_anunciar link_label="Criar anúncio" %}
+    {% endif %}
 </section>
 
 <!-- CHEGOU AGORA -->
@@ -177,6 +200,22 @@
     </div>
 </section>
 {% endif %}
+
+<!-- GUIA DO COLECIONADOR -->
+<section class="container section" aria-labelledby="guia-titulo">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Guia do colecionador</span>
+            <h2 id="guia-titulo">Pra colecionar com segurança</h2>
+        </div>
+        <a href="{% url 'guia' %}" class="link-arrow">Todos os artigos →</a>
+    </div>
+    <div class="guia-grid">
+        {% for artigo in artigos_guia %}
+            {% include "partials/guia_card.html" %}
+        {% endfor %}
+    </div>
+</section>
 
 <!-- VENDER -->
 <section class="container section">

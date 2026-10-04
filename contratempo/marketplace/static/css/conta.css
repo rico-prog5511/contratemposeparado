@@ -181,6 +181,7 @@ form.panel + .danger-zone { margin-top: 28px; }
 .payment-card--cartao_credito .btn-danger,
 .payment-card--cartao_debito .btn-danger { border-color: var(--cor-fundo); color: var(--cor-fundo); }
 .payment-number { font-size: 1.05rem; letter-spacing: 0.1em; margin: 10px 0 2px !important; }
+.payment-card .payment-aviso { margin-top: 8px; font-size: 0.85rem; font-weight: 600; color: #fff; }
 
 @media (max-width: 860px) {
     .auth-box { grid-template-columns: 1fr; box-shadow: 6px 6px 0 var(--cor-header); }

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Guia do colecionador | Contratempo{% endblock %}
+{% block meta_description %}Dicas para comprar, vender e cuidar de colecionáveis: autenticidade de cartas, condição das peças, embalagem e conservação.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/institucional.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="inst-intro">
+    <div class="container">
+        <span class="about-kicker">Guia do colecionador</span>
+        <h1>Colecionar bem é <em>saber cuidar.</em></h1>
+        <p>Dicas curtas para comprar com segurança, anunciar com clareza e fazer cada peça durar.</p>
+    </div>
+</section>
+
+<div class="container section">
+    <div class="guia-grid">
+        {% for artigo in artigos %}
+            {% include "partials/guia_card.html" %}
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

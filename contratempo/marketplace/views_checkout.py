@@ -21,14 +21,20 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from .emails import enviar_aviso_venda, enviar_cancelamento_ao_vendedor, enviar_confirmacao_compra
-from .forms import AvaliacaoForm
+from .forms import AvaliacaoForm, validar_cvv
 from .frete import calcular_envios, faixa_para_uf, resumo_envios
 from .models import Avaliacao, Carrinho, ItemPedido, Pedido, Produto
 from .views import itens_do_carrinho, validar_itens_carrinho
 
 SESSAO_ENDERECO = "checkout_endereco_id"
-SESSAO_PAGAMENTO = "checkout_pagamento_id"
+SESSAO_PAGAMENTO = "checkout_pagamento_id"  # id do cartão, "pix" ou "boleto"
 SESSAO_PEDIDOS = "checkout_pedidos_criados"
+
+# Formas que não precisam de cadastro: são escolhidas direto no checkout.
+OPCOES_SEM_CADASTRO = {
+    "pix": ("PIX", "Pagamento instantâneo pelo app do seu banco."),
+    "boleto": ("Boleto", "Compensação em até 3 dias úteis."),
+}
 
 ETAPAS_PEDIDO = [
     ("aguardando_pagamento", "Pedido realizado"),
@@ -84,6 +90,22 @@ def _breadcrumbs_checkout(etapa):
         {"label": "Carrinho", "url": reverse("carrinho")},
         {"label": f"Checkout — {etapa}", "url": None},
     ]
+
+
+def _pagamento_escolhido(usuario, valor):
+    """
+    Interpreta a escolha de pagamento (id do cartão, "pix" ou "boleto").
+    Devolve (cartão ou None, texto que vai para o pedido). O texto é None
+    se a escolha for inválida — cartão de outra pessoa, apagado ou vencido.
+    """
+    if valor in OPCOES_SEM_CADASTRO:
+        return None, OPCOES_SEM_CADASTRO[valor][0]
+    if not str(valor).isdigit():
+        return None, None
+    cartao = usuario.formas_pagamento.filter(pk=valor).first()
+    if cartao is None or cartao.vencido:
+        return None, None
+    return cartao, cartao.descricao
 
 
 def _endereco_da_sessao(request):
@@ -143,23 +165,36 @@ def checkout_pagamento(request):
     if not endereco:
         return redirect("checkout_endereco")
 
-    formas = request.user.formas_pagamento.order_by("-principal", "-data_cadastro")
-    selecionado = request.session.get(SESSAO_PAGAMENTO)
-    if not formas.filter(pk=selecionado).exists():
-        principal = formas.first()
-        selecionado = principal.pk if principal else None
+    cartoes = list(request.user.formas_pagamento.order_by("-principal", "-data_cadastro"))
+    validos = [str(c.pk) for c in cartoes if not c.vencido]
+    selecionado = str(request.session.get(SESSAO_PAGAMENTO, ""))
+    if selecionado not in validos and selecionado not in OPCOES_SEM_CADASTRO:
+        selecionado = validos[0] if validos else "pix"
 
+    erro_cvv = None
     if request.method == "POST":
-        forma = formas.filter(pk=request.POST.get("forma_pagamento")).first()
-        if forma:
-            request.session[SESSAO_PAGAMENTO] = forma.pk
-            return redirect("checkout_revisao")
-        messages.error(request, "Selecione uma forma de pagamento.")
+        escolha = request.POST.get("forma_pagamento", "")
+        cartao, rotulo = _pagamento_escolhido(request.user, escolha)
+        if rotulo is None:
+            messages.error(request, "Selecione uma forma de pagamento válida.")
+        else:
+            selecionado = escolha
+            if cartao:
+                # O CVV é conferido e descartado: nunca vai para a sessão nem para o banco.
+                try:
+                    validar_cvv(request.POST.get("cvv"), cartao.bandeira)
+                except ValidationError as erro:
+                    erro_cvv = erro.messages[0]
+            if not erro_cvv:
+                request.session[SESSAO_PAGAMENTO] = escolha
+                return redirect("checkout_revisao")
 
     return render(request, "compra/checkout_pagamento.html", {
         **_contexto_envios(itens, endereco),
         "endereco": endereco,
-        "formas": formas,
+        "cartoes": cartoes,
+        "opcoes_sem_cadastro": OPCOES_SEM_CADASTRO.items(),
+        "erro_cvv": erro_cvv,
         "selecionado": selecionado,
         "etapa": 2,
         "breadcrumbs": _breadcrumbs_checkout("Pagamento"),
@@ -175,13 +210,13 @@ def checkout_revisao(request):
     endereco = _endereco_da_sessao(request)
     if not endereco:
         return redirect("checkout_endereco")
-    forma = request.user.formas_pagamento.filter(pk=request.session.get(SESSAO_PAGAMENTO)).first()
-    if not forma:
+    cartao, rotulo_pagamento = _pagamento_escolhido(request.user, request.session.get(SESSAO_PAGAMENTO, ""))
+    if rotulo_pagamento is None:
         return redirect("checkout_pagamento")
 
     if request.method == "POST":
         try:
-            pedidos = _criar_pedidos(request.user, carrinho, itens, endereco, forma)
+            pedidos = _criar_pedidos(request.user, carrinho, itens, endereco, cartao, rotulo_pagamento)
         except CheckoutInvalido as erro:
             messages.error(request, str(erro))
             return redirect("carrinho")
@@ -198,15 +233,19 @@ def checkout_revisao(request):
     return render(request, "compra/checkout_revisao.html", {
         **_contexto_envios(itens, endereco),
         "endereco": endereco,
-        "forma": forma,
+        "cartao": cartao,
+        "rotulo_pagamento": rotulo_pagamento,
         "etapa": 3,
         "breadcrumbs": _breadcrumbs_checkout("Revisão"),
     })
 
 
 @transaction.atomic
-def _criar_pedidos(usuario, carrinho, itens, endereco, forma):
-    """Cria um pedido por vendedor. Qualquer problema desfaz tudo."""
+def _criar_pedidos(usuario, carrinho, itens, endereco, cartao, rotulo_pagamento):
+    """
+    Cria um pedido por vendedor. Qualquer problema desfaz tudo.
+    `cartao` é None quando o pagamento é PIX ou boleto.
+    """
     faixa = faixa_para_uf(endereco.estado)
     if faixa is None:
         raise CheckoutInvalido(f"Ainda não entregamos em {endereco.estado}. Escolha outro endereço.")
@@ -227,7 +266,7 @@ def _criar_pedidos(usuario, carrinho, itens, endereco, forma):
 
     envios, _ = calcular_envios(itens, endereco.estado)
     snapshot_endereco = _snapshot_endereco(endereco)[:500]
-    snapshot_pagamento = str(forma)[:150]
+    snapshot_pagamento = rotulo_pagamento[:150]
     pedidos = []
 
     for envio in envios:
@@ -236,7 +275,7 @@ def _criar_pedidos(usuario, carrinho, itens, endereco, forma):
             usuario=usuario,
             vendedor=envio["vendedor"],
             endereco=endereco,
-            forma_pagamento=forma,
+            forma_pagamento=cartao,
             endereco_snapshot=snapshot_endereco,
             forma_pagamento_snapshot=snapshot_pagamento,
             valor_frete=faixa.valor,

@@ -102,7 +102,20 @@ DB_ENGINE=sqlite
 
 EMAIL_HOST_USER=
 EMAIL_HOST_PASSWORD=
+BREVO_API_KEY=
 ```
+
+> **E-mails no plano grátis:** o Gmail recusa o login vindo do servidor do
+> PythonAnywhere (`SMTPServerDisconnected: Connection unexpectedly closed`),
+> mesmo com a senha de app certa. Use o **Brevo** (brevo.com, grátis até
+> 300 e-mails/dia):
+>
+> 1. Crie a conta no Brevo e confirme o seu Gmail como remetente
+>    (*Senders, domains & IPs → Senders → Add a sender*).
+> 2. Gere uma chave em *SMTP & API → API Keys → Generate a new API key*.
+> 3. No `.env`: `EMAIL_HOST_USER=` o Gmail confirmado no Brevo e
+>    `BREVO_API_KEY=` a chave. O `EMAIL_HOST_PASSWORD` deixa de ser usado.
+> 4. Teste com `python manage.py testar_email seu@email.com` e dê **Reload**.
 
 > **Só no plano pago com MySQL:** troque a linha `DB_ENGINE=sqlite` por:
 >
@@ -228,9 +241,10 @@ from today**, na aba **Web**.
 | `IndentationError` no Error log | O arquivo WSGI tem espaços no começo das linhas. Recrie-o com o comando do passo 6.4. |
 | "Bad Request (400)" | O endereço não está em `DJANGO_ALLOWED_HOSTS`. |
 | Site sem estilo (sem CSS) | Faltou o `collectstatic` ou a linha `/static/` em **Static files**. Recarregue depois de corrigir. |
+| Página com erro 500 logo depois de atualizar, ou CSS antigo | Com `DJANGO_DEBUG=0`, os CSS/JS ganham uma "impressão digital" no nome (`styles-retro.3f9a1c2b.css`) e o `collectstatic` precisa rodar a cada atualização. O `atualizar.sh` já faz isso; se atualizou à mão, rode `python manage.py collectstatic --noinput` e recarregue o site. |
 | Fotos quebradas | Falta a linha `/media/` em **Static files**, ou a pasta `media` não foi enviada. |
 | `Access denied for user` (só MySQL) | Confira `DB_USER`, `DB_PASSWORD` e `DB_HOST` no `.env`. |
 | `no such table` (SQLite) | Faltou o `python manage.py migrate` do passo 5. |
 | Fazer backup do banco (SQLite) | Na aba **Files**, baixe o arquivo `contratempo/contratempo.sqlite3`. Ele contém todos os dados do site. |
-| E-mails não chegam | O plano gratuito limita o acesso à internet, e o envio pelo Gmail pode ser bloqueado. O site continua funcionando e o motivo aparece no **Server log**. |
+| E-mails não chegam | No plano gratuito o Gmail recusa o login vindo do servidor. Configure o **Brevo** (`BREVO_API_KEY`, ver passo 5). O site continua funcionando e o motivo aparece no **Server log**; `python manage.py testar_email seu@email.com` explica o erro. |
 | Erro 403 "CSRF verification failed" | Acesse sempre pelo endereço com `https://` que está em `DJANGO_ALLOWED_HOSTS`. |

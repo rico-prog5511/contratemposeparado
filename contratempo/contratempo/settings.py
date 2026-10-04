@@ -219,6 +219,16 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
 STATIC_ROOT = BASE_DIR / "staticfiles"          # <- usado só em produção (collectstatic)
 
+# Em produção, CSS/JS ganham uma "impressão digital" no nome a cada mudança
+# (ex.: styles-retro.3f9a1c2b.css), para nenhum navegador ficar preso a uma
+# cópia velha em cache. Exige rodar o collectstatic a cada atualização — o
+# atualizar.sh já faz isso. Detalhes em marketplace/estaticos.py.
+if not DEBUG:
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "marketplace.estaticos.EstaticosComVersao"},
+    }
+
 # Uploads (imagens de anúncios e avatares). ProdutoImagem.url_imagem e
 # Usuario.avatar guardam a URL pública gerada por default_storage.
 MEDIA_URL = "media/"
@@ -243,7 +253,16 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "").strip()
 # os espaços são removidos para evitar erro de login.
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "").replace(" ", "").strip()
 
-if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+# Brevo (brevo.com): usado quando há BREVO_API_KEY no .env. Necessário no
+# PythonAnywhere grátis, onde o Gmail recusa o login vindo do servidor.
+# O remetente continua sendo EMAIL_HOST_USER, que precisa estar confirmado
+# no Brevo. Detalhes em marketplace/email_brevo.py.
+BREVO_API_KEY = os.environ.get("BREVO_API_KEY", "").strip()
+
+if BREVO_API_KEY:
+    EMAIL_BACKEND = "marketplace.email_brevo.BrevoEmailBackend"
+    EMAIL_TIMEOUT = 20
+elif EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_HOST = "smtp.gmail.com"
     EMAIL_PORT = 587
