@@ -29,6 +29,13 @@ class Command(BaseCommand):
             self.stdout.write(f"Conta Gmail .... {settings.EMAIL_HOST_USER or '(não definida)'}")
             self.stdout.write(f"Senha de app ... {'(não definida)' if not senha else f'{len(senha)} caracteres'}")
 
+        usuario = settings.EMAIL_HOST_USER
+        if usuario and (usuario.count("@") != 1 or "=" in usuario or " " in usuario):
+            self.stdout.write(self.style.ERROR(
+                f"\nEMAIL_HOST_USER não parece um e-mail: {usuario!r}. No .env a linha deve ser exatamente "
+                "EMAIL_HOST_USER=seuemail@gmail.com (sem repetir o nome da variável, sem espaços nem aspas)."
+            ))
+
         if backend == "email_brevo":
             if not settings.EMAIL_HOST_USER:
                 self.stdout.write(self.style.WARNING(
