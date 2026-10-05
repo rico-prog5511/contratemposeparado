@@ -4,13 +4,11 @@
 {% block title %}Contratempo — Colecionáveis, retrô e cultura geek{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/home.css' %}">
-{% endblock %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">{% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'js/home.js' %}"></script>
-<script src="{% static 'js/vistos.js' %}"></script>
-{% endblock %}
+<script src="{% static 'js/vistos.js' %}"></script>{% endblock %}
 
 {% block content %}
 
@@ -19,7 +17,13 @@
     <div class="carrossel-trilho" aria-live="off">
 
         <!-- 1. Garimpo — a foto de fundo vem de static/img/banner/banner-1.* (ver views._foto_banner) -->
-        <article class="carrossel-slide slide--vermelho{% if banner_foto %} slide--foto{% endif %} ativo" aria-roledescription="slide" aria-label="1 de 3"{% if banner_foto %} style="--slide-foto: url('{{ banner_foto }}')"{% endif %}>
+        <article class="carrossel-slide slide--vermelho{% if banner_foto %} slide--foto{% endif %} ativo" aria-roledescription="slide" aria-label="1 de 3">
+            {% if banner_foto %}
+                {# Imagem de verdade (não fundo de CSS): o navegador a encontra logo e baixa primeiro (fetchpriority); #}
+                {# com srcset, o celular baixa a versão menor. Decorativa: alt vazio. #}
+                <img class="slide-foto" src="{{ banner_foto.src }}"{% if banner_foto.srcset %} srcset="{{ banner_foto.srcset }}" sizes="100vw"{% endif %}
+                     alt="" width="1920" height="1080" fetchpriority="high" decoding="async">
+            {% endif %}
             <div class="container slide-inner">
                 <div class="slide-texto">
                     <span class="slide-tag">Garimpo de colecionador</span>

@@ -19,3 +19,12 @@ Dicas para a foto
 
 Para trocar: substitua o arquivo, mantendo o nome, e faça Commit/Push
 + atualizar.sh. Para voltar ao fundo vermelho: apague o arquivo.
+
+Versões leves (automático)
+O site não mostra a foto original (pode ter vários MB): ele usa três
+versões em WebP geradas a partir dela, banner-1-1920.webp (computador),
+banner-1-1280.webp (tablet) e banner-1-800.webp (celular), bem menores, e
+cada tela baixa só a que precisa. Elas são criadas por
+    python manage.py otimizar_banner
+que o atualizar.sh (PythonAnywhere) e o rodar.bat (PC) já rodam sozinhos.
+Não precisa mexer nesses arquivos -webp, e eles não vão para o GitHub.

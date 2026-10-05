@@ -11,6 +11,7 @@ As demais áreas ficam em arquivos próprios:
     views_errors.py    — páginas 403 / 404 / 500
 """
 
+import os
 from decimal import Decimal, InvalidOperation
 
 from django.contrib import messages
@@ -107,15 +108,32 @@ def home(request):
 # Foto de fundo do 1º slide do banner da home. Para usar/trocar: coloque o
 # arquivo em marketplace/static/img/banner/ com o nome banner-1 (.jpg,
 # .jpeg, .png ou .webp). Sem o arquivo, o slide fica com o fundo vermelho.
+# As versões leves (banner-1-1280.webp e banner-1-1920.webp) são geradas
+# por `python manage.py otimizar_banner` (o atualizar.sh já roda).
 FOTO_BANNER = "img/banner/banner-1"
+LARGURAS_BANNER = (800, 1280, 1920)  # da menor para a maior (a maior é o src padrão)
 
 
 def _foto_banner():
-    for extensao in ("webp", "jpg", "jpeg", "png"):
-        caminho = f"{FOTO_BANNER}.{extensao}"
-        if finders.find(caminho):
-            return static(caminho)
-    return None
+    """{"src", "srcset"} da foto do banner, ou None se não houver foto."""
+    original = next(
+        (f"{FOTO_BANNER}.{ext}" for ext in ("webp", "jpg", "jpeg", "png") if finders.find(f"{FOTO_BANNER}.{ext}")),
+        None,
+    )
+    if original is None:
+        return None
+    data_original = os.path.getmtime(finders.find(original))
+    # Só usa as versões leves se foram geradas DEPOIS da foto atual (trocou a
+    # foto e ainda não rodou o comando? usa a original até rodar).
+    versoes = []
+    for largura in LARGURAS_BANNER:
+        caminho = f"{FOTO_BANNER}-{largura}.webp"
+        arquivo = finders.find(caminho)
+        if arquivo and os.path.getmtime(arquivo) >= data_original:
+            versoes.append((static(caminho), largura))
+    if versoes:
+        return {"src": versoes[-1][0], "srcset": ", ".join(f"{url} {largura}w" for url, largura in versoes)}
+    return {"src": static(original), "srcset": ""}
 
 
 # Faixas de preço da home: (nome, preço mínimo exclusivo, preço máximo inclusivo).

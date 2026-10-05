@@ -46,15 +46,31 @@
         var(--cor-header-escuro);
 }
 
-/* 1º slide com foto (static/img/banner/banner-1.*): a foto cobre o fundo e
-   uma camada escura do lado do texto garante a leitura em qualquer foto.
-   O vermelho fica por baixo, caso a imagem não carregue. */
-.slide--foto {
-    background:
-        linear-gradient(90deg, rgba(18, 10, 14, 0.9) 0%, rgba(18, 10, 14, 0.75) 50%, rgba(18, 10, 14, 0.25) 100%),
-        var(--slide-foto) center / cover no-repeat,
-        var(--cor-destaque);
+/* 1º slide com foto (static/img/banner/banner-1.*): a foto (<img class="slide-foto">)
+   cobre o slide, uma camada escura (::before) do lado do texto garante a
+   leitura em qualquer foto e o texto fica por cima. O vermelho fica no
+   fundo, caso a imagem não carregue. */
+/* isolation: os z-index abaixo valem só dentro do slide (sem isso, a camada
+   escura cobriria também os controles do carrossel, que ficam fora dele) */
+.slide--foto { position: relative; isolation: isolate; background: var(--cor-destaque); }
+/* Camadas, de baixo para cima: foto (0), camada escura (1), texto (2).
+   Sem os z-index, a <img> (que vem depois do ::before no HTML) cobriria a camada escura. */
+.slide-foto {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
+.slide--foto::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(90deg, rgba(18, 10, 14, 0.9) 0%, rgba(18, 10, 14, 0.75) 50%, rgba(18, 10, 14, 0.25) 100%);
+}
+.slide--foto .slide-inner { position: relative; z-index: 2; }
 .slide--foto .slide-texto :is(h2, p, .slide-tag) { text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45); }
 
 .slide-inner {
@@ -365,12 +381,7 @@
     .slide-arte { height: 220px; }
     .home-hero-ticket { display: none; }
     /* No celular o texto ocupa a largura toda: a camada escura também */
-    .slide--foto {
-        background:
-            linear-gradient(rgba(18, 10, 14, 0.72), rgba(18, 10, 14, 0.82)),
-            var(--slide-foto) center / cover no-repeat,
-            var(--cor-destaque);
-    }
+    .slide--foto::before { background: linear-gradient(rgba(18, 10, 14, 0.72), rgba(18, 10, 14, 0.82)); }
     .home-categories { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 

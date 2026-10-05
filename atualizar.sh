@@ -23,6 +23,9 @@ cd contratempo
 echo "==> Atualizando o banco de dados"
 python manage.py migrate --noinput
 
+echo "==> Gerando as versões leves da foto do banner (se houver foto nova)"
+python manage.py otimizar_banner
+
 echo "==> Atualizando CSS, JavaScript e imagens do site"
 python manage.py collectstatic --noinput
 

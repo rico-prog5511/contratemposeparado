@@ -66,8 +66,10 @@ das denúncias, pelo painel /admin/.
   HTML + Django Templates  as páginas
   CSS puro ............. visual (sem Bootstrap), arquivos em static/css
   JavaScript puro ...... interatividade (sem jQuery), arquivos em static/js
-  Google Fonts ......... fontes Fraunces (títulos), Work Sans (texto) e
-                         Space Mono (preços e rótulos)
+  Fontes ............... Fraunces (títulos), Work Sans (texto) e Space Mono
+                         (preços e rótulos), hospedadas no próprio site em
+                         marketplace/static/fonts/ (antes vinham do Google
+                         Fonts e atrasavam a abertura da página)
   ViaCEP ............... serviço gratuito que preenche o endereço pelo CEP
   Gmail (SMTP) ......... envio dos e-mails
   GitHub ............... guarda o código (repositório)
@@ -551,7 +553,12 @@ Formato:  URL  —  quem acessa  —  arquivo da view  —  template
   - banner (carrossel) e faixa "como funciona". O 1º slide pode ter uma
     FOTO DE FUNDO: basta colocar o arquivo banner-1.jpg (ou .png/.webp)
     em marketplace/static/img/banner/ (instruções no LEIA-ME.txt de lá).
-    Sem o arquivo, o slide fica com o fundo vermelho e os 3 cartões;
+    Sem o arquivo, o slide fica com o fundo vermelho e os 3 cartões.
+    O site não usa a foto original (pesada): "manage.py otimizar_banner"
+    gera banner-1-1920/-1280/-800.webp e a página usa <img srcset> com
+    fetchpriority="high", então cada tela baixa só a versão do tamanho
+    dela. O atualizar.sh e o rodar.bat rodam o comando sozinhos; as
+    versões .webp não vão para o Git;
   - "Vistos recentemente": os últimos produtos que a pessoa abriu NESTE
     navegador (static/js/vistos.js guarda os ids no localStorage; os cards
     vêm de /produtos/vistos/?ids=..., só anúncios ativos, até 4). Sem

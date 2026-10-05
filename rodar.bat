@@ -14,6 +14,8 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
+rem Gera as versoes leves da foto do banner, se ela foi trocada.
+venv\Scripts\python.exe contratempo\manage.py otimizar_banner
 start "" http://127.0.0.1:8000/
 venv\Scripts\python.exe contratempo\manage.py runserver
 pause
