@@ -138,28 +138,6 @@
     <div class="product-grid" data-vistos-lista></div>
 </section>
 
-<!-- CATEGORIAS -->
-{% if categorias %}
-<section class="container section">
-    <div class="section-head">
-        <div>
-            <span class="eyebrow">Explore</span>
-            <h2>Mais colecionáveis</h2>
-        </div>
-        <a href="{% url 'categorias' %}" class="link-arrow">Todas as categorias →</a>
-    </div>
-    <div class="home-categories">
-        {% for categoria in categorias|slice:":8" %}
-            <a href="{% url 'produtos' %}?categoria={{ categoria.slug }}" class="home-category-pill">
-                <span class="home-category-index mono">{{ forloop.counter|stringformat:"02d" }}</span>
-                <strong>{{ categoria.nome }}</strong>
-                <span class="home-category-count">{{ categoria.total_produtos }} anúncio{{ categoria.total_produtos|pluralize }}</span>
-            </a>
-        {% endfor %}
-    </div>
-</section>
-{% endif %}
-
 <!-- FAIXAS DE PREÇO -->
 <section class="container section" aria-labelledby="faixas-titulo">
     <div class="section-head">

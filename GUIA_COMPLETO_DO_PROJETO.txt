@@ -568,7 +568,6 @@ Formato:  URL  —  quem acessa  —  arquivo da view  —  template
     vêm de /produtos/vistos/?ids=..., só anúncios ativos, até 4). Sem
     histórico, a seção não aparece. Tem botão "Limpar histórico". Só
     funciona se a pessoa aceitou os cookies FUNCIONAIS (ver /cookies/);
-  - até 8 categorias com a quantidade de anúncios;
   - "Quanto você quer investir?": faixas de preço (FAIXAS_PRECO em
     views.py) com quantas peças cada uma tem; levam ao catálogo filtrado
     por preço. Faixas vazias não aparecem;

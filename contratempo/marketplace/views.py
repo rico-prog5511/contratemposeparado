@@ -74,18 +74,10 @@ def _url_segura(request, url):
 # =====================================================================
 
 def home(request):
-    categorias = (
-        Categoria.objects
-        .filter(ativo=True)
-        .annotate(total_produtos=Count("produtos", filter=Q(produtos__status_anuncio="ativo")))
-        .order_by("nome")
-    )
-
     produtos_recentes = produtos_ativos().order_by("-data_criacao")[:4]
 
     return render(request, "home.html", {
         "banner_foto": _foto_banner(),
-        "categorias": categorias,
         "faixas_preco": _faixas_preco(),
         "produtos_recentes": produtos_recentes,
         "artigos_guia": ARTIGOS_GUIA[:3],

@@ -291,40 +291,6 @@
 .home-strip-inner .mono { color: var(--txt-vermelho); font-weight: 700; margin-right: 8px; }
 
 /* =====================================================================
-   CATEGORIAS
-   ===================================================================== */
-.home-categories {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px;
-}
-.home-category-pill {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-height: 120px;
-    padding: 18px 20px;
-    background: var(--paper);
-    border: var(--borda);
-    border-radius: var(--radius);
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-}
-.home-category-pill:hover {
-    transform: translate(-3px, -3px);
-    box-shadow: var(--shadow-card);
-}
-.home-category-pill strong {
-    margin-top: auto;
-    font-family: var(--font-display);
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--ink);
-}
-.home-category-index { font-size: 0.72rem; color: var(--txt-vermelho); font-weight: 700; }
-.home-category-count { font-size: 0.8rem; color: var(--ink-muted); }
-
-/* =====================================================================
    FAIXAS DE PREÇO
    ===================================================================== */
 .home-faixas {
@@ -382,7 +348,6 @@
     .home-hero-ticket { display: none; }
     /* No celular o texto ocupa a largura toda: a camada escura também */
     .slide--foto::before { background: linear-gradient(rgba(18, 10, 14, 0.72), rgba(18, 10, 14, 0.82)); }
-    .home-categories { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 640px) {
@@ -398,8 +363,6 @@
     .home-strip-inner { grid-template-columns: 1fr; }
     .home-strip-inner > div { border-left: 0; border-top: 1px dashed var(--line); padding: 12px 0; }
     .home-strip-inner > div:first-child { border-top: 0; }
-    .home-category-pill { min-height: 100px; padding: 14px; }
-    .home-category-pill strong { font-size: 1.05rem; }
     .home-faixas { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .home-faixa { padding: 16px 14px; }
     .home-faixa strong { margin-top: 10px; font-size: 1.1rem; }
