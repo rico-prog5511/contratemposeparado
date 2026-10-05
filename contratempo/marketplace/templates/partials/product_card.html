@@ -2,7 +2,7 @@
 {% with imagem=produto|imagem_principal %}
 <article class="product-card">
     <a href="{% url 'produto_detalhe' produto.id %}" class="product-image" tabindex="-1" aria-hidden="true">
-        <img src="{% if imagem %}{{ imagem }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt="" loading="lazy">
+        <img src="{% if imagem %}{{ imagem|miniatura }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt="" loading="lazy">
         {% if produto.status_anuncio == "ativo" and produto.quantidade_disponivel == 1 %}
             <span class="product-flag">Peça única</span>
         {% endif %}

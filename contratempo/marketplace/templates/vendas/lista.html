@@ -45,7 +45,7 @@
                                 <div class="order-thumbs" aria-hidden="true">
                                     {% for item in itens|slice:":3" %}
                                         {% with imagem=item.produto|imagem_principal %}
-                                        <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
+                                        <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem|miniatura }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
                                         {% endwith %}
                                     {% endfor %}
                                 </div>

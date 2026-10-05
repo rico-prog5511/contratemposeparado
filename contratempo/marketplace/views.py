@@ -12,7 +12,7 @@ As demais áreas ficam em arquivos próprios:
 """
 
 import os
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -27,8 +27,10 @@ from django.views.decorators.http import require_POST
 from django.http import Http404, JsonResponse
 from django.templatetags.static import static
 
+from . import catalogo
 from .busca import filtrar as filtrar_busca
 from .guia import ARTIGOS as ARTIGOS_GUIA
+from .imagens import url_miniatura
 from .guia import POR_SLUG as ARTIGOS_GUIA_POR_SLUG
 from .busca import palavras as palavras_busca
 from .emails import enviar_nova_pergunta
@@ -40,7 +42,6 @@ from .models import (
     Carrinho,
     Categoria,
     Denuncia,
-    Franquia,
     ItemCarrinho,
     ItemPedido,
     PerguntaFrequente,
@@ -49,13 +50,7 @@ from .models import (
     Usuario,
 )
 
-ORDENACOES = {
-    "recentes": ("-data_criacao", "Mais recentes"),
-    "menor_preco": ("preco", "Menor preço"),
-    "maior_preco": ("-preco", "Maior preço"),
-    "nome": ("nome", "Nome (A–Z)"),
-}
-PRODUTOS_POR_PAGINA = 12
+PRODUTOS_POR_PAGINA = 12  # ordenações e filtros do catálogo: catalogo.py
 
 
 def produtos_ativos():
@@ -66,14 +61,6 @@ def produtos_ativos():
         .select_related("categoria", "franquia")
         .prefetch_related("imagens")
     )
-
-
-def _decimal_ou_none(valor):
-    try:
-        numero = Decimal(str(valor).replace(",", "."))
-    except (InvalidOperation, TypeError, ValueError):
-        return None
-    return numero if numero >= 0 else None
 
 
 def _url_segura(request, url):
@@ -291,33 +278,18 @@ def produtos(request):
         if vendedor_atual:
             qs = qs.filter(vendedor=vendedor_atual)
 
-    franquias_selecionadas = [slug for slug in request.GET.getlist("franquia") if slug]
-    if franquias_selecionadas:
-        qs = qs.filter(franquia__slug__in=franquias_selecionadas)
-
-    condicoes_validas = dict(Produto.CONDICAO_CHOICES)
-    condicoes_selecionadas = [c for c in request.GET.getlist("condicao") if c in condicoes_validas]
-    if condicoes_selecionadas:
-        qs = qs.filter(condicao__in=condicoes_selecionadas)
-
-    preco_min = _decimal_ou_none(request.GET.get("preco_min")) if request.GET.get("preco_min") else None
-    preco_max = _decimal_ou_none(request.GET.get("preco_max")) if request.GET.get("preco_max") else None
-    if preco_min is not None:
-        qs = qs.filter(preco__gte=preco_min)
-    if preco_max is not None:
-        qs = qs.filter(preco__lte=preco_max)
-
+    # Filtros, contagens e ordenação ficam em catalogo.py. `qs` até aqui é a
+    # "base" (busca + categoria + vendedor), sobre a qual as contagens são feitas.
+    filtros = catalogo.ler_filtros(request.GET)
+    filtros["_bem_avaliados"] = catalogo.vendedores_bem_avaliados()
+    opcoes = catalogo.opcoes(qs, filtros)
     ordenar = request.GET.get("ordenar", "recentes")
-    if ordenar not in ORDENACOES:
+    if ordenar not in catalogo.ORDENACOES:
         ordenar = "recentes"
-    qs = qs.order_by(ORDENACOES[ordenar][0], "-id")
+    resultado = catalogo.ordenar(catalogo.aplicar(qs, filtros), ordenar)
 
-    page_obj = Paginator(qs, PRODUTOS_POR_PAGINA).get_page(request.GET.get("page"))
-
-    total_filtros = (
-        len(franquias_selecionadas) + len(condicoes_selecionadas)
-        + (preco_min is not None) + (preco_max is not None)
-    )
+    page_obj = Paginator(resultado, PRODUTOS_POR_PAGINA).get_page(request.GET.get("page"))
+    total_filtros = catalogo.total_ligados(filtros)
 
     breadcrumbs = [{"label": "Produtos", "url": reverse("produtos") if categoria_atual or busca else None}]
     if categoria_atual:
@@ -334,15 +306,17 @@ def produtos(request):
         "categoria_atual": categoria_atual,
         "vendedor_atual": vendedor_atual,
         "categorias": Categoria.objects.filter(ativo=True).order_by("nome"),
-        "franquias": Franquia.objects.filter(ativo=True).order_by("nome"),
-        "condicoes": Produto.CONDICAO_CHOICES,
-        "franquias_selecionadas": franquias_selecionadas,
-        "condicoes_selecionadas": condicoes_selecionadas,
+        "opcoes": opcoes,
+        "rotulo_marca": categoria_atual.rotulo_marca if categoria_atual else "Marca / autor",
         "preco_min": request.GET.get("preco_min", ""),
         "preco_max": request.GET.get("preco_max", ""),
+        "ano_min": filtros["ano_min"] or "",
+        "ano_max": filtros["ano_max"] or "",
         "ordenar": ordenar,
-        "ordenacoes": [(chave, rotulo) for chave, (_, rotulo) in ORDENACOES.items()],
+        "ordenacoes": list(catalogo.ORDENACOES.items()),
         "total_filtros": total_filtros,
+        "etiquetas": catalogo.etiquetas(request.GET, filtros, opcoes),
+        "url_limpar": catalogo.url_limpar(request.GET),
         "breadcrumbs": breadcrumbs,
     })
 
@@ -367,7 +341,7 @@ def sugestoes_busca(request):
                 "nome": p.nome,
                 "preco": brl(p.preco),
                 "categoria": p.categoria.nome,
-                "imagem": imagem_principal(p) or static("img/produto-sem-imagem.svg"),
+                "imagem": url_miniatura(imagem_principal(p)) or static("img/produto-sem-imagem.svg"),
                 "url": reverse("produto_detalhe", args=[p.id]),
             }
             for p in produtos

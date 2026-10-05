@@ -16,6 +16,7 @@ from django.utils import timezone
 from django.utils.html import format_html
 
 from .relatorios import anos_disponiveis, relatorio_anual
+from .imagens import url_miniatura
 from .templatetags.marketplace_extras import brl, imagem_principal
 from .models import (
     Avaliacao,
@@ -71,7 +72,7 @@ def selo(valor, rotulo):
 def miniatura(url, texto_alt=""):
     return format_html(
         '<img src="{}" alt="{}" class="ct-miniatura" loading="lazy" width="48" height="48">',
-        url or static("img/produto-sem-imagem.svg"), texto_alt,
+        url_miniatura(url) or static("img/produto-sem-imagem.svg"), texto_alt,
     )
 
 

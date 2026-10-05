@@ -5,16 +5,13 @@ Autenticação e área "Minha conta": login, cadastro, logout, perfil,
 edição de dados, senha, endereços e formas de pagamento.
 """
 
-import os
 import time
-import uuid
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
-from django.core.files.storage import default_storage
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -24,6 +21,7 @@ from django.views.decorators.http import require_POST
 
 from .emails import enviar_confirmacao_cadastro, token_confirmacao
 from .forms import CadastroForm, CartaoEdicaoForm, CartaoForm, EnderecoForm, LoginForm, PerfilForm
+from .imagens import salvar_foto_perfil
 from .models import Endereco, FormaPagamento, Pedido, Produto, Usuario
 
 SESSAO_REENVIO = "ultimo_envio_confirmacao"
@@ -49,12 +47,6 @@ def _next_seguro(request):
         return proximo
     return ""
 
-
-def salvar_upload(arquivo, pasta):
-    """Salva um upload em MEDIA_ROOT/<pasta>/ e devolve a URL pública."""
-    extensao = os.path.splitext(arquivo.name)[1].lower() or ".jpg"
-    nome = default_storage.save(f"{pasta}/{uuid.uuid4().hex}{extensao}", arquivo)
-    return default_storage.url(nome)
 
 
 def _breadcrumbs_conta(*itens):
@@ -241,7 +233,7 @@ def editar_perfil(request):
             usuario.avatar = None
         arquivo = form.cleaned_data.get("avatar_arquivo")
         if arquivo:
-            usuario.avatar = salvar_upload(arquivo, "avatares")
+            usuario.avatar = salvar_foto_perfil(arquivo)
         usuario.save()
         messages.success(request, "Seus dados foram atualizados.")
         return redirect("perfil")

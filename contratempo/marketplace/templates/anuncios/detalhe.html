@@ -51,7 +51,7 @@
                         <ul class="listing-images">
                             {% for imagem in imagens %}
                                 <li class="{% if imagem.principal %}principal{% endif %}">
-                                    <img src="{{ imagem.url_imagem }}" alt="Imagem {{ forloop.counter }}">
+                                    <img src="{{ imagem.url_imagem|miniatura }}" alt="Imagem {{ forloop.counter }}">
                                     {% if imagem.principal %}<span class="product-flag">Principal</span>{% endif %}
                                 </li>
                             {% endfor %}

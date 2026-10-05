@@ -13,7 +13,7 @@ Espera: envios, faixa, subtotal, frete, total, total_itens.
                 {% for item in envio.itens %}
                     {% with imagem=item.produto|imagem_principal %}
                     <li>
-                        <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
+                        <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem|miniatura }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
                         <span class="summary-item-name">{{ item.produto.nome }}<small>{{ item.quantidade }} × {{ item.preco_unitario|brl }}</small></span>
                         <strong class="mono">{{ item.subtotal|brl }}</strong>
                     </li>

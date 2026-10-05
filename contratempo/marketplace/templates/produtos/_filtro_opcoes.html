@@ -1,0 +1,13 @@
+{% comment %}
+Caixinhas de um filtro com a quantidade de produtos de cada opção.
+Uso: {% include "produtos/_filtro_opcoes.html" with nome="marca" lista=opcoes.marcas %}
+Opções que dariam zero produtos ficam desabilitadas (a não ser que já estejam marcadas).
+{% endcomment %}
+<div class="filter-options">
+    {% for o in lista %}
+        <label class="check{% if not o.total and not o.marcado %} check--vazio{% endif %}" data-filtro-item="{{ o.rotulo|lower }}">
+            <input type="checkbox" name="{{ nome }}" value="{{ o.valor }}"{% if o.marcado %} checked{% endif %}{% if not o.total and not o.marcado %} disabled{% endif %}>
+            <span>{{ o.rotulo }} <span class="filtro-total">({{ o.total }}<span class="sr-only"> produto{{ o.total|pluralize }}</span>)</span></span>
+        </label>
+    {% endfor %}
+</div>

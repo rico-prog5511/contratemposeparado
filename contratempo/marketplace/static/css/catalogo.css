@@ -93,6 +93,46 @@
 .price-range .input { min-height: 38px; padding: 6px 8px; font-size: 0.85rem; }
 .filters-actions { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
 
+/* Contagem ao lado de cada opção e opções que dariam zero produtos */
+.filtro-total { font-size: 0.78rem; color: var(--ink-muted); }
+.filtro-ajuda { display: block; font-size: 0.74rem; color: var(--ink-muted); }
+.check--vazio { opacity: 0.5; }
+.check--vazio, .check--vazio input { cursor: not-allowed; }
+.filtro-busca { min-height: 36px; padding: 6px 10px; margin-bottom: 10px; font-size: 0.85rem; }
+.filtro-anos { margin-top: 12px; }
+
+/* Etiquetas dos filtros ligados (acima dos produtos) */
+.filtros-ativos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    margin-bottom: 16px;
+}
+.filtros-ativos-titulo {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+}
+.filtros-ativos-lista { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.etiqueta-filtro {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border: 1.5px solid var(--borda-azul);
+    border-radius: var(--radius-pill);
+    background: var(--paper);
+    font-size: 0.84rem;
+    color: var(--txt-azul);
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.etiqueta-filtro [aria-hidden] { font-size: 0.75rem; }
+.etiqueta-filtro:hover { background: var(--cor-header); border-color: var(--cor-header); color: #fff; }
+
 /* Barra de ordenação */
 .catalog-toolbar {
     display: flex;

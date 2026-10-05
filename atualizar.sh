@@ -26,6 +26,9 @@ python manage.py migrate --noinput
 echo "==> Gerando as versões leves da foto do banner (se houver foto nova)"
 python manage.py otimizar_banner
 
+echo "==> Convertendo fotos antigas de produtos e de perfil (se houver)"
+python manage.py otimizar_fotos
+
 echo "==> Atualizando CSS, JavaScript e imagens do site"
 python manage.py collectstatic --noinput
 

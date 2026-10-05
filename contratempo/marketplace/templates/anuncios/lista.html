@@ -61,7 +61,7 @@
                                 <tr>
                                     <td>
                                         <div class="cell-product">
-                                            <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
+                                            <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem|miniatura }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
                                             <div>
                                                 <a href="{% url 'anuncio_detalhe' produto.id %}">{{ produto.nome }}</a>
                                                 <div class="cell-sub">{{ produto.categoria.nome }}{% if produto.sku %} · <span class="mono">{{ produto.sku }}</span>{% endif %}</div>

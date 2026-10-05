@@ -48,29 +48,53 @@
                     {% if vendedor_atual %}<input type="hidden" name="vendedor" value="{{ vendedor_atual.id }}">{% endif %}
                     <input type="hidden" name="ordenar" value="{{ ordenar }}">
 
-                    {% if franquias %}
                     <fieldset class="filter-group">
-                        <legend>Franquias</legend>
+                        <legend>Mais opções</legend>
                         <div class="filter-options">
-                            {% for franquia in franquias %}
-                                <label class="check">
-                                    <input type="checkbox" name="franquia" value="{{ franquia.slug }}" {% if franquia.slug in franquias_selecionadas %}checked{% endif %}>
-                                    <span>{{ franquia.nome }}</span>
+                            {% for extra in opcoes.extras %}
+                                <label class="check{% if not extra.total and not extra.marcado %} check--vazio{% endif %}">
+                                    <input type="checkbox" name="{{ extra.nome }}" value="1"{% if extra.marcado %} checked{% endif %}{% if not extra.total and not extra.marcado %} disabled{% endif %}>
+                                    <span>{{ extra.rotulo }} <span class="filtro-total">({{ extra.total }}<span class="sr-only"> produto{{ extra.total|pluralize }}</span>)</span>
+                                        <small class="filtro-ajuda">{{ extra.ajuda }}</small></span>
                                 </label>
                             {% endfor %}
                         </div>
+                    </fieldset>
+
+                    {% if opcoes.marcas %}
+                    <fieldset class="filter-group">
+                        <legend>{{ rotulo_marca }}</legend>
+                        {% if opcoes.marcas|length > 8 %}
+                            <label class="sr-only" for="filtro-busca-marca">Procurar na lista de {{ rotulo_marca|lower }}</label>
+                            <input class="input filtro-busca" type="search" id="filtro-busca-marca" placeholder="Procurar…" data-filtro-busca hidden>
+                        {% endif %}
+                        {% include "produtos/_filtro_opcoes.html" with nome="marca" lista=opcoes.marcas %}
+                    </fieldset>
+                    {% endif %}
+
+                    {% if opcoes.franquias %}
+                    <fieldset class="filter-group">
+                        <legend>Franquias</legend>
+                        {% include "produtos/_filtro_opcoes.html" with nome="franquia" lista=opcoes.franquias %}
                     </fieldset>
                     {% endif %}
 
                     <fieldset class="filter-group">
                         <legend>Condição</legend>
-                        <div class="filter-options">
-                            {% for valor, rotulo in condicoes %}
-                                <label class="check">
-                                    <input type="checkbox" name="condicao" value="{{ valor }}" {% if valor in condicoes_selecionadas %}checked{% endif %}>
-                                    <span>{{ rotulo }}</span>
-                                </label>
-                            {% endfor %}
+                        {% include "produtos/_filtro_opcoes.html" with nome="condicao" lista=opcoes.condicoes %}
+                    </fieldset>
+
+                    <fieldset class="filter-group">
+                        <legend>Época</legend>
+                        {% if opcoes.decadas %}
+                            {% include "produtos/_filtro_opcoes.html" with nome="decada" lista=opcoes.decadas %}
+                        {% endif %}
+                        <div class="price-range filtro-anos">
+                            <label class="sr-only" for="ano_min">Ano a partir de</label>
+                            <input class="input" type="number" min="1900" max="2100" id="ano_min" name="ano_min" value="{{ ano_min }}" placeholder="De (ano)" inputmode="numeric">
+                            <span aria-hidden="true">—</span>
+                            <label class="sr-only" for="ano_max">Ano até</label>
+                            <input class="input" type="number" min="1900" max="2100" id="ano_max" name="ano_max" value="{{ ano_max }}" placeholder="Até" inputmode="numeric">
                         </div>
                     </fieldset>
 
@@ -88,7 +112,7 @@
                     <div class="filters-actions">
                         <button type="submit" class="btn btn-accent btn-block">Filtrar</button>
                         {% if total_filtros %}
-                            <a href="?{% if busca %}q={{ busca|urlencode }}&amp;{% endif %}{% if categoria_atual %}categoria={{ categoria_atual.slug }}&amp;{% endif %}ordenar={{ ordenar }}" class="btn btn-ghost btn-block">Limpar filtros</a>
+                            <a href="{{ url_limpar }}" class="btn btn-ghost btn-block">Limpar filtros</a>
                         {% endif %}
                     </div>
                 </form>
@@ -97,6 +121,18 @@
 
         <!-- RESULTADOS -->
         <section class="catalog-results" aria-label="Produtos">
+            {% if etiquetas %}
+                <div class="filtros-ativos">
+                    <span class="filtros-ativos-titulo" id="filtros-ativos-titulo">Filtrando por:</span>
+                    <ul class="filtros-ativos-lista" aria-labelledby="filtros-ativos-titulo">
+                        {% for etiqueta in etiquetas %}
+                            <li><a href="{{ etiqueta.url }}" class="etiqueta-filtro" aria-label="Remover filtro: {{ etiqueta.rotulo }}">{{ etiqueta.rotulo }} <span aria-hidden="true">✕</span></a></li>
+                        {% endfor %}
+                    </ul>
+                    {% if etiquetas|length > 1 %}<a href="{{ url_limpar }}" class="link-button">Limpar tudo</a>{% endif %}
+                </div>
+            {% endif %}
+
             <form method="get" class="catalog-toolbar">
                 {% for chave, valores in request.GET.lists %}
                     {% if chave != "ordenar" and chave != "page" %}

@@ -33,7 +33,7 @@
                         {% with imagem=pergunta.produto|imagem_principal %}
                         <li class="qa-item {% if not pergunta.resposta %}qa-item--pendente{% endif %}">
                             <a href="{% url 'produto_detalhe' pergunta.produto_id %}#perguntas" class="qa-product">
-                                <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
+                                <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem|miniatura }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
                                 <span>{{ pergunta.produto.nome }}</span>
                             </a>
                             <p class="qa-q"><span class="qa-tag">P</span>{{ pergunta.pergunta }}</p>

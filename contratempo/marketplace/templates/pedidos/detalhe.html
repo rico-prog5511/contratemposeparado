@@ -57,7 +57,7 @@
                     {% for item in itens %}
                         {% with imagem=item.produto|imagem_principal %}
                         <li>
-                            <span class="thumb"><img src="{% if imagem %}{{ imagem }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
+                            <span class="thumb"><img src="{% if imagem %}{{ imagem|miniatura }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
                             <div class="review-item-info">
                                 {% if item.produto %}
                                     <a href="{% url 'produto_detalhe' item.produto_id %}"><strong>{{ item.nome_produto }}</strong></a>

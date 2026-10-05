@@ -5,6 +5,7 @@ Uso no template: {% load marketplace_extras %}
     {% for _ in nota|to_range %}★{% endfor %}
     {{ produto.preco|brl }}                 -> R$ 1.234,56
     {{ produto|imagem_principal }}           -> URL da imagem principal (ou "")
+    {{ url_da_foto|miniatura }}              -> versão pequena (600 px) para cards e listas
     <a href="?{% url_replace page=2 %}">     -> mantém os outros filtros da URL
 """
 
@@ -12,7 +13,15 @@ from decimal import Decimal, InvalidOperation
 
 from django import template
 
+from ..imagens import url_miniatura
+
 register = template.Library()
+
+
+@register.filter
+def miniatura(url):
+    """Miniatura de uma foto de produto (ou a própria foto, se for antiga e ainda não tiver)."""
+    return url_miniatura(url)
 
 
 @register.filter

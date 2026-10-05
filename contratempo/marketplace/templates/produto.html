@@ -18,7 +18,7 @@
         <div class="produto-miniaturas" role="list" aria-label="Imagens do produto">
             {% for imagem in imagens %}
                 <button type="button" role="listitem" class="produto-miniatura {% if forloop.first %}active{% endif %}" data-src="{{ imagem.url_imagem }}" data-indice="{{ forloop.counter0 }}" aria-label="Ver imagem {{ forloop.counter }}">
-                    <img src="{{ imagem.url_imagem }}" alt="">
+                    <img src="{{ imagem.url_imagem|miniatura }}" alt="">
                 </button>
             {% endfor %}
         </div>

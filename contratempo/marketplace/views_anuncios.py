@@ -4,7 +4,9 @@ marketplace/views_anuncios.py
 Área do vendedor: listar, criar, editar, visualizar, mudar status,
 excluir anúncios e gerenciar o estoque em lote.
 
-Imagens: o upload é salvo em MEDIA_ROOT/produtos/<id>/ e a URL pública
+Imagens: cada foto é reduzida, convertida para WebP e limpa dos dados
+escondidos (GPS etc.) por imagens.salvar_foto_produto, que salva em
+MEDIA_ROOT/produtos/<id>/ a foto e uma miniatura; a URL pública da foto
 vai para ProdutoImagem.url_imagem (coluna VARCHAR já existente).
 """
 
@@ -21,7 +23,8 @@ from django.views.decorators.http import require_POST
 from .forms import LIMITE_IMAGENS_ANUNCIO, ProdutoForm
 from .models import ItemPedido, Produto, ProdutoImagem
 from .sku import gerar_sku
-from .views_conta import _proximo, salvar_upload
+from .imagens import salvar_foto_produto
+from .views_conta import _proximo
 
 VENDAS_VALIDAS = ~Q(itens_pedido__pedido__status_pedido="cancelado")
 
@@ -44,7 +47,7 @@ def _salvar_imagens(produto, arquivos):
     for arquivo in arquivos:
         ProdutoImagem.objects.create(
             produto=produto,
-            url_imagem=salvar_upload(arquivo, f"produtos/{produto.id}"),
+            url_imagem=salvar_foto_produto(arquivo, f"produtos/{produto.id}"),
             principal=not tem_principal,
             ordem_exibicao=ordem,
         )

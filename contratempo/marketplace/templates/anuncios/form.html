@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static marketplace_extras %}
 
 {% block title %}{{ titulo }} | Contratempo{% endblock %}
 
@@ -38,7 +38,7 @@
                         <ul class="image-manage">
                             {% for imagem in imagens %}
                                 <li class="image-manage-item">
-                                    <img src="{{ imagem.url_imagem }}" alt="Imagem {{ forloop.counter }} do anúncio">
+                                    <img src="{{ imagem.url_imagem|miniatura }}" alt="Imagem {{ forloop.counter }} do anúncio">
                                     <div class="image-manage-controls">
                                         <label class="check">
                                             <input type="radio" name="imagem_principal" value="{{ imagem.id }}" {% if imagem.principal %}checked{% endif %}>

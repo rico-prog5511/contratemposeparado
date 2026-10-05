@@ -20,4 +20,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
     ajustar();
     telaPequena.addEventListener("change", ajustar);
+
+    /* Campo "Procurar…" nas listas longas (marcas): esconde as opções que não batem. */
+    function semAcento(texto) {
+        return texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+    }
+    painel.querySelectorAll("[data-filtro-busca]").forEach(function (campo) {
+        var grupo = campo.closest(".filter-group");
+        campo.hidden = false;  // sem JavaScript o campo não teria função
+        campo.addEventListener("input", function () {
+            var termo = semAcento(campo.value.trim());
+            grupo.querySelectorAll("[data-filtro-item]").forEach(function (item) {
+                var marcado = item.querySelector("input").checked;
+                item.hidden = termo !== "" && !marcado && semAcento(item.dataset.filtroItem).indexOf(termo) === -1;
+            });
+        });
+    });
 });

@@ -191,9 +191,13 @@ contratemposeparado/                  (raiz do projeto / repositório)
         ├── apps.py                   inicialização do app (busca no SQLite)
         ├── templatetags/
         │   └── marketplace_extras.py filtros: |brl (R$ 1.234,56),
-        │                             |imagem_principal, |to_range, url_replace
+        │                             |imagem_principal, |miniatura, |to_range,
+        │                             url_replace
+        ├── imagens.py                trata as fotos enviadas (ver abaixo)
         ├── management/commands/
-        │   └── testar_email.py       comando "python manage.py testar_email"
+        │   ├── testar_email.py       comando "python manage.py testar_email"
+        │   ├── otimizar_banner.py    versões leves da foto do banner
+        │   └── otimizar_fotos.py     converte fotos antigas para o formato leve
         ├── migrations/               0001 a 0005 (histórico do banco)
         ├── templates/                as páginas HTML (lista na seção 8)
         │   ├── base.html             esqueleto comum a todas as páginas
@@ -594,11 +598,24 @@ Formato:  URL  —  quem acessa  —  arquivo da view  —  template
   cookies.js para o aviso aparecer de novo para todo mundo.
 
 /produtos/  — todos — views.produtos — produtos/lista.html
-  Catálogo. Filtros na lateral: franquias, condição, preço mínimo e
-  máximo. Categorias em "pílulas" no topo. Ordenação: mais recentes, menor
-  preço, maior preço, nome. 12 produtos por página.
-  Parâmetros da URL: ?q= (busca) ?categoria= ?franquia= ?condicao=
-  ?preco_min= ?preco_max= ?ordenar= ?vendedor= ?page=
+  Catálogo. Categorias em "pílulas" no topo. 12 produtos por página.
+  Filtros na lateral (lógica em marketplace/catalogo.py):
+    - Mais opções: só peças únicas (1 unidade); vendedor bem avaliado
+      (nota média >= 4 nas avaliações publicadas);
+    - Marca/autor (o nome segue a categoria; campo "Procurar…" quando há
+      mais de 8); Franquias; Condição;
+    - Época: décadas ("Antes de 1950", "Anos 80"...) e ano de/até;
+    - Preço mínimo e máximo.
+  Cada opção mostra quantos produtos teria (considerando os OUTROS filtros
+  ligados); as que dariam zero ficam desabilitadas. Acima dos produtos, os
+  filtros ligados aparecem como etiquetas removíveis + "Limpar tudo".
+  Ordenação: mais recentes, menor/maior preço, mais vendidos (sem pedidos
+  cancelados), vendedores mais bem avaliados, ano (mais antigo primeiro),
+  nome.
+  Parâmetros da URL: ?q= (busca) ?categoria= ?franquia= ?condicao= ?marca=
+  ?decada=1980 ?ano_min= ?ano_max= ?preco_min= ?preco_max= ?unica=1
+  ?bem_avaliado=1 ?ordenar= ?vendedor= ?page=  (franquia, condicao, marca e
+  decada podem se repetir: marcar duas = uma OU outra)
 
 /produtos/sugestoes/?q=...  — todos — views.sugestoes_busca — (JSON)
   Não é uma página: devolve dados (JSON) para a lista de sugestões que
@@ -887,6 +904,11 @@ Todas as páginas /conta/... têm o MENU DA CONTA na lateral
   - Estoque 0 -> "vendido"; repor -> "ativo"; cancelar devolve estoque.
   - Anúncio ativo precisa de pelo menos 1 unidade; preço > 0.
   - Até 8 fotos por anúncio, 5 MB cada.
+  - Toda foto enviada é tratada (marketplace/imagens.py): girada do jeito
+    certo, reduzida (produto: 1600 px + miniatura de 600 px para cards e
+    listas; perfil: 400 px), salva em WebP e SEM os dados escondidos do
+    celular (localização GPS, modelo). Nada muda no banco: a miniatura é
+    o mesmo arquivo com final "-mini.webp".
   - Anúncio com vendas não pode ser excluído (só encerrado).
   - Só avalia quem recebeu; uma avaliação por produto por pedido.
   - Endereços: um principal; apagar o principal promove outro.
@@ -1056,6 +1078,10 @@ COMANDOS (dentro da pasta contratempo, com a venv ativa):
   python manage.py createsuperuser ......... cria administrador
   python manage.py changepassword email .... troca a senha de alguém
   python manage.py testar_email email ...... testa o e-mail
+  python manage.py otimizar_fotos .......... converte fotos antigas (WebP,
+                                             miniatura, sem GPS); use
+                                             --simular para só ver a lista
+  python manage.py otimizar_banner ......... versões leves da foto do banner
   python manage.py check --deploy .......... confere segurança de produção
   python manage.py collectstatic ........... reúne CSS/JS (produção)
        Em produção (DEBUG desligado) cada CSS/JS ganha uma "impressão
