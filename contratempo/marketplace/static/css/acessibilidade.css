@@ -54,7 +54,6 @@ html[data-contraste="alto"] {
     --borda: 2px solid #FFF;
     --sombra: #FFE600;
     --shadow-card: 4px 4px 0 #FFE600;
-    --shadow-hover: 4px 4px 0 #FFE600;
 }
 html[data-contraste="alto"] body { background: #000; color: #FFF; }
 html[data-contraste="alto"] a:not(.btn) { color: #FFE600; text-decoration: underline; }
@@ -119,9 +118,7 @@ html[data-animacoes="pausar"] *::after {
     transition: none !important;
 }
 
-/* =====================================================================
-   07. BOTÃO E PAINEL
-   ===================================================================== */
+/* ===== 07. BOTÃO E PAINEL ===== */
 .acess-botao {
     position: fixed;
     left: 18px;

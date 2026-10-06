@@ -25,10 +25,7 @@
    19. Responsivo
    ===================================================================== */
 
-
-/* =====================================================================
-   01. TOKENS
-   ===================================================================== */
+/* ===== 01. TOKENS ===== */
 
 /* Fonte do logotipo [contratempo]: Adult Swim.
    Coloque o arquivo da fonte em static/fonts/ com um destes nomes:
@@ -55,10 +52,10 @@
     /* Tons derivados das cores oficiais (claros/escuros para contraste) */
     --cor-header-escuro: #24245A;
     --cor-header-claro: #E4E3EE;
-    --page-bg: #F4F3F8;
+    --page-bg: #F4F3F8;          /* fundo das páginas (versão bem clara do lilás oficial) */
     /* "tempo" do logo. Sobre o azul do cabeçalho, o vermelho escuro
        (#6D191D) quase some; o vermelho claro oficial mantém a leitura. */
-    --marca-tempo: var(--cor-acento);          /* fundo das páginas (versão bem clara do lilás oficial) */
+    --marca-tempo: var(--cor-acento);
     --paper: #FFFFFF;            /* superfície de cards e painéis */
     --paper-2: #EEECF4;          /* superfície secundária / hover */
     --ink: #1B1A33;              /* texto principal e bordas fortes */
@@ -73,19 +70,6 @@
     --surface: #FFFFFF;                  /* caixas internas e campos */
     --sombra: var(--ink);                /* sombras deslocadas */
 
-    /* Aliases usados pelos templates/CSS existentes — não remover */
-    --color-bg: var(--page-bg);
-    --color-surface: var(--paper);
-    --color-text: var(--ink);
-    --color-text-muted: var(--ink-muted);
-    --color-primary: var(--cor-header);
-    --color-primary-dark: var(--cor-header-escuro);
-    --color-accent: var(--cor-destaque);
-    --color-accent-dark: var(--cor-acento);
-    --color-border: var(--line);
-    --color-danger: var(--cor-destaque);
-    --color-success: var(--cor-header);
-
     /* Tipografia: Helvetica no site todo. Ela não vem no Windows (lá o
        navegador usa a Arial, quase idêntica) e é paga, por isso não é
        hospedada aqui: usa a do aparelho. Os três nomes continuam existindo
@@ -94,7 +78,6 @@
     --font-display: var(--font-helvetica);
     --font-body: var(--font-helvetica);
     --font-mono: var(--font-helvetica);
-    --font-heading: var(--font-display);
     --font-marca: "Adult Swim", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
     /* Forma */
@@ -102,7 +85,6 @@
     --radius-pill: 999px;
     --borda: 1.5px solid var(--ink);
     --shadow-card: 5px 5px 0 var(--cor-header);
-    --shadow-hover: 7px 7px 0 var(--cor-destaque);
     --shadow-soft: 0 10px 30px rgba(27, 26, 51, 0.18);
     /* Cards de produto: sem borda, com sombra suave ao redor */
     --sombra-produto: 0 1px 2px rgba(27, 26, 51, 0.06), 0 4px 18px rgba(27, 26, 51, 0.1);
@@ -114,7 +96,6 @@
     --container-width: 1200px;
     --gutter: 24px;
 }
-
 
 /* =====================================================================
    01b. TEMA ESCURO
@@ -138,16 +119,12 @@
     --sombra: #05040C;
     --borda: 1.5px solid #5D5B84;
     --shadow-card: 5px 5px 0 #05040C;
-    --shadow-hover: 7px 7px 0 var(--cor-acento);
     /* no escuro a sombra some no fundo: um contorno de luz bem fraco separa o card */
     --sombra-produto: 0 0 0 1px rgba(236, 235, 243, 0.08), 0 6px 22px rgba(0, 0, 0, 0.45);
     --sombra-elevacao: 0 12px 26px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--borda-azul);
 }
 
-
-/* =====================================================================
-   02. BASE
-   ===================================================================== */
+/* ===== 02. BASE ===== */
 *,
 *::before,
 *::after {
@@ -249,10 +226,7 @@ textarea {
     white-space: nowrap;
 }
 
-
-/* =====================================================================
-   03. LAYOUT
-   ===================================================================== */
+/* ===== 03. LAYOUT ===== */
 .container {
     width: 100%;
     max-width: var(--container-width);
@@ -321,8 +295,6 @@ textarea {
 
 .muted { color: var(--ink-muted); }
 .mono { font-family: var(--font-mono); }
-.text-right { text-align: right; }
-.mt-0 { margin-top: 0; }
 .mb-0 { margin-bottom: 0; }
 
 .stack { display: flex; flex-direction: column; gap: 16px; }
@@ -337,10 +309,7 @@ textarea {
 }
 .layout-aside > aside { position: sticky; top: calc(var(--header-height) + 20px); }
 
-
-/* =====================================================================
-   04. BOTÕES
-   ===================================================================== */
+/* ===== 04. BOTÕES ===== */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -434,10 +403,7 @@ textarea {
 
 .inline-form { display: inline; margin: 0; }
 
-
-/* =====================================================================
-   05. HEADER
-   ===================================================================== */
+/* ===== 05. HEADER ===== */
 .header {
     min-height: var(--header-height);
     background: var(--cor-header);
@@ -696,10 +662,7 @@ textarea {
 /* Busca e "Anunciar" dentro do menu mobile */
 .nav-mobile-extra { display: none; }
 
-
-/* =====================================================================
-   06. BREADCRUMB
-   ===================================================================== */
+/* ===== 06. BREADCRUMB ===== */
 .breadcrumb {
     width: 100%;
     max-width: var(--container-width);
@@ -723,10 +686,7 @@ textarea {
     white-space: nowrap;
 }
 
-
-/* =====================================================================
-   07. MENSAGENS
-   ===================================================================== */
+/* ===== 07. MENSAGENS ===== */
 .messages {
     width: 100%;
     max-width: var(--container-width);
@@ -767,23 +727,19 @@ textarea {
 }
 .messages .message-close:hover { opacity: 1; }
 
-.messages .success, .alert-success { border-color: var(--borda-azul); color: var(--txt-azul); }
+.messages .success { border-color: var(--borda-azul); color: var(--txt-azul); }
 .messages .error, .alert-error { border-color: var(--cor-destaque); color: var(--txt-vermelho); }
 .messages .info, .alert-info { border-color: var(--cor-secundaria); color: var(--ink); }
 .messages .warning, .alert-warning { border-color: var(--cor-acento); color: var(--txt-vermelho); }
 .alert p { margin: 0; color: inherit; }
 
-
-/* =====================================================================
-   08. PAINÉIS, BADGES E UTILITÁRIOS
-   ===================================================================== */
+/* ===== 08. PAINÉIS, BADGES E UTILITÁRIOS ===== */
 .panel {
     background: var(--paper);
     border: var(--borda);
     border-radius: var(--radius);
     padding: 24px;
 }
-.panel-shadow { box-shadow: var(--shadow-card); }
 .panel + .panel { margin-top: 20px; }
 .panel-title {
     display: flex;
@@ -796,13 +752,6 @@ textarea {
     border-bottom: 1px dashed var(--line);
 }
 .panel-title .eyebrow { font-size: 0.66rem; }
-
-.divider {
-    height: 0;
-    border: 0;
-    border-top: 1px dashed var(--line);
-    margin: 18px 0;
-}
 
 .badge {
     display: inline-flex;
@@ -871,7 +820,6 @@ textarea {
 }
 .thumb img { width: 100%; height: 100%; object-fit: cover; }
 .thumb-sm { width: 48px; height: 48px; }
-.thumb-lg { width: 96px; height: 96px; }
 
 .key-value {
     display: grid;
@@ -891,10 +839,7 @@ textarea {
 }
 .key-value dd { margin: 0; color: var(--ink); }
 
-
-/* =====================================================================
-   09. CARDS DE PRODUTO
-   ===================================================================== */
+/* ===== 09. CARDS DE PRODUTO ===== */
 .product-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1013,10 +958,7 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 }
 .product-card .btn { margin: 0 16px 16px; width: auto; }
 
-
-/* =====================================================================
-   10. ESTADOS VAZIOS
-   ===================================================================== */
+/* ===== 10. ESTADOS VAZIOS ===== */
 .empty-state {
     text-align: center;
     padding: 56px 24px;
@@ -1043,21 +985,7 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 .empty-state .cluster { justify-content: center; }
 .product-grid > .empty-state { grid-column: 1 / -1; }
 
-
-/* =====================================================================
-   11. FORMULÁRIOS
-   ===================================================================== */
-.form-card {
-    width: 100%;
-    max-width: 460px;
-    margin: 48px auto;
-    background: var(--paper);
-    border: var(--borda);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-card);
-    padding: 36px 32px;
-}
-.form-card h1 { text-align: center; font-size: 1.6rem; }
+/* ===== 11. FORMULÁRIOS ===== */
 
 .form-group { margin-bottom: 18px; }
 /* Opções de rádio agrupadas em <fieldset>/<legend> (partials/form_field.html) */
@@ -1121,7 +1049,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
     font-size: 0.8rem;
     color: var(--ink-muted);
 }
-.form-error,
 .errorlist {
     list-style: none;
     padding: 0;
@@ -1145,11 +1072,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
     padding-top: 22px;
     border-top: 1px dashed var(--line);
 }
-.form-section-title {
-    font-size: 1.1rem;
-    margin-bottom: 16px;
-}
-
 .form-actions {
     display: flex;
     flex-wrap: wrap;
@@ -1251,10 +1173,7 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 }
 .filter-bar .input { flex: 1; min-width: 200px; }
 
-
-/* =====================================================================
-   12. TABELAS
-   ===================================================================== */
+/* ===== 12. TABELAS ===== */
 .table-wrap {
     width: 100%;
     overflow-x: auto;
@@ -1296,10 +1215,7 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 .data-table .cell-actions { white-space: nowrap; text-align: right; }
 .data-table .num { font-family: var(--font-mono); white-space: nowrap; }
 
-
-/* =====================================================================
-   13. ABAS E PAGINAÇÃO
-   ===================================================================== */
+/* ===== 13. ABAS E PAGINAÇÃO ===== */
 .tabs {
     display: flex;
     gap: 4px;
@@ -1369,10 +1285,7 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 .pagination .disabled { opacity: 0.4; }
 .pagination .gap { border: 0; background: none; }
 
-
-/* =====================================================================
-   14. ÁREA DA CONTA
-   ===================================================================== */
+/* ===== 14. ÁREA DA CONTA ===== */
 .account-layout {
     display: grid;
     grid-template-columns: 250px minmax(0, 1fr);
@@ -1456,10 +1369,7 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
 .avatar-lg { width: 88px; height: 88px; font-size: 2rem; }
 
-
-/* =====================================================================
-   15. RESUMO DE VALORES
-   ===================================================================== */
+/* ===== 15. RESUMO DE VALORES ===== */
 .summary {
     background: var(--paper);
     border: var(--borda);
@@ -1495,10 +1405,7 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 .summary-items .summary-item-name { flex: 1; min-width: 0; color: var(--ink); line-height: 1.3; }
 .summary-items .summary-item-name small { display: block; color: var(--ink-muted); }
 
-
-/* =====================================================================
-   16. CARDS DE OPÇÃO (radio de endereço / pagamento)
-   ===================================================================== */
+/* ===== 16. CARDS DE OPÇÃO (radio de endereço / pagamento) ===== */
 .option-list { display: flex; flex-direction: column; gap: 12px; }
 .option-card {
     position: relative;
@@ -1581,10 +1488,7 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
     gap: 16px;
 }
 
-
-/* =====================================================================
-   17. DIÁLOGO DE CONFIRMAÇÃO
-   ===================================================================== */
+/* ===== 17. DIÁLOGO DE CONFIRMAÇÃO ===== */
 .confirm-dialog {
     width: min(440px, calc(100vw - 32px));
     padding: 0;
@@ -1605,10 +1509,7 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
     padding: 18px 26px 24px;
 }
 
-
-/* =====================================================================
-   18. FOOTER
-   ===================================================================== */
+/* ===== 18. FOOTER ===== */
 .site-footer {
     background: var(--cor-header);
     color: var(--cor-header-claro);
@@ -1727,10 +1628,7 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
     padding-top: 18px;
 }
 
-
-/* =====================================================================
-   19. RESPONSIVO
-   ===================================================================== */
+/* ===== 19. RESPONSIVO ===== */
 @media (max-width: 1100px) {
     .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .search-box input { width: 130px; }
@@ -1846,7 +1744,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
     .page-header-actions .btn { flex: 1; }
 
     .panel { padding: 18px; }
-    .form-card { margin: 24px auto; padding: 28px 20px; box-shadow: 4px 4px 0 var(--cor-header); }
     .form-row,
     .form-row-3,
     .form-row-cep { grid-template-columns: 1fr; }
@@ -1912,10 +1809,7 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
     }
 }
 
-
-/* =====================================================================
-   SUGESTÕES DA BUSCA
-   ===================================================================== */
+/* ===== SUGESTÕES DA BUSCA ===== */
 .search-box { position: relative; }
 .search-suggest {
     position: absolute;

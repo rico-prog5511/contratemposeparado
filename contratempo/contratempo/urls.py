@@ -1,8 +1,4 @@
-"""
-URL configuration for contratempo project.
-
-As rotas do marketplace ficam em marketplace/urls.py.
-"""
+"""Rotas do projeto. As do marketplace ficam em marketplace/urls.py."""
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin

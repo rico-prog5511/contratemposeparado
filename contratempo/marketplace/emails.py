@@ -111,9 +111,7 @@ def explicar_erro_email(erro):
     return "Rode `python manage.py testar_email seu@email.com` para diagnosticar."
 
 
-# ---------------------------------------------------------------------
-# CONTA
-# ---------------------------------------------------------------------
+# ----- CONTA -----
 
 def enviar_confirmacao_cadastro(request, usuario):
     uid = urlsafe_base64_encode(force_bytes(usuario.pk))
@@ -125,9 +123,7 @@ def enviar_confirmacao_cadastro(request, usuario):
     }, usuario.email)
 
 
-# ---------------------------------------------------------------------
-# PEDIDOS
-# ---------------------------------------------------------------------
+# ----- PEDIDOS -----
 
 def _url(request, nome, *args):
     return request.build_absolute_uri(reverse(nome, args=args))
@@ -164,9 +160,7 @@ def enviar_cancelamento_ao_vendedor(request, pedido):
     }, pedido.vendedor.email)
 
 
-# ---------------------------------------------------------------------
-# PERGUNTAS
-# ---------------------------------------------------------------------
+# ----- PERGUNTAS -----
 
 def enviar_nova_pergunta(request, pergunta):
     vendedor = pergunta.produto.vendedor

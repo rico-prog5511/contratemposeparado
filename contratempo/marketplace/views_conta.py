@@ -53,9 +53,7 @@ def _breadcrumbs_conta(*itens):
     return [{"label": "Minha conta", "url": reverse("perfil")}, *itens]
 
 
-# =====================================================================
-# LOGIN / CADASTRO / LOGOUT
-# =====================================================================
+# ===== LOGIN / CADASTRO / LOGOUT =====
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -155,9 +153,7 @@ def reenviar_confirmacao(request):
     return redirect("login")
 
 
-# ---------------------------------------------------------------------
-# RECUPERAÇÃO DE SENHA — fluxo nativo do Django com templates próprios
-# ---------------------------------------------------------------------
+# ----- RECUPERAÇÃO DE SENHA — fluxo nativo do Django com templates próprios -----
 
 class RecuperarSenhaView(auth_views.PasswordResetView):
     template_name = "conta/senha_reset_form.html"
@@ -202,9 +198,7 @@ def logout_view(request):
     return redirect("home")
 
 
-# =====================================================================
-# PERFIL
-# =====================================================================
+# ===== PERFIL =====
 
 @login_required
 def perfil(request):
@@ -276,9 +270,7 @@ def desativar_conta(request):
     return redirect("home")
 
 
-# =====================================================================
-# ENDEREÇOS
-# =====================================================================
+# ===== ENDEREÇOS =====
 
 def _definir_endereco_principal(endereco):
     Endereco.objects.filter(usuario_id=endereco.usuario_id).exclude(pk=endereco.pk).update(endereco_principal=False)
@@ -350,9 +342,7 @@ def endereco_principal(request, endereco_id):
     return redirect(_proximo(request, "enderecos"))
 
 
-# =====================================================================
-# FORMAS DE PAGAMENTO
-# =====================================================================
+# ===== FORMAS DE PAGAMENTO =====
 
 def _definir_pagamento_principal(forma):
     FormaPagamento.objects.filter(usuario_id=forma.usuario_id).exclude(pk=forma.pk).update(principal=False)

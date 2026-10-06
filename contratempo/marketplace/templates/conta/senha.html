@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "conta/_layout.html" %}
 {% load static %}
 
 {% block title %}Alterar senha | contratempo{% endblock %}
@@ -7,32 +7,24 @@
 <link rel="stylesheet" href="{% static 'css/conta.css' %}">
 {% endblock %}
 
-{% block content %}
-<div class="container page">
-    <div class="account-layout">
-        {% include "partials/account_nav.html" %}
+{% block conta %}
+    <header class="page-header">
+        <div>
+            <h1>Alterar senha</h1>
+        </div>
+    </header>
 
-        <section>
-            <header class="page-header">
-                <div>
-                    <h1>Alterar senha</h1>
-                </div>
-            </header>
+    <form method="post" class="panel form-narrow" novalidate>
+        {% csrf_token %}
+        {% include "partials/form_errors.html" %}
+        {% include "partials/form_field.html" with field=form.old_password senha=True %}
+        {% include "partials/form_field.html" with field=form.new_password1 senha=True %}
+        {% include "partials/form_field.html" with field=form.new_password2 senha=True %}
 
-            <form method="post" class="panel form-narrow" novalidate>
-                {% csrf_token %}
-                {% include "partials/form_errors.html" %}
-                {% include "partials/form_field.html" with field=form.old_password senha=True %}
-                {% include "partials/form_field.html" with field=form.new_password1 senha=True %}
-                {% include "partials/form_field.html" with field=form.new_password2 senha=True %}
-
-                <div class="form-actions">
-                    <a href="{% url 'perfil' %}" class="btn btn-outline">Cancelar</a>
-                    <span class="spacer"></span>
-                    <button type="submit" class="btn btn-accent">Alterar senha</button>
-                </div>
-            </form>
-        </section>
-    </div>
-</div>
+        <div class="form-actions">
+            <a href="{% url 'perfil' %}" class="btn btn-outline">Cancelar</a>
+            <span class="spacer"></span>
+            <button type="submit" class="btn btn-accent">Alterar senha</button>
+        </div>
+    </form>
 {% endblock %}

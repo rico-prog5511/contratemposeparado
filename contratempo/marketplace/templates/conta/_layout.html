@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% comment %}Moldura das páginas da conta e da área do vendedor: menu lateral + conteúdo (bloco "conta").{% endcomment %}
+
+{% block content %}
+<div class="container page">
+    <div class="account-layout">
+        {% include "partials/account_nav.html" %}
+
+        <section>
+            {% block conta %}{% endblock %}
+        </section>
+    </div>
+</div>
+{% endblock %}

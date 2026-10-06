@@ -17,9 +17,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    /* ---------------------------------------------------------------
-       MENU MOBILE
-       --------------------------------------------------------------- */
+    /* ----- MENU MOBILE ----- */
     var toggle = document.querySelector(".menu-toggle");
     var nav = document.querySelector(".main-nav");
 
@@ -39,9 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    /* ---------------------------------------------------------------
-       SUBMENUS (categorias e conta)
-       --------------------------------------------------------------- */
+    /* ----- SUBMENUS (categorias e conta) ----- */
     function fecharSubmenu(item) {
         item.classList.remove("open");
         var botao = item.querySelector(".dropdown-toggle");
@@ -75,9 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".has-dropdown.open").forEach(fecharSubmenu);
     });
 
-    /* ---------------------------------------------------------------
-       MENSAGENS (django.contrib.messages)
-       --------------------------------------------------------------- */
+    /* ----- MENSAGENS (django.contrib.messages) ----- */
     function removerMensagem(item) {
         item.classList.add("saindo");
         setTimeout(function () { item.remove(); }, 250);
@@ -94,9 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    /* ---------------------------------------------------------------
-       CONFIRMAÇÃO ANTES DE ENVIAR (excluir, cancelar, desativar…)
-       --------------------------------------------------------------- */
+    /* ----- CONFIRMAÇÃO ANTES DE ENVIAR (excluir, cancelar, desativar…) ----- */
     var dialogo = document.getElementById("confirm-dialog");
 
     document.querySelectorAll("form[data-confirm]").forEach(function (form) {
@@ -132,9 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    /* ---------------------------------------------------------------
-       MOSTRAR / OCULTAR SENHA
-       --------------------------------------------------------------- */
+    /* ----- MOSTRAR / OCULTAR SENHA ----- */
     document.querySelectorAll("[data-password-toggle]").forEach(function (btn) {
         var input = btn.parentElement.querySelector("input");
         if (!input) return;
@@ -146,9 +136,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    /* ---------------------------------------------------------------
-       MÁSCARAS (CEP e telefone)
-       --------------------------------------------------------------- */
+    /* ----- MÁSCARAS (CEP e telefone) ----- */
     var mascaras = {
         cep: function (v) {
             v = v.replace(/\D/g, "").slice(0, 8);
@@ -221,9 +209,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    /* ---------------------------------------------------------------
-       CAMPOS QUE PRECISAM SER IGUAIS (confirmar senha)
-       --------------------------------------------------------------- */
+    /* ----- CAMPOS QUE PRECISAM SER IGUAIS (confirmar senha) ----- */
     document.querySelectorAll("[data-match]").forEach(function (campo) {
         var original = document.querySelector(campo.dataset.match);
         if (!original) return;
@@ -236,7 +222,6 @@ document.addEventListener("DOMContentLoaded", function () {
         original.addEventListener("input", conferir);
     });
 });
-
 
 /* ---------------------------------------------------------------
    SUGESTÕES DA BUSCA (form.search-box[data-sugestoes])
@@ -378,7 +363,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
-
 
 /* ---------------------------------------------------------------
    ERROS DE FORMULÁRIO: ao voltar do envio com erro, o foco vai para

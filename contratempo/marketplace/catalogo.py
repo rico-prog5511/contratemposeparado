@@ -34,9 +34,7 @@ ORDENACOES = {
 }
 
 
-# ---------------------------------------------------------------------
-# Leitura dos filtros da URL
-# ---------------------------------------------------------------------
+# ----- Leitura dos filtros da URL -----
 
 def _decimal(valor):
     try:
@@ -134,9 +132,7 @@ def ordenar(qs, chave):
     return qs.order_by("-data_criacao", "-id")
 
 
-# ---------------------------------------------------------------------
-# Opções com contagem
-# ---------------------------------------------------------------------
+# ----- Opções com contagem -----
 
 def _decada(ano):
     """1987 -> 1980. Tudo antes de 1950 vira uma opção só ("Antes de 1950", valor 1940)."""
@@ -157,7 +153,7 @@ def opcoes(base, f):
             for v, n in valores_contagens
         ]
 
-    # Franquias: todas as ativas aparecem (como antes), com a contagem atual.
+    # Franquias: todas as ativas aparecem, com a contagem atual.
     cont_franquia = dict(aplicar(base, f, "franquia").values_list("franquia__slug").annotate(n=Count("id")))
     franquias = [
         {"valor": fr.slug, "rotulo": fr.nome, "total": cont_franquia.get(fr.slug, 0), "marcado": fr.slug in f["franquia"]}
@@ -200,9 +196,7 @@ def opcoes(base, f):
     return {"franquias": franquias, "condicoes": condicoes, "marcas": marcas, "decadas": decadas, "extras": extras}
 
 
-# ---------------------------------------------------------------------
-# Etiquetas dos filtros ligados
-# ---------------------------------------------------------------------
+# ----- Etiquetas dos filtros ligados -----
 
 def _sem(get, chave, valor=None):
     """Querystring sem um valor (ou sem a chave inteira) e sem a página."""

@@ -152,9 +152,7 @@
 .carrossel-pausa:focus-visible,
 .carrossel-ponto:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
-/* ---------------------------------------------------------------------
-   Ilustração 1 e 3: três "cartas" em leque
-   --------------------------------------------------------------------- */
+/* ----- Ilustração 1 e 3: três "cartas" em leque ----- */
 .banner-card {
     position: absolute;
     top: 50%;
@@ -191,9 +189,7 @@
 .slide-arte:hover .banner-card--1 { transform: translate(-155%, -52%) rotate(-14deg); }
 .slide-arte:hover .banner-card--3 { transform: translate(55%, -52%) rotate(14deg); }
 
-/* ---------------------------------------------------------------------
-   Ilustração 2: ingresso
-   --------------------------------------------------------------------- */
+/* ----- Ilustração 2: ingresso ----- */
 .home-hero-ticket { display: flex; align-items: center; justify-content: center; }
 .ticket {
     position: relative;
@@ -258,9 +254,7 @@
     transform: rotate(14deg);
 }
 
-/* =====================================================================
-   FAIXA "COMO FUNCIONA"
-   ===================================================================== */
+/* ===== FAIXA "COMO FUNCIONA" ===== */
 .home-strip {
     background: var(--paper);
     border-bottom: 1.5px solid var(--ink);
@@ -278,9 +272,7 @@
 }
 .home-strip-inner > div:first-child { border-left: 0; padding-left: 0; }
 
-/* =====================================================================
-   FAIXAS DE PREÇO
-   ===================================================================== */
+/* ===== FAIXAS DE PREÇO ===== */
 .home-faixas {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -306,9 +298,7 @@
 .home-faixa-total { font-size: 0.85rem; color: var(--ink-muted); }
 .home-faixa-total::after { content: " →"; color: var(--txt-azul); }
 
-/* =====================================================================
-   CHAMADA PARA VENDER
-   ===================================================================== */
+/* ===== CHAMADA PARA VENDER ===== */
 .home-sell {
     display: flex;
     align-items: center;
@@ -324,9 +314,7 @@
 .home-sell p { margin: 0; max-width: 520px; }
 .home-sell .btn { flex-shrink: 0; }
 
-/* =====================================================================
-   RESPONSIVO
-   ===================================================================== */
+/* ===== RESPONSIVO ===== */
 @media (max-width: 960px) {
     .slide-inner { grid-template-columns: 1fr; gap: 24px; }
     .carrossel-slide { min-height: 0; padding: 48px 0 92px; }

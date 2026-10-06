@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Django's command-line utility for administrative tasks."""
+"""Comandos de administração do Django (runserver, migrate, etc.)."""
 import os
 import sys
 

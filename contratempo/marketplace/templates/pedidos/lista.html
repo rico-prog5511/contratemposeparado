@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "conta/_layout.html" %}
 {% load static marketplace_extras %}
 
 {% block title %}Meus pedidos | contratempo{% endblock %}
@@ -7,65 +7,57 @@
 <link rel="stylesheet" href="{% static 'css/compra.css' %}">
 {% endblock %}
 
-{% block content %}
-<div class="container page">
-    <div class="account-layout">
-        {% include "partials/account_nav.html" %}
+{% block conta %}
+    <header class="page-header">
+        <div>
+            <h1>Meus pedidos</h1>
+        </div>
+    </header>
 
-        <section>
-            <header class="page-header">
-                <div>
-                    <h1>Meus pedidos</h1>
-                </div>
-            </header>
+    <nav class="tabs" aria-label="Filtrar por status">
+        <a href="{% url 'pedidos' %}" class="tab {% if not status %}active{% endif %}">Todos</a>
+        {% for valor, rotulo in status_choices %}
+            <a href="?status={{ valor }}" class="tab {% if status == valor %}active{% endif %}">{{ rotulo }}</a>
+        {% endfor %}
+    </nav>
 
-            <nav class="tabs" aria-label="Filtrar por status">
-                <a href="{% url 'pedidos' %}" class="tab {% if not status %}active{% endif %}">Todos</a>
-                {% for valor, rotulo in status_choices %}
-                    <a href="?status={{ valor }}" class="tab {% if status == valor %}active{% endif %}">{{ rotulo }}</a>
-                {% endfor %}
-            </nav>
-
-            {% if pedidos %}
-                <div class="order-list">
-                    {% for pedido in pedidos %}
-                        {% with itens=pedido.itens.all %}
-                        <article class="order-card">
-                            <div class="order-card-head">
-                                <div class="order-meta"><span>Pedido</span><strong>#{{ pedido.id }}</strong></div>
-                                <div class="order-meta"><span>Data</span><strong>{{ pedido.data_criacao|date:"d/m/Y" }}</strong></div>
-                                <div class="order-meta"><span>Total</span><strong>{{ pedido.valor_total|brl }}</strong></div>
-                                <span class="badge badge--{{ pedido.status_pedido }}">{{ pedido.get_status_pedido_display }}</span>
-                            </div>
-                            <div class="order-card-body">
-                                <div class="order-thumbs" aria-hidden="true">
-                                    {% for item in itens|slice:":3" %}
-                                        {% with imagem=item.produto|imagem_principal %}
-                                        <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem|miniatura }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
-                                        {% endwith %}
-                                    {% endfor %}
-                                    {% if itens|length > 3 %}<span class="more">+{{ itens|length|add:"-3" }}</span>{% endif %}
-                                </div>
-                                <div class="order-summary">
-                                    <p>{{ itens.0.nome_produto }}{% if itens|length > 1 %} <small>e mais {{ itens|length|add:"-1" }} ite{{ itens|length|add:"-1"|pluralize:"m,ns" }}</small>{% endif %}</p>
-                                    <small>{% if pedido.vendedor %}Vendido por {{ pedido.vendedor.nome_completo }} · {% endif %}{{ pedido.forma_pagamento_snapshot }}</small>
-                                    {% if pedido.codigo_rastreio %}<small class="mono">Rastreio: {{ pedido.codigo_rastreio }}</small>{% endif %}
-                                </div>
-                                <a href="{% url 'pedido_detalhe' pedido.id %}" class="btn btn-outline btn-sm">Ver detalhes</a>
-                            </div>
-                        </article>
-                        {% endwith %}
-                    {% endfor %}
-                </div>
-                {% include "partials/pagination.html" %}
-            {% elif status %}
-                {% url 'pedidos' as url_pedidos %}
-                {% include "partials/empty_state.html" with titulo="Nenhum pedido com este status" texto="Tente outro filtro para ver seus pedidos." link_url=url_pedidos link_label="Ver todos os pedidos" %}
-            {% else %}
-                {% url 'produtos' as url_produtos %}
-                {% include "partials/empty_state.html" with titulo="Você ainda não fez nenhum pedido" texto="Quando você comprar algo, o pedido aparece aqui com o status de pagamento e entrega." link_url=url_produtos link_label="Explorar produtos" %}
-            {% endif %}
-        </section>
-    </div>
-</div>
+    {% if pedidos %}
+        <div class="order-list">
+            {% for pedido in pedidos %}
+                {% with itens=pedido.itens.all %}
+                <article class="order-card">
+                    <div class="order-card-head">
+                        <div class="order-meta"><span>Pedido</span><strong>#{{ pedido.id }}</strong></div>
+                        <div class="order-meta"><span>Data</span><strong>{{ pedido.data_criacao|date:"d/m/Y" }}</strong></div>
+                        <div class="order-meta"><span>Total</span><strong>{{ pedido.valor_total|brl }}</strong></div>
+                        <span class="badge badge--{{ pedido.status_pedido }}">{{ pedido.get_status_pedido_display }}</span>
+                    </div>
+                    <div class="order-card-body">
+                        <div class="order-thumbs" aria-hidden="true">
+                            {% for item in itens|slice:":3" %}
+                                {% with imagem=item.produto|imagem_principal %}
+                                <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem|miniatura }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
+                                {% endwith %}
+                            {% endfor %}
+                            {% if itens|length > 3 %}<span class="more">+{{ itens|length|add:"-3" }}</span>{% endif %}
+                        </div>
+                        <div class="order-summary">
+                            <p>{{ itens.0.nome_produto }}{% if itens|length > 1 %} <small>e mais {{ itens|length|add:"-1" }} ite{{ itens|length|add:"-1"|pluralize:"m,ns" }}</small>{% endif %}</p>
+                            <small>{% if pedido.vendedor %}Vendido por {{ pedido.vendedor.nome_completo }} · {% endif %}{{ pedido.forma_pagamento_snapshot }}</small>
+                            {% if pedido.codigo_rastreio %}<small class="mono">Rastreio: {{ pedido.codigo_rastreio }}</small>{% endif %}
+                        </div>
+                        <a href="{% url 'pedido_detalhe' pedido.id %}" class="btn btn-outline btn-sm">Ver detalhes</a>
+                    </div>
+                </article>
+                {% endwith %}
+            {% endfor %}
+        </div>
+        {% include "partials/pagination.html" %}
+    {% elif status %}
+        {% url 'pedidos' as url_pedidos %}
+        {% include "partials/empty_state.html" with titulo="Nenhum pedido com este status" texto="Tente outro filtro para ver seus pedidos." link_url=url_pedidos link_label="Ver todos os pedidos" %}
+    {% else %}
+        {% url 'produtos' as url_produtos %}
+        {% include "partials/empty_state.html" with titulo="Você ainda não fez nenhum pedido" texto="Quando você comprar algo, o pedido aparece aqui com o status de pagamento e entrega." link_url=url_produtos link_label="Explorar produtos" %}
+    {% endif %}
 {% endblock %}

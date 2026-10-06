@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "conta/_layout.html" %}
 {% load static %}
 
 {% block title %}Formas de pagamento | contratempo{% endblock %}
@@ -7,61 +7,53 @@
 <link rel="stylesheet" href="{% static 'css/conta.css' %}">
 {% endblock %}
 
-{% block content %}
-<div class="container page">
-    <div class="account-layout">
-        {% include "partials/account_nav.html" %}
+{% block conta %}
+    <header class="page-header">
+        <div>
+            <h1>Formas de pagamento</h1>
+            <p>Seus cartões salvos. Guardamos só a bandeira, os 4 últimos dígitos e a validade — nunca o número completo nem o CVV. PIX e boleto são escolhidos na hora da compra.</p>
+        </div>
+        {% if formas %}
+            <div class="page-header-actions">
+                <a href="{% url 'pagamento_criar' %}" class="btn btn-accent">+ Novo cartão</a>
+            </div>
+        {% endif %}
+    </header>
 
-        <section>
-            <header class="page-header">
-                <div>
-                    <h1>Formas de pagamento</h1>
-                    <p>Seus cartões salvos. Guardamos só a bandeira, os 4 últimos dígitos e a validade — nunca o número completo nem o CVV. PIX e boleto são escolhidos na hora da compra.</p>
-                </div>
-                {% if formas %}
-                    <div class="page-header-actions">
-                        <a href="{% url 'pagamento_criar' %}" class="btn btn-accent">+ Novo cartão</a>
+    {% if formas %}
+        <div class="card-grid">
+            {% for forma in formas %}
+                <article class="item-card payment-card payment-card--{{ forma.tipo }}">
+                    <div class="item-card-body">
+                        <span class="eyebrow">{{ forma.get_tipo_display }}</span>
+                        <div class="item-card-title">
+                            {% if forma.apelido %}{{ forma.apelido }}{% else %}{{ forma.get_tipo_display }}{% endif %}
+                            {% if forma.principal %}<span class="badge badge--ativo">Principal</span>{% endif %}
+                            {% if forma.vencido %}<span class="badge badge--vendido">Vencido</span>{% endif %}
+                        </div>
+                        <p class="payment-number mono">•••• •••• •••• {{ forma.ultimos_digitos }}</p>
+                        <p>{{ forma.bandeira }}{% if forma.validade_texto %} · validade <span class="mono">{{ forma.validade_texto }}</span>{% endif %}</p>
+                        {% if forma.vencido %}<p class="payment-aviso">Este cartão venceu. Atualize a validade em “Editar” para voltar a usá-lo.</p>{% endif %}
+
+                        <div class="item-card-actions">
+                            <a href="{% url 'pagamento_editar' forma.id %}" class="btn btn-outline btn-sm">Editar</a>
+                            {% if not forma.principal %}
+                                <form action="{% url 'pagamento_principal' forma.id %}" method="post" class="inline-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-ghost btn-sm">Tornar principal</button>
+                                </form>
+                            {% endif %}
+                            <form action="{% url 'pagamento_excluir' forma.id %}" method="post" class="inline-form" data-confirm="Esta forma de pagamento será excluída. Pedidos antigos não são afetados." data-confirm-title="Excluir forma de pagamento?" data-confirm-ok="Excluir">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
+                            </form>
+                        </div>
                     </div>
-                {% endif %}
-            </header>
-
-            {% if formas %}
-                <div class="card-grid">
-                    {% for forma in formas %}
-                        <article class="item-card payment-card payment-card--{{ forma.tipo }}">
-                            <div class="item-card-body">
-                                <span class="eyebrow">{{ forma.get_tipo_display }}</span>
-                                <div class="item-card-title">
-                                    {% if forma.apelido %}{{ forma.apelido }}{% else %}{{ forma.get_tipo_display }}{% endif %}
-                                    {% if forma.principal %}<span class="badge badge--ativo">Principal</span>{% endif %}
-                                    {% if forma.vencido %}<span class="badge badge--vendido">Vencido</span>{% endif %}
-                                </div>
-                                <p class="payment-number mono">•••• •••• •••• {{ forma.ultimos_digitos }}</p>
-                                <p>{{ forma.bandeira }}{% if forma.validade_texto %} · validade <span class="mono">{{ forma.validade_texto }}</span>{% endif %}</p>
-                                {% if forma.vencido %}<p class="payment-aviso">Este cartão venceu. Atualize a validade em “Editar” para voltar a usá-lo.</p>{% endif %}
-
-                                <div class="item-card-actions">
-                                    <a href="{% url 'pagamento_editar' forma.id %}" class="btn btn-outline btn-sm">Editar</a>
-                                    {% if not forma.principal %}
-                                        <form action="{% url 'pagamento_principal' forma.id %}" method="post" class="inline-form">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-ghost btn-sm">Tornar principal</button>
-                                        </form>
-                                    {% endif %}
-                                    <form action="{% url 'pagamento_excluir' forma.id %}" method="post" class="inline-form" data-confirm="Esta forma de pagamento será excluída. Pedidos antigos não são afetados." data-confirm-title="Excluir forma de pagamento?" data-confirm-ok="Excluir">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </article>
-                    {% endfor %}
-                </div>
-            {% else %}
-                {% url 'pagamento_criar' as url_novo %}
-                {% include "partials/empty_state.html" with icone="cartao" titulo="Nenhum cartão salvo" texto="Salve um cartão para finalizar compras mais rápido. PIX e boleto não precisam de cadastro: escolha na hora da compra." link_url=url_novo link_label="Adicionar cartão" %}
-            {% endif %}
-        </section>
-    </div>
-</div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        {% url 'pagamento_criar' as url_novo %}
+        {% include "partials/empty_state.html" with icone="cartao" titulo="Nenhum cartão salvo" texto="Salve um cartão para finalizar compras mais rápido. PIX e boleto não precisam de cadastro: escolha na hora da compra." link_url=url_novo link_label="Adicionar cartão" %}
+    {% endif %}
 {% endblock %}

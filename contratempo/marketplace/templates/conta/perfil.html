@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "conta/_layout.html" %}
 {% load static marketplace_extras %}
 
 {% block title %}Minha conta | contratempo{% endblock %}
@@ -8,105 +8,97 @@
 <link rel="stylesheet" href="{% static 'css/compra.css' %}">
 {% endblock %}
 
-{% block content %}
-<div class="container page">
-    <div class="account-layout">
-        {% include "partials/account_nav.html" %}
+{% block conta %}
+    <div class="profile-hero">
+        <div class="avatar avatar-lg">
+            {% if user.avatar %}<img src="{{ user.avatar }}" alt="">{% else %}{{ user.nome_completo|first|upper }}{% endif %}
+        </div>
+        <div class="profile-hero-text">
+            <h1>Olá, {{ user.nome_completo.split.0 }}!</h1>
+            <p>Membro desde {{ user.data_cadastro|date:"F \d\e Y" }}</p>
+        </div>
+        <a href="{% url 'editar_perfil' %}" class="btn btn-outline">Editar perfil</a>
+    </div>
 
-        <section>
-            <div class="profile-hero">
-                <div class="avatar avatar-lg">
-                    {% if user.avatar %}<img src="{{ user.avatar }}" alt="">{% else %}{{ user.nome_completo|first|upper }}{% endif %}
-                </div>
-                <div class="profile-hero-text">
-                    <h1>Olá, {{ user.nome_completo.split.0 }}!</h1>
-                    <p>Membro desde {{ user.data_cadastro|date:"F \d\e Y" }}</p>
-                </div>
-                <a href="{% url 'editar_perfil' %}" class="btn btn-outline">Editar perfil</a>
-            </div>
+    <div class="stat-grid">
+        <a href="{% url 'pedidos' %}" class="stat-card">
+            <span class="stat-value">{{ total_pedidos }}</span>
+            <span class="stat-label">Pedido{{ total_pedidos|pluralize }}</span>
+        </a>
+        <a href="{% url 'anuncios' %}?status=ativo" class="stat-card">
+            <span class="stat-value">{{ total_anuncios_ativos }}</span>
+            <span class="stat-label">Anúncio{{ total_anuncios_ativos|pluralize }} ativo{{ total_anuncios_ativos|pluralize }}</span>
+        </a>
+        <a href="{% url 'enderecos' %}" class="stat-card">
+            <span class="stat-value">{{ total_enderecos }}</span>
+            <span class="stat-label">Endereço{{ total_enderecos|pluralize:"s" }}</span>
+        </a>
+    </div>
 
-            <div class="stat-grid">
-                <a href="{% url 'pedidos' %}" class="stat-card">
-                    <span class="stat-value">{{ total_pedidos }}</span>
-                    <span class="stat-label">Pedido{{ total_pedidos|pluralize }}</span>
-                </a>
-                <a href="{% url 'anuncios' %}?status=ativo" class="stat-card">
-                    <span class="stat-value">{{ total_anuncios_ativos }}</span>
-                    <span class="stat-label">Anúncio{{ total_anuncios_ativos|pluralize }} ativo{{ total_anuncios_ativos|pluralize }}</span>
-                </a>
-                <a href="{% url 'enderecos' %}" class="stat-card">
-                    <span class="stat-value">{{ total_enderecos }}</span>
-                    <span class="stat-label">Endereço{{ total_enderecos|pluralize:"s" }}</span>
-                </a>
-            </div>
+    <div class="profile-grid">
+        <section class="panel">
+            <h2 class="panel-title">Dados pessoais <a href="{% url 'editar_perfil' %}" class="link-button">Editar</a></h2>
+            <dl class="key-value">
+                <dt>Nome</dt><dd>{{ user.nome_completo }}</dd>
+                <dt>E-mail</dt><dd>{{ user.email }}</dd>
+                <dt>Telefone</dt><dd>{{ user.telefone|default:"—" }}</dd>
+                <dt>Nascimento</dt><dd>{{ user.data_nascimento|date:"d/m/Y"|default:"—" }}</dd>
+            </dl>
+        </section>
 
-            <div class="profile-grid">
-                <section class="panel">
-                    <h2 class="panel-title">Dados pessoais <a href="{% url 'editar_perfil' %}" class="link-button">Editar</a></h2>
-                    <dl class="key-value">
-                        <dt>Nome</dt><dd>{{ user.nome_completo }}</dd>
-                        <dt>E-mail</dt><dd>{{ user.email }}</dd>
-                        <dt>Telefone</dt><dd>{{ user.telefone|default:"—" }}</dd>
-                        <dt>Nascimento</dt><dd>{{ user.data_nascimento|date:"d/m/Y"|default:"—" }}</dd>
-                    </dl>
-                </section>
-
-                <section class="panel">
-                    <h2 class="panel-title">Endereço principal <a href="{% url 'enderecos' %}" class="link-button">Gerenciar</a></h2>
-                    {% if endereco_principal %}
-                        <p class="mb-0"><strong>{{ endereco_principal.nome_endereco }}</strong></p>
-                        <p class="mb-0">{{ endereco_principal.logradouro }}, {{ endereco_principal.numero }}{% if endereco_principal.complemento %} — {{ endereco_principal.complemento }}{% endif %}</p>
-                        <p class="mb-0">{{ endereco_principal.cidade }}/{{ endereco_principal.estado }} · CEP {{ endereco_principal.cep }}</p>
-                    {% else %}
-                        <p>Nenhum endereço cadastrado.</p>
-                        <a href="{% url 'endereco_criar' %}" class="btn btn-outline btn-sm">Adicionar endereço</a>
-                    {% endif %}
-                </section>
-            </div>
-
-            <section class="section">
-                <div class="section-head">
-                    <h2>Pedidos recentes</h2>
-                    {% if pedidos_recentes %}<a href="{% url 'pedidos' %}" class="link-arrow">Ver todos →</a>{% endif %}
-                </div>
-                {% if pedidos_recentes %}
-                    <div class="order-list">
-                        {% for pedido in pedidos_recentes %}
-                            <article class="order-card">
-                                <div class="order-card-head">
-                                    <div class="order-meta"><span>Pedido</span><strong>#{{ pedido.id }}</strong></div>
-                                    <div class="order-meta"><span>Data</span><strong>{{ pedido.data_criacao|date:"d/m/Y" }}</strong></div>
-                                    <div class="order-meta"><span>Total</span><strong>{{ pedido.valor_total|brl }}</strong></div>
-                                    <span class="badge badge--{{ pedido.status_pedido }}">{{ pedido.get_status_pedido_display }}</span>
-                                </div>
-                                <div class="order-card-body">
-                                    <div class="order-summary">
-                                        {% with itens=pedido.itens.all %}
-                                        <p>{{ itens.0.nome_produto }}{% if itens|length > 1 %} <small>e mais {{ itens|length|add:"-1" }}</small>{% endif %}</p>
-                                        {% endwith %}
-                                    </div>
-                                    <a href="{% url 'pedido_detalhe' pedido.id %}" class="btn btn-outline btn-sm">Ver detalhes</a>
-                                </div>
-                            </article>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {% url 'produtos' as url_produtos %}
-                    {% include "partials/empty_state.html" with titulo="Nenhum pedido ainda" texto="Suas compras aparecerão aqui." link_url=url_produtos link_label="Explorar produtos" %}
-                {% endif %}
-            </section>
-
-            <section class="sell-banner">
-                <div>
-                    <h2>Tem algo para vender?</h2>
-                    <p class="mb-0">Crie anúncios, acompanhe vendas e controle o estoque.</p>
-                </div>
-                <div class="cluster">
-                    <a href="{% url 'anuncio_criar' %}" class="btn btn-accent">Criar anúncio</a>
-                    <a href="{% url 'vendas' %}" class="btn btn-outline">Minhas vendas</a>
-                </div>
-            </section>
+        <section class="panel">
+            <h2 class="panel-title">Endereço principal <a href="{% url 'enderecos' %}" class="link-button">Gerenciar</a></h2>
+            {% if endereco_principal %}
+                <p class="mb-0"><strong>{{ endereco_principal.nome_endereco }}</strong></p>
+                <p class="mb-0">{{ endereco_principal.logradouro }}, {{ endereco_principal.numero }}{% if endereco_principal.complemento %} — {{ endereco_principal.complemento }}{% endif %}</p>
+                <p class="mb-0">{{ endereco_principal.cidade }}/{{ endereco_principal.estado }} · CEP {{ endereco_principal.cep }}</p>
+            {% else %}
+                <p>Nenhum endereço cadastrado.</p>
+                <a href="{% url 'endereco_criar' %}" class="btn btn-outline btn-sm">Adicionar endereço</a>
+            {% endif %}
         </section>
     </div>
-</div>
+
+    <section class="section">
+        <div class="section-head">
+            <h2>Pedidos recentes</h2>
+            {% if pedidos_recentes %}<a href="{% url 'pedidos' %}" class="link-arrow">Ver todos →</a>{% endif %}
+        </div>
+        {% if pedidos_recentes %}
+            <div class="order-list">
+                {% for pedido in pedidos_recentes %}
+                    <article class="order-card">
+                        <div class="order-card-head">
+                            <div class="order-meta"><span>Pedido</span><strong>#{{ pedido.id }}</strong></div>
+                            <div class="order-meta"><span>Data</span><strong>{{ pedido.data_criacao|date:"d/m/Y" }}</strong></div>
+                            <div class="order-meta"><span>Total</span><strong>{{ pedido.valor_total|brl }}</strong></div>
+                            <span class="badge badge--{{ pedido.status_pedido }}">{{ pedido.get_status_pedido_display }}</span>
+                        </div>
+                        <div class="order-card-body">
+                            <div class="order-summary">
+                                {% with itens=pedido.itens.all %}
+                                <p>{{ itens.0.nome_produto }}{% if itens|length > 1 %} <small>e mais {{ itens|length|add:"-1" }}</small>{% endif %}</p>
+                                {% endwith %}
+                            </div>
+                            <a href="{% url 'pedido_detalhe' pedido.id %}" class="btn btn-outline btn-sm">Ver detalhes</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            {% url 'produtos' as url_produtos %}
+            {% include "partials/empty_state.html" with titulo="Nenhum pedido ainda" texto="Suas compras aparecerão aqui." link_url=url_produtos link_label="Explorar produtos" %}
+        {% endif %}
+    </section>
+
+    <section class="sell-banner">
+        <div>
+            <h2>Tem algo para vender?</h2>
+            <p class="mb-0">Crie anúncios, acompanhe vendas e controle o estoque.</p>
+        </div>
+        <div class="cluster">
+            <a href="{% url 'anuncio_criar' %}" class="btn btn-accent">Criar anúncio</a>
+            <a href="{% url 'vendas' %}" class="btn btn-outline">Minhas vendas</a>
+        </div>
+    </section>
 {% endblock %}

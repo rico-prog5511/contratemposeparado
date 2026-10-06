@@ -15,9 +15,7 @@
 }
 .inst-intro p { max-width: 580px; font-size: 1.08rem; margin: 0; }
 
-/* =====================================================================
-   CONTATO
-   ===================================================================== */
+/* ===== CONTATO ===== */
 .contact-content {
     display: grid;
     grid-template-columns: 0.85fr 1.15fr;
@@ -64,9 +62,7 @@
     box-shadow: 8px 8px 0 var(--cor-header);
 }
 
-/* =====================================================================
-   POLÍTICA DE PRIVACIDADE
-   ===================================================================== */
+/* ===== POLÍTICA DE PRIVACIDADE ===== */
 .legal-layout {
     display: grid;
     grid-template-columns: 230px minmax(0, 1fr);
@@ -99,9 +95,7 @@
 .legal-text ul { padding-left: 20px; margin: 0; display: flex; flex-direction: column; gap: 6px; }
 .legal-text a { color: var(--txt-vermelho); text-decoration: underline; text-underline-offset: 3px; }
 
-/* =====================================================================
-   PÁGINAS DE ERRO (403 / 404 / 500)
-   ===================================================================== */
+/* ===== PÁGINAS DE ERRO (403 / 404 / 500) ===== */
 .error-page {
     max-width: 680px;
     padding-top: 72px;
@@ -142,10 +136,7 @@
     .error-actions .btn { flex: 1; }
 }
 
-
-/* =====================================================================
-   DÚVIDAS FREQUENTES
-   ===================================================================== */
+/* ===== DÚVIDAS FREQUENTES ===== */
 .faq-search {
     display: flex;
     gap: 8px;
@@ -237,16 +228,12 @@
     .faq-cta { flex-direction: column; align-items: stretch; padding: 24px 20px; }
 }
 
-/* =====================================================================
-   GUIA DO COLECIONADOR (artigo)
-   ===================================================================== */
+/* ===== GUIA DO COLECIONADOR (artigo) ===== */
 .guia-artigo { padding-top: 40px; }
 .guia-artigo .legal-text { max-width: 760px; margin: 0 auto; }
 .guia-tempo { display: block; margin-top: 10px; font-size: 0.8rem; color: var(--ink-muted); }
 
-/* =====================================================================
-   POLÍTICA DE COOKIES (tabelas)
-   ===================================================================== */
+/* ===== POLÍTICA DE COOKIES (tabelas) ===== */
 .tabela-rolagem { margin-top: 12px; overflow-x: auto; }
 .tabela-cookies { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
 .tabela-cookies th,

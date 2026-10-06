@@ -69,9 +69,7 @@ def _url_segura(request, url):
     )
 
 
-# =====================================================================
-# HOME E INSTITUCIONAL
-# =====================================================================
+# ===== HOME E INSTITUCIONAL =====
 
 def home(request):
     produtos_recentes = produtos_ativos().order_by("-data_criacao")[:4]
@@ -87,8 +85,8 @@ def home(request):
 # Foto de fundo do 1º slide do banner da home. Para usar/trocar: coloque o
 # arquivo em marketplace/static/img/banner/ com o nome banner-1 (.jpg,
 # .jpeg, .png ou .webp). Sem o arquivo, o slide fica com o fundo vermelho.
-# As versões leves (banner-1-1280.webp e banner-1-1920.webp) são geradas
-# por `python manage.py otimizar_banner` (o atualizar.sh já roda).
+# As versões leves (banner-1-<largura>.webp) são geradas por
+# `python manage.py otimizar_banner` (o atualizar.sh já roda).
 FOTO_BANNER = "img/banner/banner-1"
 LARGURAS_BANNER = (800, 1280, 1920)  # da menor para a maior (a maior é o src padrão)
 
@@ -245,9 +243,7 @@ def contato(request):
     })
 
 
-# =====================================================================
-# CATÁLOGO, BUSCA E CATEGORIAS
-# =====================================================================
+# ===== CATÁLOGO, BUSCA E CATEGORIAS =====
 
 def produtos(request):
     qs = produtos_ativos()
@@ -589,9 +585,7 @@ def faq(request):
     })
 
 
-# =====================================================================
-# CARRINHO
-# =====================================================================
+# ===== CARRINHO =====
 
 def validar_itens_carrinho(itens):
     """

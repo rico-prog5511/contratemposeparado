@@ -33,7 +33,6 @@
 html[data-theme="light"],
 :root {
     --ct-azul: #313170;
-    --ct-azul-escuro: #24245A;
     --ct-vermelho: #6D191D;
     --ct-vermelho-claro: #A54C49;
     --ct-lilas: #ACA9BB;
@@ -205,9 +204,7 @@ html[data-theme="dark"] {
     --ct-sombra: #0D0C1C;
 }
 
-/* =====================================================================
-   04. BASE E ACESSIBILIDADE
-   ===================================================================== */
+/* ===== 04. BASE E ACESSIBILIDADE ===== */
 body {
     font-size: 0.9375rem;          /* 15px (o padrão do admin é 14px) */
     line-height: 1.5;
@@ -256,9 +253,7 @@ input[type="url"], input[type="search"], input[type="tel"], select, textarea,
     *, *::before, *::after { transition: none !important; animation: none !important; }
 }
 
-/* =====================================================================
-   05. CABEÇALHO E LOGO
-   ===================================================================== */
+/* ===== 05. CABEÇALHO E LOGO ===== */
 #header {
     border-bottom: 3px solid var(--ct-vermelho);
     padding: 12px 40px;
@@ -299,9 +294,7 @@ div.breadcrumbs { padding: 12px 40px; font-size: 0.85rem; }
 .login #header { justify-content: center; }
 .login #container { border-radius: 10px; border: 1.5px solid var(--border-color); box-shadow: 8px 8px 0 var(--ct-sombra); }
 
-/* =====================================================================
-   06. TABELAS, MÓDULOS E FORMULÁRIOS
-   ===================================================================== */
+/* ===== 06. TABELAS, MÓDULOS E FORMULÁRIOS ===== */
 .module {
     border-radius: 10px;
     overflow: hidden;
@@ -345,9 +338,7 @@ fieldset.module h2 { background: var(--primary); }
 /* Mensagens */
 ul.messagelist li { border-radius: 8px; margin-bottom: 8px; font-weight: 500; }
 
-/* =====================================================================
-   07. BOTÕES
-   ===================================================================== */
+/* ===== 07. BOTÕES ===== */
 .button, input[type="submit"], input[type="button"], .submit-row input, a.button {
     border-radius: 6px;
     font-weight: 600;
@@ -364,9 +355,7 @@ ul.messagelist li { border-radius: 8px; margin-bottom: 8px; font-weight: 500; }
 }
 .object-tools a.viewsitelink { background: var(--ct-vermelho); }
 
-/* =====================================================================
-   08. PAINEL DE RESUMO (página inicial)
-   ===================================================================== */
+/* ===== 08. PAINEL DE RESUMO (página inicial) ===== */
 .dashboard #content { width: auto; max-width: 1400px; }
 .ct-painel { margin-bottom: 28px; }
 .ct-painel h2 {
@@ -415,9 +404,7 @@ a.ct-cartao:hover {
 .ct-cartao-rotulo { font-weight: 600; }
 .ct-cartao-ajuda { font-size: 0.78rem; color: var(--body-quiet-color); }
 
-/* =====================================================================
-   09. SELOS, MINIATURAS E ESTRELAS
-   ===================================================================== */
+/* ===== 09. SELOS, MINIATURAS E ESTRELAS ===== */
 .ct-selo {
     display: inline-block;
     padding: 3px 10px;
@@ -463,10 +450,7 @@ html[data-theme="dark"] .ct-selo--lilas  { color: #ECEBF3; background: #44425E; 
     div.breadcrumbs { padding: 10px 16px; }
 }
 
-
-/* =====================================================================
-   10. RELATÓRIO ANUAL (/admin/marketplace/pedido/relatorio-anual/)
-   ===================================================================== */
+/* ===== 10. RELATÓRIO ANUAL (/admin/marketplace/pedido/relatorio-anual/) ===== */
 .ct-relatorio-pagina #content { max-width: 1400px; }
 .ct-relatorio-ano {
     display: flex;

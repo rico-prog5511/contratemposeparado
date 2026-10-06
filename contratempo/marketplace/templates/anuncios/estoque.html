@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "conta/_layout.html" %}
 {% load static marketplace_extras %}
 
 {% block title %}Gerenciar estoque | contratempo{% endblock %}
@@ -7,69 +7,61 @@
 <link rel="stylesheet" href="{% static 'css/anuncios.css' %}">
 {% endblock %}
 
-{% block content %}
-<div class="container page">
-    <div class="account-layout">
-        {% include "partials/account_nav.html" %}
+{% block conta %}
+    <header class="page-header">
+        <div>
+            <h1>Gerenciar estoque</h1>
+            <p>Altere as quantidades e salve tudo de uma vez. Anúncios esgotados voltam a ficar ativos quando recebem estoque.</p>
+        </div>
+    </header>
 
-        <section>
-            <header class="page-header">
-                <div>
-                    <h1>Gerenciar estoque</h1>
-                    <p>Altere as quantidades e salve tudo de uma vez. Anúncios esgotados voltam a ficar ativos quando recebem estoque.</p>
-                </div>
-            </header>
+    {% if produtos %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Anúncio</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Preço</th>
+                            <th scope="col">Estoque</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for produto in produtos %}
+                            {% with imagem=produto|imagem_principal %}
+                            <tr class="{% if produto.quantidade_disponivel == 0 %}row-alert{% endif %}">
+                                <td>
+                                    <div class="cell-product">
+                                        <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem|miniatura }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
+                                        <div>
+                                            <a href="{% url 'anuncio_detalhe' produto.id %}">{{ produto.nome }}</a>
+                                            <div class="cell-sub">{{ produto.categoria.nome }}{% if produto.sku %} · <span class="mono">{{ produto.sku }}</span>{% endif %}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-label="Status"><span class="badge badge--{{ produto.status_anuncio }}">{{ produto.get_status_anuncio_display }}</span></td>
+                                <td data-label="Preço" class="num">{{ produto.preco|brl }}</td>
+                                <td data-label="Estoque">
+                                    <label for="estoque-{{ produto.id }}" class="sr-only">Estoque de {{ produto.nome }}</label>
+                                    <input type="number" min="0" step="1" id="estoque-{{ produto.id }}" name="estoque_{{ produto.id }}" value="{{ produto.quantidade_disponivel }}" class="input stock-input" inputmode="numeric">
+                                </td>
+                            </tr>
+                            {% endwith %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-            {% if produtos %}
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="table-wrap">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Anúncio</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Preço</th>
-                                    <th scope="col">Estoque</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for produto in produtos %}
-                                    {% with imagem=produto|imagem_principal %}
-                                    <tr class="{% if produto.quantidade_disponivel == 0 %}row-alert{% endif %}">
-                                        <td>
-                                            <div class="cell-product">
-                                                <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem|miniatura }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
-                                                <div>
-                                                    <a href="{% url 'anuncio_detalhe' produto.id %}">{{ produto.nome }}</a>
-                                                    <div class="cell-sub">{{ produto.categoria.nome }}{% if produto.sku %} · <span class="mono">{{ produto.sku }}</span>{% endif %}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td data-label="Status"><span class="badge badge--{{ produto.status_anuncio }}">{{ produto.get_status_anuncio_display }}</span></td>
-                                        <td data-label="Preço" class="num">{{ produto.preco|brl }}</td>
-                                        <td data-label="Estoque">
-                                            <label for="estoque-{{ produto.id }}" class="sr-only">Estoque de {{ produto.nome }}</label>
-                                            <input type="number" min="0" step="1" id="estoque-{{ produto.id }}" name="estoque_{{ produto.id }}" value="{{ produto.quantidade_disponivel }}" class="input stock-input" inputmode="numeric">
-                                        </td>
-                                    </tr>
-                                    {% endwith %}
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="form-actions stock-actions">
-                        <a href="{% url 'anuncios' %}" class="btn btn-outline">Voltar aos anúncios</a>
-                        <span class="spacer"></span>
-                        <button type="submit" class="btn btn-accent">Salvar estoque</button>
-                    </div>
-                </form>
-            {% else %}
-                {% url 'anuncio_criar' as url_criar %}
-                {% include "partials/empty_state.html" with titulo="Nada para gerenciar ainda" texto="Crie um anúncio para controlar o estoque por aqui." link_url=url_criar link_label="Criar anúncio" %}
-            {% endif %}
-        </section>
-    </div>
-</div>
+            <div class="form-actions stock-actions">
+                <a href="{% url 'anuncios' %}" class="btn btn-outline">Voltar aos anúncios</a>
+                <span class="spacer"></span>
+                <button type="submit" class="btn btn-accent">Salvar estoque</button>
+            </div>
+        </form>
+    {% else %}
+        {% url 'anuncio_criar' as url_criar %}
+        {% include "partials/empty_state.html" with titulo="Nada para gerenciar ainda" texto="Crie um anúncio para controlar o estoque por aqui." link_url=url_criar link_label="Criar anúncio" %}
+    {% endif %}
 {% endblock %}

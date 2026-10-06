@@ -55,9 +55,7 @@ def _salvar_imagens(produto, arquivos):
         ordem += 1
 
 
-# =====================================================================
-# LISTA
-# =====================================================================
+# ===== LISTA =====
 
 @login_required
 def anuncios(request):
@@ -97,9 +95,7 @@ def anuncios(request):
     })
 
 
-# =====================================================================
-# CRIAR / EDITAR
-# =====================================================================
+# ===== CRIAR / EDITAR =====
 
 def _salvar_com_sku_gerado(produto, tentativas=5):
     """
@@ -194,9 +190,7 @@ def anuncio_editar(request, produto_id):
     })
 
 
-# =====================================================================
-# VISUALIZAR
-# =====================================================================
+# ===== VISUALIZAR =====
 
 @login_required
 def anuncio_detalhe(request, produto_id):
@@ -227,9 +221,7 @@ def anuncio_detalhe(request, produto_id):
     })
 
 
-# =====================================================================
-# STATUS / EXCLUSÃO
-# =====================================================================
+# ===== STATUS / EXCLUSÃO =====
 
 @login_required
 @require_POST
@@ -276,9 +268,7 @@ def anuncio_excluir(request, produto_id):
     return redirect("anuncios")
 
 
-# =====================================================================
-# ESTOQUE EM LOTE
-# =====================================================================
+# ===== ESTOQUE EM LOTE =====
 
 @login_required
 def estoque(request):

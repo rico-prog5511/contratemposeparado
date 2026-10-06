@@ -116,9 +116,7 @@ def _endereco_da_sessao(request):
     return endereco
 
 
-# =====================================================================
-# CHECKOUT
-# =====================================================================
+# ===== CHECKOUT =====
 
 @login_required
 def checkout_endereco(request):
@@ -305,9 +303,7 @@ def _criar_pedidos(usuario, carrinho, itens, endereco, cartao, rotulo_pagamento)
     return pedidos
 
 
-# =====================================================================
-# PEDIDOS DO COMPRADOR
-# =====================================================================
+# ===== PEDIDOS DO COMPRADOR =====
 
 def _pedido_do_usuario(request, pedido_id):
     return get_object_or_404(

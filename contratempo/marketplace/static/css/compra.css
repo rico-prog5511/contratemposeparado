@@ -1,8 +1,6 @@
 /* static/css/compra.css — carrinho, checkout, pedido concluído e pedidos */
 
-/* =====================================================================
-   CARRINHO
-   ===================================================================== */
+/* ===== CARRINHO ===== */
 .cart-items { display: flex; flex-direction: column; gap: 14px; }
 
 .cart-item {
@@ -59,9 +57,7 @@
 .cart-item-price strong { font-family: var(--font-mono); font-size: 1.05rem; color: var(--txt-vermelho); }
 .cart-continue { align-self: flex-start; margin-top: 6px; }
 
-/* =====================================================================
-   CHECKOUT
-   ===================================================================== */
+/* ===== CHECKOUT ===== */
 .checkout-steps {
     list-style: none;
     display: flex;
@@ -158,9 +154,7 @@
 .review-grid .panel + .panel { margin-top: 0; }
 .review-grid p { color: var(--ink); font-size: 0.9rem; }
 
-/* =====================================================================
-   PEDIDO CONCLUÍDO ("Já feito")
-   ===================================================================== */
+/* ===== PEDIDO CONCLUÍDO ("Já feito") ===== */
 .done-ticket {
     position: relative;
     margin-top: 24px;
@@ -196,9 +190,7 @@
 }
 .done-total { margin: 18px 0 0; padding-top: 14px; border-top: 1.5px solid var(--ink); }
 
-/* =====================================================================
-   MEUS PEDIDOS
-   ===================================================================== */
+/* ===== MEUS PEDIDOS ===== */
 .order-list { display: flex; flex-direction: column; gap: 16px; }
 .order-card {
     background: var(--paper);
@@ -371,10 +363,7 @@
     .checkout-recap { flex-direction: column; align-items: flex-start; }
 }
 
-
-/* =====================================================================
-   FRETE, PACOTES POR VENDEDOR E RASTREIO
-   ===================================================================== */
+/* ===== FRETE, PACOTES POR VENDEDOR E RASTREIO ===== */
 .option-frete { margin-top: 8px !important; font-size: 0.85rem; color: var(--ink) !important; }
 .option-frete strong { font-family: var(--font-mono); color: var(--txt-vermelho); }
 .option-frete--off { color: var(--txt-vermelho) !important; font-weight: 600; }

@@ -10,9 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var imagemPrincipal = document.getElementById("imagem-principal");
     var miniaturas = document.querySelectorAll(".produto-miniatura");
 
-    /* ---------------------------------------------------------------
-       MINIATURAS
-       --------------------------------------------------------------- */
+    /* ----- MINIATURAS ----- */
     function mostrarNaPrincipal(indice) {
         var miniatura = miniaturas[indice];
         if (!imagemPrincipal || !miniatura) return;
@@ -41,9 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    /* ---------------------------------------------------------------
-       LIGHTBOX
-       --------------------------------------------------------------- */
+    /* ----- LIGHTBOX ----- */
     var lightbox = document.getElementById("lightbox");
     var dados = document.getElementById("lightbox-dados");
     var abrir = document.querySelector("[data-lightbox-open]");
@@ -98,9 +94,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    /* ---------------------------------------------------------------
-       QUANTIDADE
-       --------------------------------------------------------------- */
+    /* ----- QUANTIDADE ----- */
     var input = document.getElementById("quantidade");
     if (input) {
         var limitar = function (valor) {

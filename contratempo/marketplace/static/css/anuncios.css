@@ -4,9 +4,7 @@
 .stock-zero { color: var(--txt-vermelho); font-weight: 700; }
 .row-alert td:first-child { box-shadow: inset 4px 0 0 var(--cor-destaque); }
 
-/* =====================================================================
-   FORMULÁRIO DO ANÚNCIO
-   ===================================================================== */
+/* ===== FORMULÁRIO DO ANÚNCIO ===== */
 .listing-form .panel + .panel { margin-top: 20px; }
 
 .upload-area {
@@ -114,9 +112,7 @@
     border-top: 1.5px solid var(--ink);
 }
 
-/* =====================================================================
-   VISUALIZAR ANÚNCIO
-   ===================================================================== */
+/* ===== VISUALIZAR ANÚNCIO ===== */
 .stat-row {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -184,9 +180,7 @@
 .table-plain { border: 0; background: transparent; }
 .listing-manage .cluster .spacer { flex: 1; }
 
-/* =====================================================================
-   ESTOQUE
-   ===================================================================== */
+/* ===== ESTOQUE ===== */
 .stock-input { width: 96px !important; min-height: 40px !important; text-align: center; font-family: var(--font-mono); font-weight: 700; }
 .stock-actions {
     position: sticky;
@@ -216,7 +210,6 @@
     .listing-manage .inline-form .btn { width: 100%; }
     .data-table td .stock-input { width: 110px !important; }
 }
-
 
 /* Perguntas recebidas */
 .qa-product {

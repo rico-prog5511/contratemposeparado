@@ -719,6 +719,10 @@ Formato:  URL  —  quem acessa  —  arquivo da view  —  template
 
 Todas as páginas /conta/... têm o MENU DA CONTA na lateral
 (partials/account_nav.html), dividido em Compras, Vendas e Conta.
+Essa moldura (menu + área de conteúdo) fica num lugar só,
+conta/_layout.html: as páginas da conta, dos anúncios, das vendas e
+dos pedidos fazem {% extends "conta/_layout.html" %} e preenchem só o
+bloco {% block conta %}.
 
 --------------------------------------------------------------------------------
 8.3  COMPRA  (views.py + views_checkout.py, templates/compra/ e pedidos/)

@@ -28,9 +28,7 @@ LIMITE_IMAGENS_ANUNCIO = 8
 TAMANHO_MAXIMO_IMAGEM = 5 * 1024 * 1024  # 5 MB
 
 
-# =====================================================================
-# UPLOAD DE VÁRIAS IMAGENS
-# =====================================================================
+# ===== UPLOAD DE VÁRIAS IMAGENS =====
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
@@ -60,9 +58,7 @@ def validar_tamanho_imagem(arquivo):
         )
 
 
-# =====================================================================
-# CONTA
-# =====================================================================
+# ===== CONTA =====
 
 class LoginForm(forms.Form):
     email = forms.EmailField(
@@ -349,9 +345,7 @@ class CartaoEdicaoForm(forms.ModelForm):
         return cartao
 
 
-# =====================================================================
-# CONTATO
-# =====================================================================
+# ===== CONTATO =====
 
 class ContatoForm(forms.ModelForm):
     ASSUNTOS = [
@@ -378,9 +372,7 @@ class ContatoForm(forms.ModelForm):
         }
 
 
-# =====================================================================
-# ANÚNCIOS
-# =====================================================================
+# ===== ANÚNCIOS =====
 
 class ProdutoForm(forms.ModelForm):
     imagens = MultipleImageField(
@@ -513,9 +505,7 @@ class ProdutoForm(forms.ModelForm):
         return dados
 
 
-# =====================================================================
-# AVALIAÇÕES
-# =====================================================================
+# ===== AVALIAÇÕES =====
 
 class AvaliacaoForm(forms.Form):
     """

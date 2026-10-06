@@ -1,11 +1,4 @@
-"""
-WSGI config for contratempo project.
-
-It exposes the WSGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/
-"""
+"""Ponto de entrada WSGI (usado pelo servidor web em produção)."""
 
 import os
 

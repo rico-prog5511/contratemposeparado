@@ -1,8 +1,6 @@
 /* static/css/conta.css — login, cadastro e área "Minha conta" */
 
-/* =====================================================================
-   LOGIN / CADASTRO
-   ===================================================================== */
+/* ===== LOGIN / CADASTRO ===== */
 .auth-box {
     display: grid;
     grid-template-columns: 0.9fr 1.1fr;
@@ -60,9 +58,7 @@
 }
 .auth-row .form-group { margin: 0; }
 
-/* =====================================================================
-   PERFIL
-   ===================================================================== */
+/* ===== PERFIL ===== */
 .profile-hero {
     display: flex;
     align-items: center;
@@ -129,9 +125,7 @@
 .sell-banner .btn-outline { border-color: var(--cor-fundo); color: #fff; }
 .sell-banner .btn-outline:hover { background: var(--cor-fundo); color: var(--cor-header); }
 
-/* =====================================================================
-   FORMULÁRIOS DA CONTA
-   ===================================================================== */
+/* ===== FORMULÁRIOS DA CONTA ===== */
 .form-narrow { max-width: 560px; }
 
 .avatar-field {
@@ -149,9 +143,7 @@
 .panel + .danger-zone,
 form.panel + .danger-zone { margin-top: 28px; }
 
-/* =====================================================================
-   ENDEREÇOS E PAGAMENTOS
-   ===================================================================== */
+/* ===== ENDEREÇOS E PAGAMENTOS ===== */
 .item-card--principal { box-shadow: 5px 5px 0 var(--cor-header); }
 
 .payment-card { position: relative; overflow: hidden; }
@@ -202,7 +194,6 @@ form.panel + .danger-zone { margin-top: 28px; }
     .avatar-field { flex-direction: column; align-items: flex-start; }
     .auth-row { flex-wrap: wrap; }
 }
-
 
 /* =====================================================================
    PÁGINAS CURTAS DE AUTENTICAÇÃO

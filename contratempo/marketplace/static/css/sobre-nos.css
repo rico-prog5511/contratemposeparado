@@ -177,8 +177,7 @@ body:has(.about-end) .site-footer { margin-top: 0; }
     .about-end { padding: 64px var(--gutter); }
 }
 
-
-/* Logo [contratempo] no bloco final (sem o espaçamento do rótulo) */
+/* Logo [contratempo] no bloco final */
 .about-end > .about-end-marca {
     font-family: var(--font-display);
     font-size: 1.7rem;

@@ -39,9 +39,7 @@ from .models import (
 )
 
 
-# =====================================================================
-# APARÊNCIA GERAL (o tema visual fica em static/css/admin.css)
-# =====================================================================
+# ===== APARÊNCIA GERAL (o tema visual fica em static/css/admin.css) =====
 
 admin.site.site_header = "contratempo"
 admin.site.site_title = "contratempo — painel"
@@ -76,9 +74,7 @@ def miniatura(url, texto_alt=""):
     )
 
 
-# =====================================================================
-# FRETE, FAQ E PERGUNTAS
-# =====================================================================
+# ===== FRETE, FAQ E PERGUNTAS =====
 
 @admin.register(TabelaFrete)
 class TabelaFreteAdmin(admin.ModelAdmin):
@@ -153,9 +149,7 @@ class PerguntaProdutoAdmin(admin.ModelAdmin):
         return obj.resposta is not None
 
 
-# =====================================================================
-# USUÁRIO
-# =====================================================================
+# ===== USUÁRIO =====
 
 @admin.register(Usuario)
 class UsuarioAdmin(UserAdmin):
@@ -201,9 +195,7 @@ class UsuarioAdmin(UserAdmin):
         return reverse("vendedor_perfil", args=[obj.pk])
 
 
-# =====================================================================
-# ENDEREÇOS E PAGAMENTO
-# =====================================================================
+# ===== ENDEREÇOS E PAGAMENTO =====
 
 @admin.register(Endereco)
 class EnderecoAdmin(admin.ModelAdmin):
@@ -225,9 +217,7 @@ class FormaPagamentoAdmin(admin.ModelAdmin):
         return f"{obj.validade_texto} (vencido)" if obj.vencido else obj.validade_texto
 
 
-# =====================================================================
-# CATEGORIAS E FRANQUIAS
-# =====================================================================
+# ===== CATEGORIAS E FRANQUIAS =====
 
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
@@ -247,9 +237,7 @@ class FranquiaAdmin(admin.ModelAdmin):
     list_editable = ("ativo",)
 
 
-# =====================================================================
-# PRODUTOS
-# =====================================================================
+# ===== PRODUTOS =====
 
 class ProdutoImagemInline(admin.TabularInline):
     model = ProdutoImagem
@@ -307,9 +295,7 @@ class ProdutoAdmin(admin.ModelAdmin):
         return reverse("produto_detalhe", args=[obj.pk])
 
 
-# =====================================================================
-# CARRINHO
-# =====================================================================
+# ===== CARRINHO =====
 
 class ItemCarrinhoInline(admin.TabularInline):
     model = ItemCarrinho
@@ -331,9 +317,7 @@ class CarrinhoAdmin(admin.ModelAdmin):
         return selo(obj.status, obj.get_status_display())
 
 
-# =====================================================================
-# PEDIDOS
-# =====================================================================
+# ===== PEDIDOS =====
 
 class ItemPedidoInline(admin.TabularInline):
     model = ItemPedido
@@ -414,9 +398,7 @@ class PedidoAdmin(admin.ModelAdmin):
         return brl(obj.valor_frete)
 
 
-# =====================================================================
-# CONTATO
-# =====================================================================
+# ===== CONTATO =====
 
 @admin.register(Contato)
 class ContatoAdmin(admin.ModelAdmin):
@@ -427,9 +409,7 @@ class ContatoAdmin(admin.ModelAdmin):
     list_editable = ("status",)
 
 
-# =====================================================================
-# AVALIAÇÕES
-# =====================================================================
+# ===== AVALIAÇÕES =====
 
 @admin.register(Avaliacao)
 class AvaliacaoAdmin(admin.ModelAdmin):

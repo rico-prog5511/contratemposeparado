@@ -246,17 +246,6 @@
     font-size: 0.9rem;
 }
 
-.buy-seller {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin-top: 14px;
-    padding-top: 16px;
-    border-top: 1.5px dashed rgba(255, 255, 255, 0.35);
-}
-.buy-seller strong { font-family: var(--font-display); font-size: 1.1rem; }
-.buy-seller small { color: var(--cor-fundo); font-size: 0.78rem; }
-
 .buy-perks {
     list-style: none;
     margin: 6px 0 0;
@@ -319,10 +308,7 @@
     .produto-specs { padding: 16px 16px 6px; }
 }
 
-
-/* =====================================================================
-   GALERIA AMPLIADA (lightbox)
-   ===================================================================== */
+/* ===== GALERIA AMPLIADA (lightbox) ===== */
 .zoom-trigger {
     position: relative;
     display: block;
@@ -405,9 +391,7 @@
 .lightbox-close:hover,
 .lightbox-nav:hover { background: var(--cor-destaque); color: #fff; }
 
-/* =====================================================================
-   CALCULADORA DE FRETE (dentro do painel de compra)
-   ===================================================================== */
+/* ===== CALCULADORA DE FRETE (dentro do painel de compra) ===== */
 .frete-calc {
     margin-top: 14px;
     padding-top: 16px;
@@ -442,9 +426,7 @@
 }
 .frete-ajuda:hover { color: #fff; }
 
-/* =====================================================================
-   VENDEDOR
-   ===================================================================== */
+/* ===== VENDEDOR ===== */
 .produto-meta-links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
 .seller-section { margin-top: 8px; margin-bottom: 56px; }
 .seller-card {
@@ -481,9 +463,7 @@
 .seller-stats dd { margin: 2px 0 0; font-family: var(--font-mono); font-size: 1.3rem; font-weight: 700; color: var(--txt-vermelho); }
 .seller-stats dd.seller-stats-nota { margin: 0; font-family: inherit; font-size: 0.74rem; font-weight: 400; color: var(--ink-muted); }
 
-/* =====================================================================
-   PERGUNTAS
-   ===================================================================== */
+/* ===== PERGUNTAS ===== */
 .produto-perguntas { margin: 56px auto; }
 .ask-form { display: flex; gap: 10px; align-items: flex-start; }
 .ask-form textarea { flex: 1; min-height: 52px; resize: vertical; }
@@ -539,10 +519,7 @@
     .answer-form { flex-direction: column; align-items: stretch; margin-left: 0; }
 }
 
-
-/* =====================================================================
-   PERFIL PÚBLICO DO VENDEDOR
-   ===================================================================== */
+/* ===== PERFIL PÚBLICO DO VENDEDOR ===== */
 .seller-id h2 a:hover { color: var(--txt-vermelho); text-decoration: underline; text-underline-offset: 4px; }
 .seller-hero { grid-template-columns: minmax(0, 1fr) auto; margin-bottom: 28px; }
 .seller-hero h1 { font-size: clamp(1.8rem, 3.5vw, 2.4rem); margin: 4px 0; }
@@ -579,9 +556,7 @@
 .seller-categories { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
 .seller-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
-/* =====================================================================
-   DENUNCIAR ANÚNCIO
-   ===================================================================== */
+/* ===== DENUNCIAR ANÚNCIO ===== */
 .report { margin-top: 28px; padding-top: 14px; border-top: 1px dashed var(--line); }
 .report-link {
     display: inline-flex;

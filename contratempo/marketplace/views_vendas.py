@@ -28,9 +28,7 @@ def _breadcrumbs(*itens):
     return [{"label": "Minha conta", "url": reverse("perfil")}, *itens]
 
 
-# =====================================================================
-# MINHAS VENDAS
-# =====================================================================
+# ===== MINHAS VENDAS =====
 
 @login_required
 def vendas(request):
@@ -132,9 +130,7 @@ def venda_cancelar(request, pedido_id):
     return redirect("venda_detalhe", pedido_id=pedido.id)
 
 
-# =====================================================================
-# PERGUNTAS RECEBIDAS
-# =====================================================================
+# ===== PERGUNTAS RECEBIDAS =====
 
 @login_required
 def perguntas_recebidas(request):

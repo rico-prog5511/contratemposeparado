@@ -16,9 +16,7 @@ from django.db import models
 from django.utils import timezone
 
 
-# =====================================================================
-# USUÁRIO PERSONALIZADO
-# =====================================================================
+# ===== USUÁRIO PERSONALIZADO =====
 
 class UsuarioManager(BaseUserManager):
     """
@@ -118,9 +116,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         self.save(update_fields=["is_active", "status_conta"])
 
 
-# =====================================================================
-# ENDEREÇOS E FORMAS DE PAGAMENTO
-# =====================================================================
+# ===== ENDEREÇOS E FORMAS DE PAGAMENTO =====
 
 class Endereco(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -217,9 +213,7 @@ class FormaPagamento(models.Model):
         return (self.validade_ano, self.validade_mes) < (hoje.year, hoje.month)
 
 
-# =====================================================================
-# CATEGORIAS E FRANQUIAS
-# =====================================================================
+# ===== CATEGORIAS E FRANQUIAS =====
 
 # Como o campo `marca` do produto é chamado em cada categoria. A escolha é
 # pelas palavras do nome/slug da categoria (sem acento), então funciona
@@ -285,9 +279,7 @@ class Franquia(models.Model):
         return self.nome
 
 
-# =====================================================================
-# PRODUTOS
-# =====================================================================
+# ===== PRODUTOS =====
 
 class Produto(models.Model):
     CONDICAO_CHOICES = [
@@ -352,9 +344,6 @@ class ProdutoImagem(models.Model):
         related_name="imagens",
         db_column="produto_id",
     )
-    # Em produção, trocar por models.ImageField(upload_to=...) e
-    # armazenar o campo .name aqui; mantido como CharField para
-    # compatibilidade direta com a coluna VARCHAR já existente.
     url_imagem = models.CharField(max_length=255)
     principal = models.BooleanField(default=False)
     ordem_exibicao = models.SmallIntegerField(default=0)
@@ -378,9 +367,7 @@ class ProdutoImagem(models.Model):
         return f"Imagem de {self.produto.nome} (#{self.ordem_exibicao})"
 
 
-# =====================================================================
-# CARRINHO
-# =====================================================================
+# ===== CARRINHO =====
 
 class Carrinho(models.Model):
     STATUS_CHOICES = [
@@ -452,9 +439,7 @@ class ItemCarrinho(models.Model):
         return f"{self.quantidade}x {self.produto.nome}"
 
 
-# =====================================================================
-# PEDIDOS
-# =====================================================================
+# ===== PEDIDOS =====
 
 class Pedido(models.Model):
     STATUS_CHOICES = [
@@ -560,9 +545,7 @@ class ItemPedido(models.Model):
         return f"{self.quantidade}x {self.nome_produto} (pedido #{self.pedido_id})"
 
 
-# =====================================================================
-# CONTATO
-# =====================================================================
+# ===== CONTATO =====
 
 class Contato(models.Model):
     STATUS_CHOICES = [
@@ -597,9 +580,7 @@ class Contato(models.Model):
         return f"{self.assunto} — {self.nome}"
 
 
-# =====================================================================
-# AVALIAÇÕES
-# =====================================================================
+# ===== AVALIAÇÕES =====
 
 class Avaliacao(models.Model):
     STATUS_CHOICES = [
@@ -667,9 +648,7 @@ class Avaliacao(models.Model):
     def __str__(self):
         return f"{self.produto.nome} — nota {self.nota} ({self.usuario})"
 
-# =====================================================================
-# FRETE
-# =====================================================================
+# ===== FRETE =====
 
 class TabelaFrete(models.Model):
     """
@@ -704,9 +683,7 @@ class TabelaFrete(models.Model):
         return f"{self.uf} — R$ {self.valor} ({self.prazo_dias} dias)"
 
 
-# =====================================================================
-# DÚVIDAS FREQUENTES
-# =====================================================================
+# ===== DÚVIDAS FREQUENTES =====
 
 class PerguntaFrequente(models.Model):
     TEMA_CHOICES = [
@@ -734,9 +711,7 @@ class PerguntaFrequente(models.Model):
         return self.pergunta
 
 
-# =====================================================================
-# PERGUNTAS AO VENDEDOR
-# =====================================================================
+# ===== PERGUNTAS AO VENDEDOR =====
 
 class PerguntaProduto(models.Model):
     STATUS_CHOICES = [
@@ -773,9 +748,7 @@ class PerguntaProduto(models.Model):
         return f"{self.produto.nome}: {self.pergunta[:50]}"
 
 
-# =====================================================================
-# DENÚNCIAS DE ANÚNCIOS
-# =====================================================================
+# ===== DENÚNCIAS DE ANÚNCIOS =====
 
 class Denuncia(models.Model):
     """

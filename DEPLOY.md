@@ -245,6 +245,6 @@ from today**, na aba **Web**.
 | Fotos quebradas | Falta a linha `/media/` em **Static files**, ou a pasta `media` não foi enviada. |
 | `Access denied for user` (só MySQL) | Confira `DB_USER`, `DB_PASSWORD` e `DB_HOST` no `.env`. |
 | `no such table` (SQLite) | Faltou o `python manage.py migrate` do passo 5. |
-| Fazer backup do banco (SQLite) | Na aba **Files**, baixe o arquivo `contratempo/contratempo.sqlite3`. Ele contém todos os dados do site. |
+| Fazer backup do banco e das fotos | No console Bash: `bash ~/contratemposeparado/backup.sh`. Gera `~/backups/contratempo-DATA.zip` (banco + pasta `media/`, sem o `.env`) e mantém os 5 mais recentes. Baixe o `.zip` pela aba **Files**. |
 | E-mails não chegam | No plano gratuito o Gmail recusa o login vindo do servidor. Configure o **Brevo** (`BREVO_API_KEY`, ver passo 5). O site continua funcionando e o motivo aparece no **Server log**; `python manage.py testar_email seu@email.com` explica o erro. |
 | Erro 403 "CSRF verification failed" | Acesse sempre pelo endereço com `https://` que está em `DJANGO_ALLOWED_HOSTS`. |

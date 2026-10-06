@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "conta/_layout.html" %}
 {% load static marketplace_extras %}
 
 {% block title %}Perguntas recebidas | contratempo{% endblock %}
@@ -8,58 +8,50 @@
 <link rel="stylesheet" href="{% static 'css/anuncios.css' %}">
 {% endblock %}
 
-{% block content %}
-<div class="container page">
-    <div class="account-layout">
-        {% include "partials/account_nav.html" %}
+{% block conta %}
+    <header class="page-header">
+        <div>
+            <h1>Perguntas recebidas</h1>
+            <p>As respostas ficam públicas no anúncio e o comprador é avisado por e-mail.</p>
+        </div>
+    </header>
 
-        <section>
-            <header class="page-header">
-                <div>
-                    <h1>Perguntas recebidas</h1>
-                    <p>As respostas ficam públicas no anúncio e o comprador é avisado por e-mail.</p>
-                </div>
-            </header>
+    <nav class="tabs" aria-label="Filtrar perguntas">
+        <a href="?filtro=pendentes" class="tab {% if filtro == 'pendentes' %}active{% endif %}">Sem resposta <span class="tab-count">{{ totais.pendentes }}</span></a>
+        <a href="?filtro=respondidas" class="tab {% if filtro == 'respondidas' %}active{% endif %}">Respondidas <span class="tab-count">{{ totais.respondidas }}</span></a>
+    </nav>
 
-            <nav class="tabs" aria-label="Filtrar perguntas">
-                <a href="?filtro=pendentes" class="tab {% if filtro == 'pendentes' %}active{% endif %}">Sem resposta <span class="tab-count">{{ totais.pendentes }}</span></a>
-                <a href="?filtro=respondidas" class="tab {% if filtro == 'respondidas' %}active{% endif %}">Respondidas <span class="tab-count">{{ totais.respondidas }}</span></a>
-            </nav>
-
-            {% if perguntas %}
-                <ul class="qa-list">
-                    {% for pergunta in perguntas %}
-                        {% with imagem=pergunta.produto|imagem_principal %}
-                        <li class="qa-item {% if not pergunta.resposta %}qa-item--pendente{% endif %}">
-                            <a href="{% url 'produto_detalhe' pergunta.produto_id %}#perguntas" class="qa-product">
-                                <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem|miniatura }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
-                                <span>{{ pergunta.produto.nome }}</span>
-                            </a>
-                            <p class="qa-q"><span class="qa-tag">P</span>{{ pergunta.pergunta }}</p>
-                            <p class="qa-meta">{{ pergunta.usuario.nome_completo }} · {{ pergunta.data_pergunta|date:"d/m/Y H:i" }}</p>
-                            {% if pergunta.resposta %}
-                                <p class="qa-a"><span class="qa-tag qa-tag--a">R</span>{{ pergunta.resposta }}<small>{{ pergunta.data_resposta|date:"d/m/Y" }}</small></p>
-                            {% else %}
-                                <form action="{% url 'responder_pergunta' pergunta.id %}" method="post" class="answer-form">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                                    <label for="resposta-{{ pergunta.id }}" class="sr-only">Resposta</label>
-                                    <textarea id="resposta-{{ pergunta.id }}" name="resposta" rows="2" maxlength="1000" required class="input" placeholder="Escreva sua resposta"></textarea>
-                                    <button type="submit" class="btn btn-accent btn-sm">Responder</button>
-                                </form>
-                            {% endif %}
-                        </li>
-                        {% endwith %}
-                    {% endfor %}
-                </ul>
-                {% include "partials/pagination.html" %}
-            {% elif filtro == "pendentes" %}
-                {% url 'anuncios' as url_anuncios %}
-                {% include "partials/empty_state.html" with titulo="Nenhuma pergunta sem resposta" texto="Tudo em dia! Novas perguntas também chegam por e-mail." link_url=url_anuncios link_label="Meus anúncios" %}
-            {% else %}
-                {% include "partials/empty_state.html" with titulo="Nenhuma pergunta respondida ainda" %}
-            {% endif %}
-        </section>
-    </div>
-</div>
+    {% if perguntas %}
+        <ul class="qa-list">
+            {% for pergunta in perguntas %}
+                {% with imagem=pergunta.produto|imagem_principal %}
+                <li class="qa-item {% if not pergunta.resposta %}qa-item--pendente{% endif %}">
+                    <a href="{% url 'produto_detalhe' pergunta.produto_id %}#perguntas" class="qa-product">
+                        <span class="thumb thumb-sm"><img src="{% if imagem %}{{ imagem|miniatura }}{% else %}{% static 'img/produto-sem-imagem.svg' %}{% endif %}" alt=""></span>
+                        <span>{{ pergunta.produto.nome }}</span>
+                    </a>
+                    <p class="qa-q"><span class="qa-tag">P</span>{{ pergunta.pergunta }}</p>
+                    <p class="qa-meta">{{ pergunta.usuario.nome_completo }} · {{ pergunta.data_pergunta|date:"d/m/Y H:i" }}</p>
+                    {% if pergunta.resposta %}
+                        <p class="qa-a"><span class="qa-tag qa-tag--a">R</span>{{ pergunta.resposta }}<small>{{ pergunta.data_resposta|date:"d/m/Y" }}</small></p>
+                    {% else %}
+                        <form action="{% url 'responder_pergunta' pergunta.id %}" method="post" class="answer-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                            <label for="resposta-{{ pergunta.id }}" class="sr-only">Resposta</label>
+                            <textarea id="resposta-{{ pergunta.id }}" name="resposta" rows="2" maxlength="1000" required class="input" placeholder="Escreva sua resposta"></textarea>
+                            <button type="submit" class="btn btn-accent btn-sm">Responder</button>
+                        </form>
+                    {% endif %}
+                </li>
+                {% endwith %}
+            {% endfor %}
+        </ul>
+        {% include "partials/pagination.html" %}
+    {% elif filtro == "pendentes" %}
+        {% url 'anuncios' as url_anuncios %}
+        {% include "partials/empty_state.html" with titulo="Nenhuma pergunta sem resposta" texto="Tudo em dia! Novas perguntas também chegam por e-mail." link_url=url_anuncios link_label="Meus anúncios" %}
+    {% else %}
+        {% include "partials/empty_state.html" with titulo="Nenhuma pergunta respondida ainda" %}
+    {% endif %}
 {% endblock %}

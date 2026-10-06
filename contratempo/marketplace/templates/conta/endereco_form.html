@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "conta/_layout.html" %}
 {% load static %}
 
 {% block title %}{{ titulo }} | contratempo{% endblock %}
@@ -7,47 +7,39 @@
 <link rel="stylesheet" href="{% static 'css/conta.css' %}">
 {% endblock %}
 
-{% block content %}
-<div class="container page">
-    <div class="account-layout">
-        {% include "partials/account_nav.html" %}
+{% block conta %}
+    <header class="page-header">
+        <div>
+            <h1>{{ titulo }}</h1>
+            <p>Digite o CEP para preencher o endereço automaticamente.</p>
+        </div>
+    </header>
 
-        <section>
-            <header class="page-header">
-                <div>
-                    <h1>{{ titulo }}</h1>
-                    <p>Digite o CEP para preencher o endereço automaticamente.</p>
-                </div>
-            </header>
+    <form method="post" class="panel" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        {% include "partials/form_errors.html" %}
 
-            <form method="post" class="panel" novalidate>
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{{ next }}">
-                {% include "partials/form_errors.html" %}
+        {% include "partials/form_field.html" with field=form.nome_endereco %}
+        <div class="form-row form-row-cep">
+            {% include "partials/form_field.html" with field=form.cep %}
+            {% include "partials/form_field.html" with field=form.logradouro %}
+        </div>
+        <div class="form-row">
+            {% include "partials/form_field.html" with field=form.numero %}
+            {% include "partials/form_field.html" with field=form.complemento %}
+        </div>
+        <div class="form-row form-row-3">
+            {% include "partials/form_field.html" with field=form.bairro %}
+            {% include "partials/form_field.html" with field=form.cidade %}
+            {% include "partials/form_field.html" with field=form.estado %}
+        </div>
+        {% include "partials/form_field.html" with field=form.endereco_principal %}
 
-                {% include "partials/form_field.html" with field=form.nome_endereco %}
-                <div class="form-row form-row-cep">
-                    {% include "partials/form_field.html" with field=form.cep %}
-                    {% include "partials/form_field.html" with field=form.logradouro %}
-                </div>
-                <div class="form-row">
-                    {% include "partials/form_field.html" with field=form.numero %}
-                    {% include "partials/form_field.html" with field=form.complemento %}
-                </div>
-                <div class="form-row form-row-3">
-                    {% include "partials/form_field.html" with field=form.bairro %}
-                    {% include "partials/form_field.html" with field=form.cidade %}
-                    {% include "partials/form_field.html" with field=form.estado %}
-                </div>
-                {% include "partials/form_field.html" with field=form.endereco_principal %}
-
-                <div class="form-actions">
-                    <a href="{% if next %}{{ next }}{% else %}{% url 'enderecos' %}{% endif %}" class="btn btn-outline">Cancelar</a>
-                    <span class="spacer"></span>
-                    <button type="submit" class="btn btn-accent">Salvar endereço</button>
-                </div>
-            </form>
-        </section>
-    </div>
-</div>
+        <div class="form-actions">
+            <a href="{% if next %}{{ next }}{% else %}{% url 'enderecos' %}{% endif %}" class="btn btn-outline">Cancelar</a>
+            <span class="spacer"></span>
+            <button type="submit" class="btn btn-accent">Salvar endereço</button>
+        </div>
+    </form>
 {% endblock %}
