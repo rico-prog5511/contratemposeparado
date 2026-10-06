@@ -3,7 +3,7 @@
 {% comment %}
 Layout das páginas curtas de autenticação (verificar e-mail, link
 inválido, recuperação de senha). As páginas filhas preenchem
-auth_icone, auth_eyebrow, auth_titulo e auth_corpo.
+auth_icone, auth_titulo e auth_corpo.
 {% endcomment %}
 
 {% block extra_css %}
@@ -16,7 +16,6 @@ auth_icone, auth_eyebrow, auth_titulo e auth_corpo.
         <div class="auth-card-icon" aria-hidden="true">{% block auth_icone %}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3,7 12,13 21,7"/></svg>
         {% endblock %}</div>
-        <span class="eyebrow">{% block auth_eyebrow %}{% endblock %}</span>
         <h1>{% block auth_titulo %}{% endblock %}</h1>
         {% block auth_corpo %}{% endblock %}
     </section>

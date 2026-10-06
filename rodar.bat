@@ -1,5 +1,5 @@
 @echo off
-rem Abre o Contratempo em http://127.0.0.1:8000 (feche esta janela para parar).
+rem Abre o contratempo em http://127.0.0.1:8000 (feche esta janela para parar).
 cd /d "%~dp0"
 if not exist "venv\Scripts\python.exe" (
     echo Rode o instalar.bat primeiro.

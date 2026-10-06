@@ -19,12 +19,9 @@ Depois de colocar o arquivo:
 Confira a licença da fonte antes de publicar o site.
 
 
-FONTES DO SITE (já estão aqui, não mexa)
-- fraunces.woff2, fraunces-italic.woff2 ... títulos (Fraunces)
-- work-sans.woff2 .......................... textos (Work Sans)
-- space-mono-400.woff2, space-mono-700.woff2  etiquetas e preços (Space Mono)
-
-Baixadas do Google Fonts (só o conjunto latino, que inclui os acentos
-do português) para o site não depender do Google para abrir mais rápido.
-As três são de licença livre (SIL Open Font License 1.1), que permite
-hospedá-las e distribuí-las junto com o site.
+FONTE DO RESTO DO SITE: Helvetica
+O site todo usa Helvetica ("Helvetica Neue", Helvetica, Arial). Ela NÃO
+fica nesta pasta: é uma fonte paga, então o site usa a que já vem no
+aparelho. No Mac/iPhone aparece a Helvetica; no Windows e em muitos
+Android, a Arial, que é quase idêntica. Para trocar a fonte do site,
+mude --font-helvetica em static/css/styles-retro.css.

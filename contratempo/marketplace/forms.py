@@ -1,7 +1,7 @@
 """
 marketplace/forms.py
 
-Formulários do Contratempo. Todos os campos correspondem aos Models de
+Formulários do contratempo. Todos os campos correspondem aos Models de
 marketplace/models.py — nenhum campo novo foi criado no banco.
 """
 

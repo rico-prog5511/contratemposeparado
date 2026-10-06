@@ -3,17 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="{% block meta_description %}Contratempo — marketplace de colecionáveis, itens retrô e cultura geek.{% endblock %}">
+    <meta name="description" content="{% block meta_description %}contratempo — marketplace de colecionáveis, itens retrô e cultura geek.{% endblock %}">
     <meta name="theme-color" content="#313170">
-    <title>{% block title %}Contratempo{% endblock %}</title>
-
-    {# Fontes do próprio site (declaradas em styles-retro.css); as 2 mais usadas já começam a baixar aqui #}
-    <link rel="preload" href="{% static 'fonts/work-sans.woff2' %}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{% static 'fonts/fraunces.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <title>{% block title %}contratempo{% endblock %}</title>
 
     <link rel="stylesheet" href="{% static 'css/styles-retro.css' %}">
     {% block extra_css %}{% endblock %}
-    <link rel="stylesheet" href="{% static 'css/teste-selecao.css' %}">{# TESTE: efeitos de seleção dos cards (qualquer página com ?testar-selecao). Apague esta linha e a do script para desfazer. #}
     <link rel="stylesheet" href="{% static 'css/acessibilidade.css' %}">
     {# Aplica as preferências de acessibilidade antes da página aparecer (sem "piscar") #}
     <script src="{% static 'js/acessibilidade.js' %}"></script>
@@ -38,7 +33,6 @@
     {% include "partials/vlibras.html" %}
 
     <script src="{% static 'js/main.js' %}"></script>
-    <script src="{% static 'js/teste-selecao.js' %}"></script>{# TESTE: efeitos de seleção dos cards #}
     {% block extra_js %}{% endblock %}
 </body>
 </html>

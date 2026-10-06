@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Contratempo — Colecionáveis, retrô e cultura geek{% endblock %}
+{% block title %}contratempo — Colecionáveis, retrô e cultura geek{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/home.css' %}">{% endblock %}
@@ -26,7 +26,6 @@
             {% endif %}
             <div class="container slide-inner">
                 <div class="slide-texto">
-                    <span class="slide-tag">Garimpo de colecionador</span>
                     <h2>Peças raras que <em>não voltam ao estoque.</em></h2>
                     <p>Cartas, consoles, vinis, HQs e action figures anunciados por colecionadores de todo o Brasil.</p>
                     <div class="cluster">
@@ -56,7 +55,6 @@
         <article class="carrossel-slide slide--azul" aria-roledescription="slide" aria-label="2 de 3">
             <div class="container slide-inner">
                 <div class="slide-texto">
-                    <span class="slide-tag">Marketplace de colecionáveis</span>
                     <h1>Colecionáveis que <em>atravessam o tempo.</em></h1>
                     <p>Action figures, cartas raras, HQs, vinis e peças vintage — compre de outros colecionadores ou anuncie o que está parado na sua estante.</p>
                     <div class="cluster">
@@ -79,7 +77,6 @@
         <article class="carrossel-slide slide--escuro" aria-roledescription="slide" aria-label="3 de 3">
             <div class="container slide-inner">
                 <div class="slide-texto">
-                    <span class="slide-tag">Compra tranquila</span>
                     <h2>Do clique até a <em>sua estante.</em></h2>
                     <p>Pague com Pix, boleto ou cartão, veja o frete pelo seu CEP antes de comprar e receba o código de rastreio por e-mail.</p>
                     <div class="cluster">
@@ -120,9 +117,9 @@
 <!-- VANTAGENS -->
 <section class="home-strip" aria-label="Como funciona">
     <div class="container home-strip-inner">
-        <div><span class="mono">01</span> Anuncie grátis em minutos</div>
-        <div><span class="mono">02</span> Pagamento por cartão, PIX ou boleto</div>
-        <div><span class="mono">03</span> Acompanhe cada pedido pela sua conta</div>
+        <div>Anuncie grátis em minutos</div>
+        <div>Pagamento por cartão, PIX ou boleto</div>
+        <div>Acompanhe cada pedido pela sua conta</div>
     </div>
 </section>
 
@@ -130,7 +127,6 @@
 <section class="container section home-vistos" aria-labelledby="vistos-titulo" data-vistos data-url="{% url 'produtos_vistos' %}" hidden>
     <div class="section-head">
         <div>
-            <span class="eyebrow">Continue de onde parou</span>
             <h2 id="vistos-titulo">Vistos recentemente</h2>
         </div>
         <button type="button" class="link-button" data-vistos-limpar>Limpar histórico</button>
@@ -142,7 +138,6 @@
 <section class="container section" aria-labelledby="faixas-titulo">
     <div class="section-head">
         <div>
-            <span class="eyebrow">Do seu jeito</span>
             <h2 id="faixas-titulo">Quanto você quer investir?</h2>
         </div>
         <a href="{% url 'produtos' %}" class="link-arrow">Ver todos →</a>
@@ -161,7 +156,7 @@
         </ul>
     {% else %}
         {% url 'anuncio_criar' as url_anunciar %}
-        {% include "partials/empty_state.html" with titulo="Nenhum produto por aqui ainda" texto="Seja a primeira pessoa a anunciar um colecionável na Contratempo." link_url=url_anunciar link_label="Criar anúncio" %}
+        {% include "partials/empty_state.html" with titulo="Nenhum produto por aqui ainda" texto="Seja a primeira pessoa a anunciar um colecionável na contratempo." link_url=url_anunciar link_label="Criar anúncio" %}
     {% endif %}
 </section>
 
@@ -170,7 +165,6 @@
 <section class="container section">
     <div class="section-head">
         <div>
-            <span class="eyebrow">Novidades</span>
             <h2>Chegou agora</h2>
         </div>
         <a href="{% url 'produtos' %}?ordenar=recentes" class="link-arrow">Ver todos →</a>
@@ -187,7 +181,6 @@
 <section class="container section" aria-labelledby="guia-titulo">
     <div class="section-head">
         <div>
-            <span class="eyebrow">Guia do colecionador</span>
             <h2 id="guia-titulo">Pra colecionar com segurança</h2>
         </div>
         <a href="{% url 'guia' %}" class="link-arrow">Todos os artigos →</a>
@@ -203,7 +196,6 @@
 <section class="container section">
     <div class="home-sell">
         <div>
-            <span class="eyebrow">Para colecionadores</span>
             <h2>Aquela peça parada na estante <em>merece um novo dono.</em></h2>
             <p>Crie seu anúncio com fotos, preço e estoque, e acompanhe tudo pela área de anúncios.</p>
         </div>

@@ -17,46 +17,9 @@
 .about-intro h1 {
     font-size: clamp(2.4rem, 6vw, 4.4rem);
     line-height: 1.02;
-    margin: 16px 0 18px;
+    margin: 0 0 18px;
 }
 .about-intro-text > p { font-size: 1.1rem; max-width: 560px; margin: 0; }
-
-.about-intro-number {
-    width: 150px;
-    height: 150px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 1.5px solid var(--cor-destaque);
-    border-radius: var(--radius);
-    transform: rotate(4deg);
-}
-.about-intro-number span { font-family: var(--font-display); font-size: 3.4rem; color: var(--txt-vermelho); line-height: 1; }
-.about-intro-number small { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.16em; color: var(--ink-muted); }
-
-/* RÓTULOS NUMERADOS */
-.about-label {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 32px;
-}
-.about-label span {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--txt-vermelho);
-}
-.about-label p {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    color: var(--ink);
-}
 
 /* HISTÓRIA */
 .about-story {
@@ -81,7 +44,6 @@
     border-top: var(--borda);
     border-bottom: var(--borda);
 }
-.about-values > .about-label,
 .about-values-header,
 .about-values-grid { max-width: calc(var(--container-width) - 2 * var(--gutter)); margin-left: auto; margin-right: auto; }
 .about-values-header {
@@ -105,8 +67,7 @@
     border-left: 1px dashed var(--line);
 }
 .about-value:first-child { border-left: 0; }
-.value-number { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--txt-vermelho); }
-.about-value h3 { margin: 44px 0 12px; font-size: 1.35rem; letter-spacing: 0.02em; }
+.about-value h3 { margin: 0 0 12px; font-size: 1.35rem; letter-spacing: 0.02em; }
 .about-value p { margin: 0; font-size: 0.95rem; }
 
 /* PROPOSTA */
@@ -199,15 +160,12 @@ body:has(.about-end) .site-footer { margin-top: 0; }
 
 @media (max-width: 860px) {
     .about-intro { flex-direction: column; align-items: flex-start; padding: 44px 28px; margin: 20px var(--gutter) 0; }
-    .about-intro-number { width: 110px; height: 110px; }
-    .about-intro-number span { font-size: 2.4rem; }
     .about-story-grid,
     .about-purpose { grid-template-columns: 1fr; gap: 40px; }
     .about-values-header { flex-direction: column; align-items: flex-start; }
     .about-values-grid { grid-template-columns: 1fr; }
     .about-value { border-left: 0; border-top: 1px dashed var(--line); min-height: 0; }
     .about-value:first-child { border-top: 0; }
-    .about-value h3 { margin-top: 20px; }
 }
 
 @media (max-width: 640px) {
@@ -233,4 +191,3 @@ body:has(.about-end) .site-footer { margin-top: 0; }
 .about-poster span,
 .about-poster strong { font-family: var(--font-marca); letter-spacing: -0.03em; }
 .about-poster span { font-size: 1.4rem; font-weight: 700; color: #fff; }
-.about-intro-number small { font-family: var(--font-marca); font-weight: 700; letter-spacing: 0; font-size: 0.8rem; }

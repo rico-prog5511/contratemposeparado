@@ -1,4 +1,4 @@
-# Contratempo
+# contratempo
 
 Marketplace de colecionáveis, itens retrô e cultura geek, feito com
 **Django 5.2** e **MySQL 8**. Qualquer usuário pode comprar e vender: anunciar

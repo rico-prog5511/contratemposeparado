@@ -1,7 +1,7 @@
 """
 marketplace/emails.py
 
-Envio de todos os e-mails do Contratempo e o token de confirmação de
+Envio de todos os e-mails do contratempo e o token de confirmação de
 cadastro. Os templates ficam em templates/emails/ e estendem
 emails/base.html (HTML com estilos inline, que é o que os clientes de
 e-mail entendem). A versão em texto puro é gerada automaticamente.
@@ -57,7 +57,7 @@ def enviar_email(request, assunto, template, contexto, para):
     texto = "\n".join(linha.strip() for linha in texto.splitlines() if linha.strip())
 
     mensagem = EmailMultiAlternatives(
-        subject=f"{assunto} | Contratempo",
+        subject=f"{assunto} | contratempo",
         body=texto,
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=destinatarios,

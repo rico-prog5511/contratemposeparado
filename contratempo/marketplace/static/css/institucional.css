@@ -11,7 +11,7 @@
 .inst-intro h1 {
     font-size: clamp(2.4rem, 6vw, 4.2rem);
     line-height: 1;
-    margin: 16px 0 16px;
+    margin: 0 0 16px;
 }
 .inst-intro p { max-width: 580px; font-size: 1.08rem; margin: 0; }
 
@@ -26,7 +26,7 @@
     padding-top: 56px;
     padding-bottom: 24px;
 }
-.contact-info h2 { font-size: clamp(2rem, 4vw, 2.8rem); margin: 12px 0 14px; }
+.contact-info h2 { font-size: clamp(2rem, 4vw, 2.8rem); margin: 0 0 14px; }
 .contact-info > p { max-width: 420px; margin-bottom: 32px; }
 .contact-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 20px; }
 .contact-item { display: flex; align-items: center; gap: 16px; }
@@ -118,7 +118,7 @@
     margin-bottom: 24px;
 }
 .error-code span { color: var(--txt-vermelho); font-style: italic; font-weight: 500; }
-.error-page h1 { font-size: clamp(1.8rem, 4.5vw, 2.6rem); margin: 10px 0 12px; }
+.error-page h1 { font-size: clamp(1.8rem, 4.5vw, 2.6rem); margin: 0 0 12px; }
 .error-page p { font-size: 1.02rem; }
 .error-search {
     display: flex;
@@ -225,8 +225,7 @@
     border-radius: var(--radius);
     color: #fff;
 }
-.faq-cta .eyebrow { color: var(--cor-fundo); }
-.faq-cta h2 { color: #fff; font-size: 1.8rem; margin: 6px 0; }
+.faq-cta h2 { color: #fff; font-size: 1.8rem; margin: 0 0 6px; }
 .faq-cta p { color: var(--cor-header-claro); }
 
 @media (max-width: 860px) {

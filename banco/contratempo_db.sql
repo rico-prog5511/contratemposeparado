@@ -528,7 +528,7 @@ INSERT INTO `perguntas_frequentes` (`tema`, `pergunta`, `resposta`, `ordem`) VAL
   ('vendas', 'Onde vejo minhas vendas?', 'Em Minha conta > Minhas vendas. Lá você vê o endereço de entrega de cada pedido, aprova o pagamento, marca como em preparação e informa o código de rastreio ao enviar. Você também recebe um e-mail a cada venda.', 13),
   ('vendas', 'Como respondo às perguntas dos compradores?', 'Em Minha conta > Perguntas recebidas, ou direto na página do seu anúncio. O comprador é avisado por e-mail quando você responde.', 14),
   ('seguranca', 'Meus dados de cartão ficam salvos?', 'Não. Guardamos apenas o tipo da forma de pagamento, a bandeira e os 4 últimos dígitos, para você identificar o cartão. Veja a Política de privacidade para mais detalhes.', 15),
-  ('seguranca', 'A Contratempo pede minha senha por e-mail?', 'Nunca. Nossos e-mails só trazem links para o próprio site. Se receber um pedido de senha, não responda e avise a gente pela página de contato.', 16);
+  ('seguranca', 'A contratempo pede minha senha por e-mail?', 'Nunca. Nossos e-mails só trazem links para o próprio site. Se receber um pedido de senha, não responda e avise a gente pela página de contato.', 16);
 
 -- =====================================================================
 -- 10. REGISTRO DAS MIGRATIONS DO DJANGO

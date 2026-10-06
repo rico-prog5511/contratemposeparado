@@ -2,7 +2,7 @@
 {% load static %}
 {% load marketplace_extras %}
 
-{% block title %}{{ produto.nome }} | Contratempo{% endblock %}
+{% block title %}{{ produto.nome }} | contratempo{% endblock %}
 {% block meta_description %}{{ produto.descricao|truncatechars:150 }}{% endblock %}
 
 {% block extra_css %}
@@ -89,7 +89,7 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 22V4a1 1 0 0 1 1-1h13l-2 5 2 5H5"/></svg>
                         Denunciar anúncio
                     </summary>
-                    <form action="{% url 'denunciar_produto' produto.id %}" method="post" class="report-form" data-confirm="A denúncia é analisada pela equipe da Contratempo. O vendedor não fica sabendo quem denunciou." data-confirm-title="Enviar denúncia?" data-confirm-ok="Enviar denúncia">
+                    <form action="{% url 'denunciar_produto' produto.id %}" method="post" class="report-form" data-confirm="A denúncia é analisada pela equipe da contratempo. O vendedor não fica sabendo quem denunciou." data-confirm-title="Enviar denúncia?" data-confirm-ok="Enviar denúncia">
                         {% csrf_token %}
                         <fieldset>
                             <legend class="form-label">Qual é o problema?</legend>
@@ -194,7 +194,7 @@
             <div>
                 <span class="eyebrow">Vendido por</span>
                 <h2><a href="{% url 'vendedor_perfil' produto.vendedor_id %}">{{ produto.vendedor.nome_completo }}</a></h2>
-                <p class="mb-0">Na Contratempo desde {{ produto.vendedor.data_cadastro|date:"F \d\e Y" }}</p>
+                <p class="mb-0">Na contratempo desde {{ produto.vendedor.data_cadastro|date:"F \d\e Y" }}</p>
             </div>
         </div>
         <dl class="seller-stats">
@@ -234,7 +234,6 @@
 <section class="container produto-perguntas" id="perguntas">
     <div class="section-head">
         <div>
-            <span class="eyebrow">Tire suas dúvidas</span>
             <h2>Perguntas ao vendedor</h2>
         </div>
     </div>
@@ -283,7 +282,6 @@
 <section class="container produto-avaliacoes" id="avaliacoes">
     <div class="section-head">
         <div>
-            <span class="eyebrow">Opiniões de quem comprou</span>
             <h2>Avaliações</h2>
         </div>
         {% if media_avaliacoes %}

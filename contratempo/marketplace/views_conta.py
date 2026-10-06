@@ -130,7 +130,7 @@ def confirmar_email(request, uidb64, token):
     usuario.email_confirmado = True
     usuario.save(update_fields=["email_confirmado"])
     login(request, usuario, backend="django.contrib.auth.backends.ModelBackend")
-    messages.success(request, "E-mail confirmado! Sua conta está ativa. Boas-vindas à Contratempo!")
+    messages.success(request, "E-mail confirmado! Sua conta está ativa. Boas-vindas à contratempo!")
     return redirect("perfil")
 
 

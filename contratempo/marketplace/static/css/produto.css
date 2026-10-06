@@ -424,7 +424,7 @@
     font-size: 0.88rem;
 }
 .frete-resultado strong { font-family: var(--font-mono); font-size: 1.05rem; color: #fff; }
-.frete-resultado span { display: block; color: var(--cor-fundo); font-size: 0.8rem; margin-top: 2px; }
+.frete-resultado span { display: block; color: var(--cor-header-claro); font-size: 0.8rem; margin-top: 2px; }
 .frete-erro {
     margin: 10px 0 0 !important;
     padding: 8px 12px;

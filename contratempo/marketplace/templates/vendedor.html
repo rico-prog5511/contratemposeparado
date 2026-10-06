@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% load static marketplace_extras %}
 
-{% block title %}{{ vendedor.nome_completo }} — Vendedor | Contratempo{% endblock %}
-{% block meta_description %}Anúncios e avaliações de {{ vendedor.nome_completo }} na Contratempo.{% endblock %}
+{% block title %}{{ vendedor.nome_completo }} — Vendedor | contratempo{% endblock %}
+{% block meta_description %}Anúncios e avaliações de {{ vendedor.nome_completo }} na contratempo.{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/produto.css' %}">
@@ -24,9 +24,8 @@
                 {% if vendedor.avatar %}<img src="{{ vendedor.avatar }}" alt="">{% else %}{{ vendedor.nome_completo|first|upper }}{% endif %}
             </span>
             <div>
-                <span class="eyebrow">Vendedor</span>
                 <h1>{{ vendedor.nome_completo }}</h1>
-                <p class="mb-0">Na Contratempo desde {{ vendedor.data_cadastro|date:"F \d\e Y" }}</p>
+                <p class="mb-0">Na contratempo desde {{ vendedor.data_cadastro|date:"F \d\e Y" }}</p>
             </div>
         </div>
         <dl class="seller-stats seller-stats-4">
@@ -97,7 +96,6 @@
         <section aria-label="Anúncios do vendedor">
             <div class="section-head">
                 <div>
-                    <span class="eyebrow">À venda</span>
                     <h2>Anúncios de {{ vendedor.nome_completo.split.0 }}</h2>
                 </div>
             </div>

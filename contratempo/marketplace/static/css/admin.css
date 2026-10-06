@@ -90,8 +90,9 @@ html[data-theme="light"],
     --object-tools-bg: #5F5C70;
     --object-tools-hover-bg: #313170;
 
-    --font-family-primary: "Work Sans", "Segoe UI", system-ui, Roboto, Arial, sans-serif;
-    --font-family-monospace: "Space Mono", ui-monospace, Menlo, Consolas, monospace;
+    /* Helvetica, como no resto do site (no Windows aparece a Arial) */
+    --font-family-primary: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-family-monospace: "Helvetica Neue", Helvetica, Arial, sans-serif;
     --ct-fonte-marca: "Adult Swim", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
     --ct-cartao-bg: #FFFFFF;

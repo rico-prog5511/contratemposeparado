@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static marketplace_extras %}
 
-{% block title %}{{ titulo }} | Contratempo{% endblock %}
+{% block title %}{{ titulo }} | contratempo{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/anuncios.css' %}">
@@ -15,7 +15,6 @@
         <section>
             <header class="page-header">
                 <div>
-                    <span class="eyebrow">Área do vendedor</span>
                     <h1>{{ titulo }}</h1>
                     {% if produto %}<p>{{ produto.nome }}</p>{% else %}<p>Quanto mais detalhes e fotos, mais fácil vender.</p>{% endif %}
                 </div>

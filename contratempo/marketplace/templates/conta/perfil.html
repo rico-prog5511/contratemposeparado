@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static marketplace_extras %}
 
-{% block title %}Minha conta | Contratempo{% endblock %}
+{% block title %}Minha conta | contratempo{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/conta.css' %}">
@@ -19,7 +19,6 @@
                     {% if user.avatar %}<img src="{{ user.avatar }}" alt="">{% else %}{{ user.nome_completo|first|upper }}{% endif %}
                 </div>
                 <div class="profile-hero-text">
-                    <span class="eyebrow">Minha conta</span>
                     <h1>Olá, {{ user.nome_completo.split.0 }}!</h1>
                     <p>Membro desde {{ user.data_cadastro|date:"F \d\e Y" }}</p>
                 </div>
@@ -99,7 +98,6 @@
 
             <section class="sell-banner">
                 <div>
-                    <span class="eyebrow">Área do vendedor</span>
                     <h2>Tem algo para vender?</h2>
                     <p class="mb-0">Crie anúncios, acompanhe vendas e controle o estoque.</p>
                 </div>

@@ -1,7 +1,7 @@
 """
 marketplace/admin.py
 
-Painel administrativo completo do Contratempo. Não há registro de
+Painel administrativo completo do contratempo. Não há registro de
 Favorito — a funcionalidade foi removida do projeto.
 """
 
@@ -43,8 +43,8 @@ from .models import (
 # APARÊNCIA GERAL (o tema visual fica em static/css/admin.css)
 # =====================================================================
 
-admin.site.site_header = "Contratempo"
-admin.site.site_title = "Contratempo — painel"
+admin.site.site_header = "contratempo"
+admin.site.site_title = "contratempo — painel"
 admin.site.index_title = "Painel de controle"
 admin.site.empty_value_display = "—"
 

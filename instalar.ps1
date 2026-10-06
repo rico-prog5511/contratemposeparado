@@ -1,4 +1,4 @@
-﻿# instalar.ps1 — prepara o Contratempo numa máquina nova (rode pelo instalar.bat).
+﻿# instalar.ps1 — prepara o contratempo numa máquina nova (rode pelo instalar.bat).
 # Pode ser executado de novo sem problema: pula o que já estiver pronto.
 #
 # Pré-requisitos: Python 3.10+ e MySQL Server 8 instalados.

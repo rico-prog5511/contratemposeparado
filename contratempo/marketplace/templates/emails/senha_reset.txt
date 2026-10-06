@@ -6,4 +6,4 @@ Abra o link abaixo para escolher a nova senha (vale por 3 dias e só funciona um
 {{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}
 
 Se não foi você, ignore este e-mail: sua senha atual continua valendo.
-A Contratempo nunca pede sua senha por e-mail.
+A contratempo nunca pede sua senha por e-mail.

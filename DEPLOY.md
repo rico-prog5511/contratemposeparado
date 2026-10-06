@@ -1,4 +1,4 @@
-# Publicar o Contratempo no PythonAnywhere
+# Publicar o contratempo no PythonAnywhere
 
 Guia passo a passo para colocar o site no ar, de graça, em
 `https://SEUUSUARIO.pythonanywhere.com`.

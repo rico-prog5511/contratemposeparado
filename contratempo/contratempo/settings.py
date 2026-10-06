@@ -271,7 +271,7 @@ elif EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-DEFAULT_FROM_EMAIL = f"Contratempo <{EMAIL_HOST_USER or 'nao-responda@contratempo.local'}>"
+DEFAULT_FROM_EMAIL = f"contratempo <{EMAIL_HOST_USER or 'nao-responda@contratempo.local'}>"
 
 # Validade dos links de confirmação de cadastro e de nova senha (3 dias).
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 3

@@ -1,7 +1,7 @@
 """
 marketplace/models.py
 
-Models do Contratempo mapeados para as tabelas já existentes em
+Models do contratempo mapeados para as tabelas já existentes em
 contratempo_db.sql. Todos usam managed = True: o Django é responsável
 por futuras migrations, e a tabela inicial criada pelo SQL é "adotada"
 via `migrate --fake-initial` (ver seção H do guia).
@@ -713,7 +713,7 @@ class PerguntaFrequente(models.Model):
         ("conta", "Conta e cadastro"),
         ("compras", "Compras e pagamento"),
         ("entrega", "Frete e entrega"),
-        ("vendas", "Vendendo na Contratempo"),
+        ("vendas", "Vendendo na contratempo"),
         ("seguranca", "Segurança e privacidade"),
     ]
 

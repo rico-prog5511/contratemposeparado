@@ -5,5 +5,5 @@
     <polyline points="120 160 200 204 280 160"/>
     <line x1="200" y1="204" x2="200" y2="284"/>
   </g>
-  <text x="200" y="330" text-anchor="middle" font-family="Space Mono, monospace" font-size="18" letter-spacing="3" fill="#787586">SEM IMAGEM</text>
+  <text x="200" y="330" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="700" font-size="18" letter-spacing="3" fill="#787586">SEM IMAGEM</text>
 </svg>

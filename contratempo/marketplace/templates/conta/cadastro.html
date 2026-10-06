@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Criar conta | Contratempo{% endblock %}
+{% block title %}Criar conta | contratempo{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/conta.css' %}">
@@ -21,7 +21,6 @@
         </div>
 
         <div class="auth-content">
-            <span class="eyebrow">Bem-vindo à Contratempo</span>
             <h1>Crie sua conta</h1>
             <p class="auth-lead">Já possui uma conta? <a href="{% url 'login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Entrar</a></p>
 

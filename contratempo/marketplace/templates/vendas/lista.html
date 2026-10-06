@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static marketplace_extras %}
 
-{% block title %}Minhas vendas | Contratempo{% endblock %}
+{% block title %}Minhas vendas | contratempo{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/compra.css' %}">
@@ -16,7 +16,6 @@
         <section>
             <header class="page-header">
                 <div>
-                    <span class="eyebrow">Área do vendedor</span>
                     <h1>Minhas vendas</h1>
                     {% if pendentes %}<p><strong>{{ pendentes }} pedido{{ pendentes|pluralize }}</strong> aguardando alguma ação sua.</p>{% endif %}
                 </div>

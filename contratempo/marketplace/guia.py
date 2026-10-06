@@ -21,7 +21,7 @@ ARTIGOS = [
     {
         "slug": "condicao-das-pecas",
         "titulo": "Novo, semi-novo ou usado?",
-        "resumo": "O que cada condição significa na Contratempo e como descrever o estado da sua peça.",
+        "resumo": "O que cada condição significa na contratempo e como descrever o estado da sua peça.",
         "assunto": "Anúncios",
         "minutos": 3,
     },

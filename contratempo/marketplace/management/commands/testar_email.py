@@ -58,8 +58,8 @@ class Command(BaseCommand):
 
         try:
             send_mail(
-                "Teste de e-mail | Contratempo",
-                "Se você recebeu esta mensagem, o envio de e-mails do Contratempo está funcionando.",
+                "Teste de e-mail | contratempo",
+                "Se você recebeu esta mensagem, o envio de e-mails do contratempo está funcionando.",
                 None,
                 [opcoes["destino"]],
             )

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{% if busca %}Busca: {{ busca }}{% elif categoria_atual %}{{ categoria_atual.nome }}{% else %}Produtos{% endif %} | Contratempo{% endblock %}
+{% block title %}{% if busca %}Busca: {{ busca }}{% elif categoria_atual %}{{ categoria_atual.nome }}{% else %}Produtos{% endif %} | contratempo{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/catalogo.css' %}">
@@ -12,7 +12,6 @@
 
     <header class="page-header">
         <div>
-            <span class="eyebrow">{% if busca %}Resultados da busca{% else %}Catálogo{% endif %}</span>
             <h1>
                 {% if busca %}“{{ busca }}”
                 {% elif vendedor_atual %}Anúncios de {{ vendedor_atual.nome_completo }}

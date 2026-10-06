@@ -1,7 +1,7 @@
 """
 banco/criar_banco.py — usado pelo instalar.bat
 
-Cria o banco do Contratempo a partir de banco/contratempo_db.sql, usando
+Cria o banco do contratempo a partir de banco/contratempo_db.sql, usando
 os dados de conexão do arquivo .env. Se o banco já existir, não mexe em
 nada (o `manage.py migrate` que roda depois aplica o que faltar).
 """

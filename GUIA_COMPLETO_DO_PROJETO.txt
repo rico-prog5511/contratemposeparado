@@ -10,7 +10,7 @@ Dica: no Bloco de Notas, use Ctrl+F para buscar um assunto, por exemplo
 "PEDIDOS" ou "/carrinho/".
 
 ÍNDICE
-   1. O que é o Contratempo
+   1. O que é o contratempo
    2. Tecnologias usadas
    3. Como o Django funciona (o caminho de uma página)
    4. Estrutura de pastas e arquivos
@@ -66,10 +66,12 @@ das denúncias, pelo painel /admin/.
   HTML + Django Templates  as páginas
   CSS puro ............. visual (sem Bootstrap), arquivos em static/css
   JavaScript puro ...... interatividade (sem jQuery), arquivos em static/js
-  Fontes ............... Fraunces (títulos), Work Sans (texto) e Space Mono
-                         (preços e rótulos), hospedadas no próprio site em
-                         marketplace/static/fonts/ (antes vinham do Google
-                         Fonts e atrasavam a abertura da página)
+  Fonte ................ Helvetica no site todo (títulos, textos, preços e
+                         rótulos), a que já vem no aparelho: no Windows
+                         aparece a Arial, quase idêntica. Trocar a fonte:
+                         --font-helvetica em static/css/styles-retro.css.
+                         O logo usa a Adult Swim, se o arquivo estiver em
+                         static/fonts/ (ver o LEIA-ME de lá)
   ViaCEP ............... serviço gratuito que preenche o endereço pelo CEP
   Gmail (SMTP) ......... envio dos e-mails
   GitHub ............... guarda o código (repositório)
@@ -989,7 +991,11 @@ cantos pouco arredondados, painel de compra em forma de ingresso.
 ARQUIVOS CSS:
   styles-retro.css .. sistema global: cores, botões, formulários, cards,
                       tabelas, cabeçalho, rodapé, abas, paginação,
-                      mensagens, sugestões da busca, responsividade
+                      mensagens, sugestões da busca, responsividade.
+                      Inclui o efeito único de seleção dos cards
+                      clicáveis ("elevação suave": sobem 4 px com sombra
+                      difusa ao passar o mouse ou focar com o teclado;
+                      sem subir para quem pediu menos movimento)
   home.css, catalogo.css, produto.css (inclui perfil do vendedor e
   denúncia), compra.css (carrinho, checkout, pedidos, vendas), conta.css,
   anuncios.css, institucional.css, sobre-nos.css

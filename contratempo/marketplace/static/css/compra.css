@@ -428,8 +428,7 @@
     box-shadow: 6px 6px 0 var(--cor-destaque);
     color: #fff;
 }
-.next-step .eyebrow { color: var(--cor-fundo); }
-.next-step h2 { color: #fff; font-size: 1.5rem; margin: 6px 0; }
+.next-step h2 { color: #fff; font-size: 1.5rem; margin: 0 0 6px; }
 .next-step p { color: var(--cor-header-claro); margin: 0; }
 .next-step-form { display: flex; flex-direction: column; gap: 8px; }
 .next-step-form .form-label { color: var(--cor-fundo); margin: 0; }

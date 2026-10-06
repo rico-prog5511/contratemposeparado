@@ -2,22 +2,22 @@
 {% comment %}Tabela de itens de um pedido, reutilizada nos e-mails.{% endcomment %}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 18px; border:1.5px solid #1B1A33; background:#FFFFFF; font-size:14px;">
     <tr>
-        <td colspan="2" style="padding:10px 14px; background:#313170; color:#FFFFFF; font-family:'Courier New', monospace; font-size:12px; font-weight:bold; letter-spacing:1px;">
+        <td colspan="2" style="padding:10px 14px; background:#313170; color:#FFFFFF; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; font-size:12px; font-weight:bold; letter-spacing:1px;">
             PEDIDO #{{ pedido.id }}{% if pedido.vendedor and mostrar_vendedor %} · VENDIDO POR {{ pedido.vendedor.nome_completo|upper }}{% endif %}
         </td>
     </tr>
     {% for item in pedido.itens.all %}
     <tr>
         <td style="padding:10px 14px; border-top:1px dashed #787586;">{{ item.quantidade }} × {{ item.nome_produto }}</td>
-        <td align="right" style="padding:10px 14px; border-top:1px dashed #787586; font-family:'Courier New', monospace; white-space:nowrap;">{{ item.subtotal|brl }}</td>
+        <td align="right" style="padding:10px 14px; border-top:1px dashed #787586; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; white-space:nowrap;">{{ item.subtotal|brl }}</td>
     </tr>
     {% endfor %}
     <tr>
         <td style="padding:8px 14px; border-top:1px dashed #787586; color:#545166;">Frete{% if pedido.prazo_entrega_dias %} ({{ pedido.prazo_entrega_dias }} dias úteis){% endif %}</td>
-        <td align="right" style="padding:8px 14px; border-top:1px dashed #787586; font-family:'Courier New', monospace; color:#545166; white-space:nowrap;">{{ pedido.valor_frete|brl }}</td>
+        <td align="right" style="padding:8px 14px; border-top:1px dashed #787586; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; color:#545166; white-space:nowrap;">{{ pedido.valor_frete|brl }}</td>
     </tr>
     <tr>
         <td style="padding:10px 14px; border-top:1.5px solid #1B1A33; font-weight:bold;">Total</td>
-        <td align="right" style="padding:10px 14px; border-top:1.5px solid #1B1A33; font-family:'Courier New', monospace; font-weight:bold; color:#6D191D; white-space:nowrap;">{{ pedido.valor_total|brl }}</td>
+        <td align="right" style="padding:10px 14px; border-top:1.5px solid #1B1A33; font-family:'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight:bold; color:#6D191D; white-space:nowrap;">{{ pedido.valor_total|brl }}</td>
     </tr>
 </table>

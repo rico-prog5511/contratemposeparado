@@ -44,55 +44,8 @@
     font-display: swap;
 }
 
-/* Fontes do site, hospedadas aqui (antes vinham do Google Fonts e travavam
-   o carregamento da página). Licença livre (SIL Open Font License).
-   Só o conjunto latino (inclui todos os acentos do português).
-   font-display: swap = o texto aparece na hora com a fonte do sistema e
-   troca quando a fonte carrega. As duas principais são pré-carregadas no
-   <head> (base.html). */
-@font-face {
-    font-family: "Fraunces";
-    font-style: normal;
-    font-weight: 500 600;
-    font-display: swap;
-    src: url("../fonts/fraunces.woff2") format("woff2");
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-    font-family: "Fraunces";
-    font-style: italic;
-    font-weight: 500;
-    font-display: swap;
-    src: url("../fonts/fraunces-italic.woff2") format("woff2");
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-    font-family: "Space Mono";
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url("../fonts/space-mono-400.woff2") format("woff2");
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-    font-family: "Space Mono";
-    font-style: normal;
-    font-weight: 700;
-    font-display: swap;
-    src: url("../fonts/space-mono-700.woff2") format("woff2");
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-    font-family: "Work Sans";
-    font-style: normal;
-    font-weight: 400 600;
-    font-display: swap;
-    src: url("../fonts/work-sans.woff2") format("woff2");
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
 :root {
-    /* Cores oficiais do Contratempo */
+    /* Cores oficiais do contratempo */
     --cor-header: #313170;
     --cor-fundo: #ACA9BB;
     --cor-secundaria: #787586;
@@ -133,10 +86,14 @@
     --color-danger: var(--cor-destaque);
     --color-success: var(--cor-header);
 
-    /* Tipografia */
-    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
-    --font-body: "Work Sans", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    --font-mono: "Space Mono", ui-monospace, "Courier New", monospace;
+    /* Tipografia: Helvetica no site todo. Ela não vem no Windows (lá o
+       navegador usa a Arial, quase idêntica) e é paga, por isso não é
+       hospedada aqui: usa a do aparelho. Os três nomes continuam existindo
+       (títulos, textos e etiquetas) para dar para trocar uma só no futuro. */
+    --font-helvetica: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-display: var(--font-helvetica);
+    --font-body: var(--font-helvetica);
+    --font-mono: var(--font-helvetica);
     --font-heading: var(--font-display);
     --font-marca: "Adult Swim", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
@@ -149,7 +106,8 @@
     --shadow-soft: 0 10px 30px rgba(27, 26, 51, 0.18);
     /* Cards de produto: sem borda, com sombra suave ao redor */
     --sombra-produto: 0 1px 2px rgba(27, 26, 51, 0.06), 0 4px 18px rgba(27, 26, 51, 0.1);
-    --sombra-produto-hover: 0 2px 4px rgba(27, 26, 51, 0.08), 0 14px 32px rgba(27, 26, 51, 0.18);
+    /* "Elevação suave": sombra de todos os cards clicáveis ao passar o mouse ou focar */
+    --sombra-elevacao: 0 12px 26px rgba(27, 26, 51, 0.2);
 
     /* Medidas */
     --header-height: 72px;
@@ -183,7 +141,7 @@
     --shadow-hover: 7px 7px 0 var(--cor-acento);
     /* no escuro a sombra some no fundo: um contorno de luz bem fraco separa o card */
     --sombra-produto: 0 0 0 1px rgba(236, 235, 243, 0.08), 0 6px 22px rgba(0, 0, 0, 0.45);
-    --sombra-produto-hover: 0 0 0 1px rgba(236, 235, 243, 0.14), 0 14px 36px rgba(0, 0, 0, 0.6);
+    --sombra-elevacao: 0 12px 26px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--borda-azul);
 }
 
 
@@ -321,13 +279,12 @@ textarea {
 }
 .page-header h1 {
     font-size: clamp(1.9rem, 4vw, 2.6rem);
-    margin: 6px 0 0;
+    margin: 0;
 }
 .page-header p { margin: 8px 0 0; max-width: 620px; }
 .page-header-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 
-.eyebrow,
-.about-kicker {
+.eyebrow {
     display: inline-block;
     font-family: var(--font-mono);
     font-size: 0.72rem;
@@ -348,7 +305,7 @@ textarea {
     gap: 8px 16px;
     margin-bottom: 20px;
 }
-.section-head h2 { font-size: clamp(1.4rem, 3vw, 1.8rem); margin: 4px 0 0; }
+.section-head h2 { font-size: clamp(1.4rem, 3vw, 1.8rem); margin: 0; }
 
 .link-arrow {
     font-family: var(--font-mono);
@@ -955,10 +912,30 @@ textarea {
     flex-direction: column;
     transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
-.product-card:hover,
-.product-card:focus-within {
-    transform: translateY(-3px);
-    box-shadow: var(--sombra-produto-hover);
+/* Efeito de seleção de TODOS os cards clicáveis: "elevação suave".
+   Ao passar o mouse ou focar com o teclado (focus-within: o foco está num
+   link/botão de dentro do card), o card sobe um pouco, ganha sombra difusa
+   e a borda fica azul. Vale para produtos, faixas de preço (home),
+   categorias, artigos do guia, resumo da conta e opções do checkout — a
+   opção já escolhida no checkout mantém o próprio visual. */
+:is(.product-card, .home-faixa, .category-card, .guia-card, .stat-card, .option-card) {
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+:is(.product-card, .home-faixa, .category-card, .guia-card, .stat-card,
+    .option-card:not(.option-card--off):not(:has(input:checked))):is(:hover, :focus-within) {
+    transform: translateY(-4px);
+    border-color: var(--borda-azul);
+    box-shadow: var(--sombra-elevacao);
+}
+/* Quem pediu menos movimento (sistema ou painel de acessibilidade): só a sombra, sem subir.
+   Mesma lista de seletores da regra acima + "html", para ter prioridade sobre ela. */
+@media (prefers-reduced-motion: reduce) {
+    html :is(.product-card, .home-faixa, .category-card, .guia-card, .stat-card,
+             .option-card:not(.option-card--off):not(:has(input:checked))):is(:hover, :focus-within) { transform: none; }
+}
+html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .guia-card, .stat-card,
+                                  .option-card:not(.option-card--off):not(:has(input:checked))):is(:hover, :focus-within) {
+    transform: none;
 }
 .product-card .product-image {
     position: relative;
@@ -1535,7 +1512,6 @@ textarea {
     cursor: pointer;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-.option-card:hover { border-color: var(--borda-azul); }
 .option-card input[type="radio"] {
     width: 18px;
     height: 18px;
@@ -1569,7 +1545,6 @@ textarea {
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .guia-card:nth-child(3n + 2) { border-top-color: var(--cor-destaque); }
-.guia-card:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-card); }
 .guia-card-assunto {
     font-family: var(--font-mono);
     font-size: 0.68rem;

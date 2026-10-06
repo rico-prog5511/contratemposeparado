@@ -71,7 +71,7 @@
     background: linear-gradient(90deg, rgba(18, 10, 14, 0.9) 0%, rgba(18, 10, 14, 0.75) 50%, rgba(18, 10, 14, 0.25) 100%);
 }
 .slide--foto .slide-inner { position: relative; z-index: 2; }
-.slide--foto .slide-texto :is(h2, p, .slide-tag) { text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45); }
+.slide--foto .slide-texto :is(h2, p) { text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45); }
 
 .slide-inner {
     display: grid;
@@ -80,23 +80,12 @@
     gap: 48px;
 }
 .slide-texto { max-width: 640px; }
-.slide-tag {
-    display: inline-block;
-    padding: 5px 12px;
-    border: 1.5px solid rgba(255, 255, 255, 0.55);
-    border-radius: var(--radius-pill);
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-}
 .slide-texto h1,
 .slide-texto h2 {
     color: #fff;
     font-size: clamp(2.2rem, 5vw, 3.7rem);
     line-height: 1.03;
-    margin: 18px 0 16px;
+    margin: 0 0 16px;
     max-width: 15ch;
 }
 .slide-texto h1 em,
@@ -288,7 +277,6 @@
     border-left: 1px dashed var(--line);
 }
 .home-strip-inner > div:first-child { border-left: 0; padding-left: 0; }
-.home-strip-inner .mono { color: var(--txt-vermelho); font-weight: 700; margin-right: 8px; }
 
 /* =====================================================================
    FAIXAS DE PREÇO
@@ -313,8 +301,6 @@
     color: var(--ink);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.home-faixa:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-card); }
-.home-faixas li:nth-child(even) .home-faixa:hover { box-shadow: var(--shadow-hover); }
 .home-faixa-intervalo { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; color: var(--txt-vermelho); }
 .home-faixa strong { margin-top: 18px; font-family: var(--font-display); font-size: 1.35rem; font-weight: 600; line-height: 1.15; }
 .home-faixa-total { font-size: 0.85rem; color: var(--ink-muted); }

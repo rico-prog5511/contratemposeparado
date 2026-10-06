@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name='PerguntaFrequente',
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('tema', models.CharField(choices=[('conta', 'Conta e cadastro'), ('compras', 'Compras e pagamento'), ('entrega', 'Frete e entrega'), ('vendas', 'Vendendo na Contratempo'), ('seguranca', 'Segurança e privacidade')], max_length=15)),
+                ('tema', models.CharField(choices=[('conta', 'Conta e cadastro'), ('compras', 'Compras e pagamento'), ('entrega', 'Frete e entrega'), ('vendas', 'Vendendo na contratempo'), ('seguranca', 'Segurança e privacidade')], max_length=15)),
                 ('pergunta', models.CharField(max_length=200)),
                 ('resposta', models.TextField()),
                 ('ordem', models.PositiveSmallIntegerField(default=0)),

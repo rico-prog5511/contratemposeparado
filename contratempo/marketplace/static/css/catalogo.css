@@ -162,10 +162,7 @@
     border-radius: var(--radius);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.category-card:hover { transform: translate(-3px, -3px); box-shadow: var(--shadow-card); }
-.category-card:nth-child(3n + 2):hover { box-shadow: var(--shadow-hover); }
-.category-card-index { font-size: 0.75rem; font-weight: 700; color: var(--txt-vermelho); }
-.category-card h2 { font-size: 1.45rem; margin: 8px 0 0; }
+.category-card h2 { font-size: 1.45rem; margin: 0; }
 .category-card p { font-size: 0.88rem; margin: 0; }
 .category-card-count {
     margin-top: auto;

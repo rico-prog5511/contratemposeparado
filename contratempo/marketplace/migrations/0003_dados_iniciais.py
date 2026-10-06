@@ -65,7 +65,7 @@ FAQ = [
     ("seguranca", "Meus dados de cartão ficam salvos?",
      "Não. Guardamos apenas o tipo da forma de pagamento, a bandeira e os 4 últimos dígitos, para você "
      "identificar o cartão. Veja a Política de privacidade para mais detalhes."),
-    ("seguranca", "A Contratempo pede minha senha por e-mail?",
+    ("seguranca", "A contratempo pede minha senha por e-mail?",
      "Nunca. Nossos e-mails só trazem links para o próprio site. Se receber um pedido de senha, não responda e "
      "avise a gente pela página de contato."),
 ]

@@ -1,23 +1,20 @@
 {% extends "admin/base.html" %}
 {% load static %}
 {% comment %}
-Tema do painel administrativo do Contratempo. Fica em contratempo/templates/
+Tema do painel administrativo do contratempo. Fica em contratempo/templates/
 (TEMPLATES["DIRS"]), que tem prioridade sobre os templates do próprio admin.
 Cores, fontes e acessibilidade: static/css/admin.css.
 {% endcomment %}
 
-{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:"Contratempo" }}{% endblock %}
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:"contratempo" }}{% endblock %}
 
 {% block extrastyle %}{{ block.super }}
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Work+Sans:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="{% static 'css/admin.css' %}">
 {% endblock %}
 
 {% block branding %}
 <div id="site-name">
-    <a href="{% url 'admin:index' %}" class="ct-marca" aria-label="Contratempo — painel administrativo">
+    <a href="{% url 'admin:index' %}" class="ct-marca" aria-label="contratempo — painel administrativo">
         {% include "partials/marca.html" %}<span class="ct-marca-painel">painel</span>
     </a>
 </div>

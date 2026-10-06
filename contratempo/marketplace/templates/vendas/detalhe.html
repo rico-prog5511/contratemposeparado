@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static marketplace_extras %}
 
-{% block title %}Venda #{{ pedido.id }} | Contratempo{% endblock %}
+{% block title %}Venda #{{ pedido.id }} | contratempo{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/compra.css' %}">
@@ -26,7 +26,6 @@
             {% if proximo_status %}
                 <section class="next-step">
                     <div class="next-step-text">
-                        <span class="eyebrow">Próximo passo</span>
                         {% if proximo_status == "pagamento_aprovado" %}
                             <h2>Confirme o pagamento</h2>
                             <p>Marque quando o pagamento de {{ pedido.valor_total|brl }} ({{ pedido.forma_pagamento_snapshot }}) estiver confirmado.</p>

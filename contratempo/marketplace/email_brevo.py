@@ -9,7 +9,7 @@ por HTTPS — api.brevo.com está na lista de sites liberados do plano grátis
 — e envia até 300 e-mails/dia de graça.
 
 Como ligar: coloque BREVO_API_KEY no .env (ver .env.exemplo). O remetente
-continua sendo DEFAULT_FROM_EMAIL ("Contratempo <EMAIL_HOST_USER>"), e esse
+continua sendo DEFAULT_FROM_EMAIL ("contratempo <EMAIL_HOST_USER>"), e esse
 endereço precisa estar confirmado no Brevo (Senders, domains & IPs).
 Sem a chave, o site segue usando o Gmail/terminal como antes.
 
