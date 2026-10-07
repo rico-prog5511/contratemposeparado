@@ -1,16 +1,3 @@
-"""
-marketplace/views_checkout.py
-
-Fluxo de compra em 3 etapas (endereço → pagamento → revisão) e a área
-"Meus pedidos" do comprador. As escolhas de endereço e pagamento ficam
-na sessão até a confirmação; os pedidos só são criados no POST da
-revisão, dentro de uma transação que trava o estoque (select_for_update).
-
-A compra é dividida em UM pedido por vendedor. Cada pedido tem o frete
-da UF de entrega (tabela TabelaFrete) e é enviado e atualizado pelo
-próprio vendedor (ver views_vendas.py).
-"""
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -27,10 +14,9 @@ from .models import Avaliacao, Carrinho, ItemPedido, Pedido, Produto
 from .views import itens_do_carrinho, validar_itens_carrinho
 
 SESSAO_ENDERECO = "checkout_endereco_id"
-SESSAO_PAGAMENTO = "checkout_pagamento_id"  # id do cartão, "pix" ou "boleto"
+SESSAO_PAGAMENTO = "checkout_pagamento_id"
 SESSAO_PEDIDOS = "checkout_pedidos_criados"
 
-# Formas que não precisam de cadastro: são escolhidas direto no checkout.
 OPCOES_SEM_CADASTRO = {
     "pix": ("PIX", "Pagamento instantâneo pelo app do seu banco."),
     "boleto": ("Boleto", "Compensação em até 3 dias úteis."),
@@ -50,10 +36,6 @@ class CheckoutInvalido(Exception):
 
 
 def _carrinho_para_checkout(request):
-    """
-    Devolve (carrinho, itens, redirect). O redirect vem preenchido se o
-    carrinho não puder seguir (vazio ou com itens indisponíveis).
-    """
     carrinho = Carrinho.objects.filter(usuario=request.user, status="ativo").first()
     itens = itens_do_carrinho(carrinho)
     if not itens:
@@ -93,11 +75,6 @@ def _breadcrumbs_checkout(etapa):
 
 
 def _pagamento_escolhido(usuario, valor):
-    """
-    Interpreta a escolha de pagamento (id do cartão, "pix" ou "boleto").
-    Devolve (cartão ou None, texto que vai para o pedido). O texto é None
-    se a escolha for inválida — cartão de outra pessoa, apagado ou vencido.
-    """
     if valor in OPCOES_SEM_CADASTRO:
         return None, OPCOES_SEM_CADASTRO[valor][0]
     if not str(valor).isdigit():
@@ -109,14 +86,11 @@ def _pagamento_escolhido(usuario, valor):
 
 
 def _endereco_da_sessao(request):
-    """Endereço escolhido na etapa 1, desde que a UF tenha frete."""
     endereco = request.user.enderecos.filter(pk=request.session.get(SESSAO_ENDERECO)).first()
     if endereco and faixa_para_uf(endereco.estado) is None:
         return None
     return endereco
 
-
-# ===== CHECKOUT =====
 
 @login_required
 def checkout_endereco(request):
@@ -178,7 +152,6 @@ def checkout_pagamento(request):
         else:
             selecionado = escolha
             if cartao:
-                # O CVV é conferido e descartado: nunca vai para a sessão nem para o banco.
                 try:
                     validar_cvv(request.POST.get("cvv"), cartao.bandeira)
                 except ValidationError as erro:
@@ -240,10 +213,6 @@ def checkout_revisao(request):
 
 @transaction.atomic
 def _criar_pedidos(usuario, carrinho, itens, endereco, cartao, rotulo_pagamento):
-    """
-    Cria um pedido por vendedor. Qualquer problema desfaz tudo.
-    `cartao` é None quando o pagamento é PIX ou boleto.
-    """
     faixa = faixa_para_uf(endereco.estado)
     if faixa is None:
         raise CheckoutInvalido(f"Ainda não entregamos em {endereco.estado}. Escolha outro endereço.")
@@ -303,8 +272,6 @@ def _criar_pedidos(usuario, carrinho, itens, endereco, cartao, rotulo_pagamento)
     return pedidos
 
 
-# ===== PEDIDOS DO COMPRADOR =====
-
 def _pedido_do_usuario(request, pedido_id):
     return get_object_or_404(
         Pedido.objects.select_related("vendedor").prefetch_related("itens__produto__imagens"),
@@ -313,7 +280,6 @@ def _pedido_do_usuario(request, pedido_id):
 
 
 def devolver_estoque(pedido):
-    """Devolve ao estoque as unidades de um pedido cancelado."""
     for item in pedido.itens.select_related("produto"):
         if item.produto_id is None:
             continue
@@ -459,7 +425,7 @@ def avaliar_produto(request, pedido_id, produto_id):
         comentario=form.cleaned_data["comentario"] or None,
     )
     try:
-        avaliacao.full_clean()  # aplica a regra "só avalia quem recebeu"
+        avaliacao.full_clean()
     except ValidationError as erro:
         messages.error(request, " ".join(erro.messages))
         return redirect("pedido_detalhe", pedido_id=pedido.id)

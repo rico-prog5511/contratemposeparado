@@ -1,10 +1,5 @@
 {% extends "admin/base.html" %}
 {% load static %}
-{% comment %}
-Tema do painel administrativo do contratempo. Fica em contratempo/templates/
-(TEMPLATES["DIRS"]), que tem prioridade sobre os templates do próprio admin.
-Cores, fontes e acessibilidade: static/css/admin.css.
-{% endcomment %}
 
 {% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:"contratempo" }}{% endblock %}
 

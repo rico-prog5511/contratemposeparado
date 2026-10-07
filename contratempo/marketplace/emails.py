@@ -1,15 +1,3 @@
-"""
-marketplace/emails.py
-
-Envio de todos os e-mails do contratempo e o token de confirmação de
-cadastro. Os templates ficam em templates/emails/ e estendem
-emails/base.html (HTML com estilos inline, que é o que os clientes de
-e-mail entendem). A versão em texto puro é gerada automaticamente.
-
-Uma falha de envio NUNCA derruba a ação do usuário (compra, pergunta,
-mudança de status): o erro vai para o log e a função devolve False.
-"""
-
 import logging
 import smtplib
 import socket
@@ -28,11 +16,6 @@ logger = logging.getLogger(__name__)
 
 
 class ConfirmacaoEmailTokenGenerator(PasswordResetTokenGenerator):
-    """
-    Token do link de confirmação de cadastro. Inclui `email_confirmado`
-    no hash, então o link deixa de valer assim que for usado. Expira em
-    settings.PASSWORD_RESET_TIMEOUT.
-    """
 
     key_salt = "marketplace.emails.ConfirmacaoEmailTokenGenerator"
 
@@ -44,7 +27,6 @@ token_confirmacao = ConfirmacaoEmailTokenGenerator()
 
 
 def enviar_email(request, assunto, template, contexto, para):
-    """Renderiza templates/emails/<template>.html e envia para `para`."""
     destinatarios = [para] if isinstance(para, str) else list(para)
     contexto = {
         **contexto,
@@ -53,7 +35,6 @@ def enviar_email(request, assunto, template, contexto, para):
     }
     html = render_to_string(f"emails/{template}.html", contexto, request=request)
     texto = strip_tags(html)
-    # strip_tags deixa muitas linhas em branco; compacta o texto puro.
     texto = "\n".join(linha.strip() for linha in texto.splitlines() if linha.strip())
 
     mensagem = EmailMultiAlternatives(
@@ -65,7 +46,7 @@ def enviar_email(request, assunto, template, contexto, para):
     mensagem.attach_alternative(html, "text/html")
     try:
         mensagem.send()
-    except Exception as erro:  # SMTP fora do ar, credencial errada, etc.
+    except Exception as erro:
         logger.error(
             "Falha ao enviar e-mail '%s' para %s: %s: %s\n  -> %s",
             assunto, destinatarios, type(erro).__name__, erro, explicar_erro_email(erro),
@@ -75,7 +56,6 @@ def enviar_email(request, assunto, template, contexto, para):
 
 
 def explicar_erro_email(erro):
-    """Tradução, para quem administra o site, dos erros mais comuns do Gmail e do Brevo."""
     from .email_brevo import BrevoErro
 
     if isinstance(erro, BrevoErro):
@@ -111,8 +91,6 @@ def explicar_erro_email(erro):
     return "Rode `python manage.py testar_email seu@email.com` para diagnosticar."
 
 
-# ----- CONTA -----
-
 def enviar_confirmacao_cadastro(request, usuario):
     uid = urlsafe_base64_encode(force_bytes(usuario.pk))
     link = request.build_absolute_uri(
@@ -122,8 +100,6 @@ def enviar_confirmacao_cadastro(request, usuario):
         "usuario": usuario, "link": link,
     }, usuario.email)
 
-
-# ----- PEDIDOS -----
 
 def _url(request, nome, *args):
     return request.build_absolute_uri(reverse(nome, args=args))
@@ -145,7 +121,6 @@ def enviar_aviso_venda(request, pedido):
 
 
 def enviar_atualizacao_pedido(request, pedido):
-    """Avisa o comprador sobre a mudança de status do pedido."""
     return enviar_email(request, f"Pedido #{pedido.id}: {pedido.get_status_pedido_display().lower()}",
                         "pedido_atualizado", {
                             "pedido": pedido, "usuario": pedido.usuario,
@@ -159,8 +134,6 @@ def enviar_cancelamento_ao_vendedor(request, pedido):
         "link": _url(request, "venda_detalhe", pedido.id),
     }, pedido.vendedor.email)
 
-
-# ----- PERGUNTAS -----
 
 def enviar_nova_pergunta(request, pergunta):
     vendedor = pergunta.produto.vendedor

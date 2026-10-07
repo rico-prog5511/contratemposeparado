@@ -1,11 +1,3 @@
-/* static/js/upload.js — pré-visualização de imagens antes do envio
- *
- *   [data-avatar-preview]      troca a foto de perfil ao escolher um arquivo
- *   [data-upload-preview]      lista miniaturas das imagens novas do anúncio
- *                              (o input fica dentro de [data-upload-area])
- *   [data-remove-image]        checkbox "remover" marca a miniatura existente
- */
-
 document.addEventListener("DOMContentLoaded", function () {
 
     function lerImagem(arquivo, callback) {
@@ -15,7 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
         leitor.readAsDataURL(arquivo);
     }
 
-    /* Foto de perfil */
     var avatar = document.querySelector("[data-avatar-preview]");
     if (avatar) {
         var inputAvatar = document.querySelector("input[type='file'][name='avatar_arquivo']");
@@ -32,14 +23,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    /* Imagens do anúncio
-     *
-     * O campo de arquivo do navegador TROCA a seleção a cada escolha. Para
-     * dar para adicionar fotos aos poucos (uma por vez, várias juntas ou
-     * arrastando), as fotos escolhidas ficam numa lista aqui e o campo é
-     * remontado com todas elas (DataTransfer) a cada mudança. Cada miniatura
-     * tem um botão para tirar a foto antes de enviar.
-     */
     var area = document.querySelector("[data-upload-area]");
     var lista = document.querySelector("[data-upload-preview]");
     if (area && lista) {
@@ -139,18 +122,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
         inputImagens.addEventListener("change", function () {
             if (!acumula) {
-                // Navegador antigo: sem como somar seleções; mostra só a escolha atual.
                 selecionadas = Array.prototype.slice.call(inputImagens.files);
                 desenhar();
                 lista.querySelectorAll(".upload-thumb-remover").forEach(function (b) { b.remove(); });
                 avisar("Dica: segure Ctrl (ou Cmd) para escolher várias fotos de uma vez. " + resumo());
                 return;
             }
-            // Aqui inputImagens.files tem só a escolha NOVA: soma à lista.
             adicionar(inputImagens.files);
         });
 
-        // Arrastar e soltar sobre a área
         ["dragenter", "dragover"].forEach(function (ev) {
             area.addEventListener(ev, function (e) { e.preventDefault(); area.classList.add("dragging"); });
         });
@@ -168,7 +148,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // Marcar/desmarcar "remover" numa foto já salva muda quantas novas cabem.
         document.querySelectorAll("[data-remove-image]").forEach(function (checkbox) {
             checkbox.addEventListener("change", function () {
                 desenhar();
@@ -177,7 +156,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    /* Imagens existentes marcadas para remoção */
     document.querySelectorAll("[data-remove-image]").forEach(function (checkbox) {
         var card = checkbox.closest(".image-manage-item");
         checkbox.addEventListener("change", function () {

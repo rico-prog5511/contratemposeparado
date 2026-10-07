@@ -12,7 +12,6 @@
 {% block content %}
 <div class="container produto-page">
 
-    <!-- GALERIA -->
     <div class="produto-galeria {% if imagens|length > 1 %}com-miniaturas{% endif %}">
         {% if imagens|length > 1 %}
         <div class="produto-miniaturas" role="list" aria-label="Imagens do produto">
@@ -38,7 +37,6 @@
         </div>
     </div>
 
-    <!-- INFORMAÇÕES -->
     <div class="produto-info">
         <div class="cluster">
             <span class="badge badge--{{ produto.condicao }}">{{ produto.get_condicao_display }}</span>
@@ -107,7 +105,6 @@
         {% endif %}
     </div>
 
-    <!-- PAINEL DE COMPRA -->
     <aside class="buy-panel" aria-label="Comprar">
         {% if eh_dono %}
             <span class="eyebrow">Seu anúncio</span>
@@ -155,7 +152,6 @@
             {% endif %}
         {% endif %}
 
-        <!-- CALCULADORA DE FRETE -->
         <div class="frete-calc" id="frete">
             <form method="get" action="{{ request.path }}#frete" class="frete-form">
                 <label for="cep-frete" class="form-label">Calcular frete</label>
@@ -184,7 +180,6 @@
     </aside>
 </div>
 
-<!-- VENDEDOR -->
 <section class="container seller-section">
     <div class="seller-card">
         <div class="seller-id">
@@ -230,7 +225,6 @@
     {% endif %}
 </section>
 
-<!-- PERGUNTAS -->
 <section class="container produto-perguntas" id="perguntas">
     <div class="section-head">
         <div>
@@ -278,7 +272,6 @@
     {% endif %}
 </section>
 
-<!-- AVALIAÇÕES -->
 <section class="container produto-avaliacoes" id="avaliacoes">
     <div class="section-head">
         <div>
@@ -307,7 +300,6 @@
     {% endif %}
 </section>
 
-<!-- RELACIONADOS -->
 {% if produtos_relacionados %}
 <section class="container section">
     <div class="section-head">
@@ -325,7 +317,6 @@
 </section>
 {% endif %}
 
-<!-- LIGHTBOX (galeria ampliada) -->
 {% if imagens %}
 <dialog class="lightbox" id="lightbox" aria-label="Imagens de {{ produto.nome }}">
     <button type="button" class="lightbox-close" data-lightbox-close aria-label="Fechar">&times;</button>

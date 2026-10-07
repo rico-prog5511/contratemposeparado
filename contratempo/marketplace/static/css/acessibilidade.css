@@ -1,35 +1,15 @@
-/* =====================================================================
-   static/css/acessibilidade.css
-   Modos ativados pelo painel de acessibilidade (atributos no <html>,
-   definidos por static/js/acessibilidade.js) e o próprio painel.
-   Carregado por último em base.html, para valer sobre os demais CSS.
-
-   01. Tamanho do texto
-   02. Alto contraste
-   03. Fonte para dislexia
-   04. Destacar links
-   05. Mais espaçamento
-   06. Pausar animações
-   07. Botão e painel
-   ===================================================================== */
-
-/* 01. TAMANHO DO TEXTO — o site usa rem, então tudo acompanha */
 html[data-texto="-1"] { font-size: 87.5%; }
 html[data-texto="1"]  { font-size: 112.5%; }
 html[data-texto="2"]  { font-size: 125%; }
 html[data-texto="3"]  { font-size: 137.5%; }
 html[data-texto="4"]  { font-size: 150%; }
-/* Alto contraste: a foto do banner sai, fica o fundo liso */
 html[data-contraste="alto"] .slide--foto { background: #000; }
 html[data-contraste="alto"] .slide--foto .slide-foto,
 html[data-contraste="alto"] .slide--foto::before { display: none; }
-/* Alto contraste: o card de produto (que não tem borda) ganha contorno branco */
 html[data-contraste="alto"] .product-card { border: 2px solid #FFF; box-shadow: none; }
-/* Com letras grandes em tela estreita, palavras longas nos títulos são hifenizadas. */
 html[data-texto="3"] :is(h1, h2, h3),
 html[data-texto="4"] :is(h1, h2, h3) { hyphens: auto; }
 
-/* 02. ALTO CONTRASTE — preto, branco e amarelo (vale sobre o tema escuro) */
 html[data-contraste="alto"] {
     color-scheme: dark;
     --page-bg: #000;
@@ -68,10 +48,8 @@ html[data-contraste="alto"] .btn:focus-visible { background: #FFE600 !important;
 html[data-contraste="alto"] .header,
 html[data-contraste="alto"] .site-footer { border-color: #FFE600; }
 html[data-contraste="alto"] :focus-visible { outline: 3px solid #FFE600 !important; outline-offset: 3px; }
-/* Fotos continuam com as cores originais, só com moldura branca */
 html[data-contraste="alto"] img { filter: none; }
 
-/* 03. FONTE PARA DISLEXIA — Atkinson Hyperlegible, sem itálico nem caixa-alta */
 html[data-leitura="facil"] {
     --font-display: "Atkinson Hyperlegible", Arial, sans-serif;
     --font-body: "Atkinson Hyperlegible", Arial, sans-serif;
@@ -82,11 +60,9 @@ html[data-leitura="facil"] body * {
     text-transform: none !important;
     letter-spacing: 0.02em !important;
 }
-/* O logo mantém a fonte da marca */
 html[data-leitura="facil"] .marca,
 html[data-leitura="facil"] .marca * { letter-spacing: -0.03em !important; }
 
-/* 04. DESTACAR LINKS */
 html[data-links="destacar"] a:not(.btn):not(.logo):not(.product-image) {
     text-decoration: underline !important;
     text-decoration-thickness: 2px !important;
@@ -96,7 +72,6 @@ html[data-links="destacar"] a:not(.btn):not(.logo):not(.product-image) {
 html[data-links="destacar"] a.btn,
 html[data-links="destacar"] button.btn { outline: 2px dashed currentColor; outline-offset: 2px; }
 
-/* 05. MAIS ESPAÇAMENTO (critério 1.4.12 da WCAG) */
 html[data-espacamento="amplo"] body { line-height: 1.9; }
 html[data-espacamento="amplo"] p,
 html[data-espacamento="amplo"] li,
@@ -109,7 +84,6 @@ html[data-espacamento="amplo"] td {
 }
 html[data-espacamento="amplo"] p { margin-bottom: 1.4em; }
 
-/* 06. PAUSAR ANIMAÇÕES */
 html[data-animacoes="pausar"] { scroll-behavior: auto; }
 html[data-animacoes="pausar"] *,
 html[data-animacoes="pausar"] *::before,
@@ -118,7 +92,6 @@ html[data-animacoes="pausar"] *::after {
     transition: none !important;
 }
 
-/* ===== 07. BOTÃO E PAINEL ===== */
 .acess-botao {
     position: fixed;
     left: 18px;
@@ -223,7 +196,6 @@ html[data-contraste="alto"] .acess-botao { background: #000; color: #FFE600; bor
     background: var(--paper-2);
     font-size: 0.8rem;
 }
-/* Estado ligado: cor + marcação ✓ (não depende só da cor) */
 .acess-segmentos button[aria-pressed="true"],
 .acess-opcao[aria-pressed="true"] {
     background: var(--cor-header);

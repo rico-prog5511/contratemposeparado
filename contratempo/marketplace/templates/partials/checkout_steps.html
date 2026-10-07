@@ -1,4 +1,3 @@
-{% comment %}Indicador de etapas do checkout. Espera `etapa` (1, 2 ou 3) no contexto.{% endcomment %}
 <ol class="checkout-steps" aria-label="Etapas da compra">
     <li class="{% if etapa > 1 %}done{% elif etapa == 1 %}current{% endif %}" {% if etapa == 1 %}aria-current="step"{% endif %}>
         {% if etapa > 1 %}<a href="{% url 'checkout_endereco' %}">{% endif %}

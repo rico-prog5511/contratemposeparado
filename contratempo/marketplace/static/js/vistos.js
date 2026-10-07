@@ -1,19 +1,3 @@
-/* =====================================================================
-   vistos.js — "Vistos recentemente".
-
-   Na página do produto (<script ... data-visto-id="12">): guarda o id no
-   histórico DESTE navegador (localStorage), do mais recente para o mais
-   antigo, até 12 produtos. Nada vai para o servidor nem para a conta.
-
-   Na home ([data-vistos]): busca os cards desses produtos em
-   /produtos/vistos/?ids=... (só voltam anúncios ainda ativos) e mostra a
-   seção. Sem histórico, sem JavaScript ou sem localStorage, a seção
-   continua escondida.
-
-   É um recurso "funcional" do aviso de cookies (cookies.js): só grava e
-   só mostra se a pessoa aceitou; se ela desligar depois, o histórico é
-   apagado na hora.
-   ===================================================================== */
 (function () {
     "use strict";
 
@@ -38,10 +22,9 @@
         try {
             if (lista.length) localStorage.setItem(CHAVE, JSON.stringify(lista));
             else localStorage.removeItem(CHAVE);
-        } catch (e) { /* navegador sem localStorage: só não guarda */ }
+        } catch (e) {  }
     }
 
-    // Recusou (ou desligou) os cookies funcionais: apaga o que houver.
     document.addEventListener("ct:cookies", function () {
         if (permitido()) return;
         gravar([]);
@@ -49,7 +32,6 @@
         if (secao) secao.hidden = true;
     });
 
-    // Página do produto: registra a visita (só com permissão).
     var visto = script && script.dataset.vistoId;
     if (visto) {
         if (!permitido()) return;
@@ -59,7 +41,6 @@
         return;
     }
 
-    // Home: mostra a seção.
     document.addEventListener("DOMContentLoaded", function () {
         var secao = document.querySelector("[data-vistos]");
         if (!secao) return;
@@ -73,12 +54,11 @@
                 secao.querySelector("[data-vistos-lista]").innerHTML = html;
                 secao.hidden = false;
             })
-            .catch(function () { /* sem rede: a seção só não aparece */ });
+            .catch(function () {  });
 
         secao.querySelector("[data-vistos-limpar]").addEventListener("click", function () {
             gravar([]);
             secao.hidden = true;
-            // O botão sumiu junto com a seção: o foco vai para a próxima seção.
             var proximo = secao.nextElementSibling && secao.nextElementSibling.querySelector("h2");
             if (proximo) {
                 proximo.setAttribute("tabindex", "-1");

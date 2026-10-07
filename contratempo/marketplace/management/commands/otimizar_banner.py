@@ -1,23 +1,3 @@
-"""
-python manage.py otimizar_banner
-
-Gera, a partir da foto do banner (static/img/banner/banner-1.png/.jpg/
-.jpeg/.webp), duas versões leves em WebP:
-
-    banner-1-1920.webp   telas grandes   (~200 KB em vez de ~3 MB)
-    banner-1-1280.webp   tablet / notebook pequeno (~100 KB)
-    banner-1-800.webp    celular         (~45 KB)
-
-A home usa essas versões quando existem e estão mais novas que a foto
-original (views._foto_banner); senão, usa a original. O atualizar.sh roda
-este comando antes do collectstatic, então no PythonAnywhere é automático.
-No PC, rode-o depois de trocar a foto (ou o site usa a original, mais
-pesada, até você rodar).
-
-As versões geradas não vão para o Git (.gitignore): cada máquina gera as
-suas a partir da foto original.
-"""
-
 from pathlib import Path
 
 from django.core.management.base import BaseCommand
@@ -25,7 +5,7 @@ from PIL import Image
 
 PASTA = Path(__file__).resolve().parents[2] / "static" / "img" / "banner"
 ORIGINAIS = ("banner-1.webp", "banner-1.jpg", "banner-1.jpeg", "banner-1.png")
-VERSOES = ((1920, 80), (1280, 78), (800, 75))  # (largura máxima, qualidade WebP)
+VERSOES = ((1920, 80), (1280, 78), (800, 75))
 
 
 class Command(BaseCommand):

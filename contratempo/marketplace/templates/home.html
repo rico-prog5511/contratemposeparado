@@ -12,21 +12,17 @@
 
 {% block content %}
 
-<!-- BANNER (carrossel) — sem JavaScript, mostra só o primeiro slide -->
-<section class="home-carrossel" aria-roledescription="carrossel" aria-label="Destaques" data-carrossel>
+<section class="home-carrossel" aria-label="Destaques" data-carrossel>
     <div class="carrossel-trilho" aria-live="off">
 
-        <!-- 1. Garimpo — a foto de fundo vem de static/img/banner/banner-1.* (ver views._foto_banner) -->
-        <article class="carrossel-slide slide--vermelho{% if banner_foto %} slide--foto{% endif %} ativo" aria-roledescription="slide" aria-label="1 de 3">
+        <article class="carrossel-slide slide--vermelho{% if banner_foto %} slide--foto{% endif %} ativo">
             {% if banner_foto %}
-                {# Imagem de verdade (não fundo de CSS): o navegador a encontra logo e baixa primeiro (fetchpriority); #}
-                {# com srcset, o celular baixa a versão menor. Decorativa: alt vazio. #}
                 <img class="slide-foto" src="{{ banner_foto.src }}"{% if banner_foto.srcset %} srcset="{{ banner_foto.srcset }}" sizes="100vw"{% endif %}
                      alt="" width="1920" height="1080" fetchpriority="high" decoding="async">
             {% endif %}
             <div class="container slide-inner">
                 <div class="slide-texto">
-                    <h2>Peças raras que <em>não voltam ao estoque.</em></h2>
+                    <h1>Peças raras que <em>não voltam ao estoque.</em></h1>
                     <p>Cartas, consoles, vinis, HQs e action figures anunciados por colecionadores de todo o Brasil.</p>
                     <div class="cluster">
                         <a href="{% url 'produtos' %}?ordenar=recentes" class="btn btn-light btn-lg">Ver o que chegou →</a>
@@ -50,71 +46,16 @@
                 {% endif %}
             </div>
         </article>
-
-        <!-- 2. Apresentação -->
-        <article class="carrossel-slide slide--azul" aria-roledescription="slide" aria-label="2 de 3">
-            <div class="container slide-inner">
-                <div class="slide-texto">
-                    <h1>Colecionáveis que <em>atravessam o tempo.</em></h1>
-                    <p>Action figures, cartas raras, HQs, vinis e peças vintage — compre de outros colecionadores ou anuncie o que está parado na sua estante.</p>
-                    <div class="cluster">
-                        <a href="{% url 'produtos' %}" class="btn btn-accent btn-lg">Explorar produtos</a>
-                        <a href="{% url 'anuncio_criar' %}" class="btn btn-light btn-lg">Vender um item</a>
-                    </div>
-                </div>
-                <div class="slide-arte home-hero-ticket" aria-hidden="true">
-                    <div class="ticket">
-                        <span class="ticket-top">ADMIT ONE · Nº 0001</span>
-                        <strong>{% include "partials/marca.html" %}</strong>
-                        <span class="ticket-line">ESTILO · MEMÓRIA · PRESENTE</span>
-                        <span class="ticket-stamp">desde<br>sempre</span>
-                    </div>
-                </div>
-            </div>
-        </article>
-
-        <!-- 3. Compra segura -->
-        <article class="carrossel-slide slide--escuro" aria-roledescription="slide" aria-label="3 de 3">
-            <div class="container slide-inner">
-                <div class="slide-texto">
-                    <h2>Do clique até a <em>sua estante.</em></h2>
-                    <p>Pague com Pix, boleto ou cartão, veja o frete pelo seu CEP antes de comprar e receba o código de rastreio por e-mail.</p>
-                    <div class="cluster">
-                        <a href="{% url 'faq' %}" class="btn btn-light btn-lg">Como funciona</a>
-                    </div>
-                </div>
-                <div class="slide-arte home-banner-art" aria-hidden="true">
-                    <div class="banner-card banner-card--1">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6" width="18" height="12" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="6" y1="14.5" x2="10" y2="14.5"/></svg>
-                        <span>Pagamento</span>
-                    </div>
-                    <div class="banner-card banner-card--2">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1.5" y="6" width="13" height="10"/><path d="M14.5 9.5h4l3 3.5v3h-7z"/><circle cx="6" cy="18" r="1.8"/><circle cx="18" cy="18" r="1.8"/></svg>
-                        <span>Frete</span>
-                    </div>
-                    <div class="banner-card banner-card--3">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><polyline points="3 8 12 13 21 8"/><line x1="12" y1="13" x2="12" y2="21"/></svg>
-                        <span>Rastreio</span>
-                    </div>
-                </div>
-            </div>
-        </article>
     </div>
 
-    <!-- Controles (aparecem quando o JavaScript carrega) -->
     <div class="carrossel-controles" hidden>
         <button type="button" class="carrossel-seta" data-anterior aria-label="Slide anterior">‹</button>
-        <div class="carrossel-pontos" role="group" aria-label="Escolher slide">
-            <button type="button" class="carrossel-ponto ativo" aria-label="Slide 1" aria-current="true"></button>
-            <button type="button" class="carrossel-ponto" aria-label="Slide 2"></button>
-            <button type="button" class="carrossel-ponto" aria-label="Slide 3"></button>
-        </div>
+        <div class="carrossel-pontos" role="group" aria-label="Escolher slide"></div>
         <button type="button" class="carrossel-seta" data-proximo aria-label="Próximo slide">›</button>
         <button type="button" class="carrossel-pausa" data-pausa aria-label="Pausar a troca automática">❚❚</button>
     </div>
 </section>
 
-<!-- VANTAGENS -->
 <section class="home-strip" aria-label="Como funciona">
     <div class="container home-strip-inner">
         <div>Anuncie grátis em minutos</div>
@@ -123,7 +64,6 @@
     </div>
 </section>
 
-<!-- VISTOS RECENTEMENTE: preenchido por vistos.js com o histórico deste navegador; some se estiver vazio -->
 <section class="container section home-vistos" aria-labelledby="vistos-titulo" data-vistos data-url="{% url 'produtos_vistos' %}" hidden>
     <div class="section-head">
         <div>
@@ -134,7 +74,6 @@
     <div class="product-grid" data-vistos-lista></div>
 </section>
 
-<!-- FAIXAS DE PREÇO -->
 <section class="container section" aria-labelledby="faixas-titulo">
     <div class="section-head">
         <div>
@@ -160,7 +99,6 @@
     {% endif %}
 </section>
 
-<!-- CHEGOU AGORA -->
 {% if produtos_recentes %}
 <section class="container section">
     <div class="section-head">
@@ -177,7 +115,6 @@
 </section>
 {% endif %}
 
-<!-- GUIA DO COLECIONADOR -->
 <section class="container section" aria-labelledby="guia-titulo">
     <div class="section-head">
         <div>
@@ -192,7 +129,6 @@
     </div>
 </section>
 
-<!-- VENDER -->
 <section class="container section">
     <div class="home-sell">
         <div>

@@ -1,15 +1,3 @@
-"""
-marketplace/guia.py
-
-Artigos do "Guia do colecionador". Não ficam no banco: cada artigo é um
-item desta lista + um template com o texto em
-templates/guia/textos/<slug>.html.
-
-Para criar um artigo novo: adicione um item aqui e crie o template com o
-mesmo slug. A ordem da lista é a ordem de exibição (os 3 primeiros
-aparecem na home).
-"""
-
 ARTIGOS = [
     {
         "slug": "carta-original",

@@ -1,10 +1,7 @@
-/* static/css/anuncios.css — área do vendedor */
-
 .cell-sub { font-size: 0.8rem; color: var(--ink-muted); margin-top: 2px; }
 .stock-zero { color: var(--txt-vermelho); font-weight: 700; }
 .row-alert td:first-child { box-shadow: inset 4px 0 0 var(--cor-destaque); }
 
-/* ===== FORMULÁRIO DO ANÚNCIO ===== */
 .listing-form .panel + .panel { margin-top: 20px; }
 
 .upload-area {
@@ -58,7 +55,6 @@
 }
 .upload-thumb { position: relative; }
 .upload-thumb img { width: 100%; height: 100%; object-fit: cover; }
-/* Botão "×" para tirar uma foto nova antes de enviar (upload.js) */
 .upload-thumb-remover {
     position: absolute;
     top: 6px;
@@ -112,7 +108,6 @@
     border-top: 1.5px solid var(--ink);
 }
 
-/* ===== VISUALIZAR ANÚNCIO ===== */
 .stat-row {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -180,7 +175,6 @@
 .table-plain { border: 0; background: transparent; }
 .listing-manage .cluster .spacer { flex: 1; }
 
-/* ===== ESTOQUE ===== */
 .stock-input { width: 96px !important; min-height: 40px !important; text-align: center; font-family: var(--font-mono); font-weight: 700; }
 .stock-actions {
     position: sticky;
@@ -211,7 +205,6 @@
     .data-table td .stock-input { width: 110px !important; }
 }
 
-/* Perguntas recebidas */
 .qa-product {
     display: inline-flex;
     align-items: center;

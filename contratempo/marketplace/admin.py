@@ -1,10 +1,3 @@
-"""
-marketplace/admin.py
-
-Painel administrativo completo do contratempo. Não há registro de
-Favorito — a funcionalidade foi removida do projeto.
-"""
-
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import PermissionDenied
@@ -39,25 +32,17 @@ from .models import (
 )
 
 
-# ===== APARÊNCIA GERAL (o tema visual fica em static/css/admin.css) =====
-
 admin.site.site_header = "contratempo"
 admin.site.site_title = "contratempo — painel"
 admin.site.index_title = "Painel de controle"
 admin.site.empty_value_display = "—"
 
-# Tom do selo de cada status. O texto do status sempre aparece junto,
-# então a informação não depende só da cor (acessibilidade).
 TOM_STATUS = {
-    # positivos / em andamento normal
     "ativo": "azul", "publicada": "azul", "entregue": "azul", "respondido": "azul",
     "pagamento_aprovado": "azul", "processamento": "azul", "enviado": "azul",
     "finalizado": "azul", "improcedente": "cinza",
-    # pedem atenção
     "pendente": "alerta", "aguardando_pagamento": "alerta", "inativo": "cinza",
-    # pausados / arquivados
     "pausado": "cinza", "oculta": "cinza", "arquivado": "cinza", "abandonado": "cinza", "vendido": "lilas",
-    # negativos
     "encerrado": "vermelho", "cancelado": "vermelho", "removida": "vermelho",
     "suspenso": "vermelho", "procedente": "vermelho",
 }
@@ -73,8 +58,6 @@ def miniatura(url, texto_alt=""):
         url_miniatura(url) or static("img/produto-sem-imagem.svg"), texto_alt,
     )
 
-
-# ===== FRETE, FAQ E PERGUNTAS =====
 
 @admin.register(TabelaFrete)
 class TabelaFreteAdmin(admin.ModelAdmin):
@@ -117,12 +100,9 @@ class DenunciaAdmin(admin.ModelAdmin):
     @admin.action(description="Procedente: encerrar o anúncio")
     def marcar_procedente(self, request, queryset):
         agora = timezone.now()
-        # IDs em listas: o MySQL não aceita subconsulta na própria tabela
-        # que está sendo atualizada (erro 1093).
         ids_denuncias = list(queryset.values_list("id", flat=True))
         ids_produtos = list(queryset.values_list("produto_id", flat=True).distinct())
         total_produtos = Produto.objects.filter(pk__in=ids_produtos).update(status_anuncio="encerrado")
-        # Todas as denúncias pendentes desses anúncios ficam resolvidas.
         Denuncia.objects.filter(
             Q(pk__in=ids_denuncias) | Q(produto_id__in=ids_produtos, status="pendente")
         ).update(status="procedente", data_analise=agora)
@@ -149,13 +129,8 @@ class PerguntaProdutoAdmin(admin.ModelAdmin):
         return obj.resposta is not None
 
 
-# ===== USUÁRIO =====
-
 @admin.register(Usuario)
 class UsuarioAdmin(UserAdmin):
-    # UserAdmin.fieldsets/add_fieldsets assumem "username" e
-    # "date_joined"; como o Usuario usa email + data_cadastro,
-    # sobrescrevemos ambos.
     model = Usuario
     ordering = ["-data_cadastro"]
     list_display = (
@@ -195,8 +170,6 @@ class UsuarioAdmin(UserAdmin):
         return reverse("vendedor_perfil", args=[obj.pk])
 
 
-# ===== ENDEREÇOS E PAGAMENTO =====
-
 @admin.register(Endereco)
 class EnderecoAdmin(admin.ModelAdmin):
     list_display = ("nome_endereco", "usuario", "cidade", "estado", "endereco_principal")
@@ -217,8 +190,6 @@ class FormaPagamentoAdmin(admin.ModelAdmin):
         return f"{obj.validade_texto} (vencido)" if obj.vencido else obj.validade_texto
 
 
-# ===== CATEGORIAS E FRANQUIAS =====
-
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
     list_display = ("nome", "slug", "ativo")
@@ -236,8 +207,6 @@ class FranquiaAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("nome",)}
     list_editable = ("ativo",)
 
-
-# ===== PRODUTOS =====
 
 class ProdutoImagemInline(admin.TabularInline):
     model = ProdutoImagem
@@ -295,8 +264,6 @@ class ProdutoAdmin(admin.ModelAdmin):
         return reverse("produto_detalhe", args=[obj.pk])
 
 
-# ===== CARRINHO =====
-
 class ItemCarrinhoInline(admin.TabularInline):
     model = ItemCarrinho
     extra = 0
@@ -317,8 +284,6 @@ class CarrinhoAdmin(admin.ModelAdmin):
         return selo(obj.status, obj.get_status_display())
 
 
-# ===== PEDIDOS =====
-
 class ItemPedidoInline(admin.TabularInline):
     model = ItemPedido
     extra = 0
@@ -326,8 +291,6 @@ class ItemPedidoInline(admin.TabularInline):
     can_delete = False
 
     def has_add_permission(self, request, obj=None):
-        # Itens de pedido só devem ser criados pelo fluxo de checkout,
-        # nunca manualmente pelo Admin.
         return False
 
 
@@ -355,7 +318,6 @@ class PedidoAdmin(admin.ModelAdmin):
         ("Datas", {"fields": ("data_criacao", "data_atualizacao"), "classes": ("collapse",)}),
     )
 
-    # Lista de pedidos com o botão "Relatório anual" no topo
     change_list_template = "admin/marketplace/pedido/change_list.html"
 
     def get_urls(self):
@@ -367,7 +329,6 @@ class PedidoAdmin(admin.ModelAdmin):
         return [rota] + super().get_urls()
 
     def relatorio_anual_view(self, request):
-        """Página "Relatório do ano" (/admin/marketplace/pedido/relatorio-anual/)."""
         if not self.has_view_permission(request):
             raise PermissionDenied
         anos = anos_disponiveis()
@@ -398,8 +359,6 @@ class PedidoAdmin(admin.ModelAdmin):
         return brl(obj.valor_frete)
 
 
-# ===== CONTATO =====
-
 @admin.register(Contato)
 class ContatoAdmin(admin.ModelAdmin):
     list_display = ("assunto", "nome", "email", "status", "data_envio")
@@ -408,8 +367,6 @@ class ContatoAdmin(admin.ModelAdmin):
     readonly_fields = ("nome", "email", "assunto", "mensagem", "usuario", "data_envio")
     list_editable = ("status",)
 
-
-# ===== AVALIAÇÕES =====
 
 @admin.register(Avaliacao)
 class AvaliacaoAdmin(admin.ModelAdmin):

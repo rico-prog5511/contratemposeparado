@@ -1,16 +1,3 @@
-"""
-python manage.py otimizar_fotos [--simular]
-
-Converte as fotos enviadas ANTES do tratamento automático (marketplace/
-imagens.py): reduz, salva em WebP, cria a miniatura dos produtos e apaga
-os dados escondidos (GPS etc.). Atualiza a URL no banco e apaga o
-arquivo original pesado (só se nada mais o usar).
-
-- Fotos já tratadas são puladas: pode rodar quantas vezes quiser.
-- --simular mostra o que seria feito, sem mexer em nada.
-- O atualizar.sh e o rodar.bat já rodam este comando.
-"""
-
 import os
 
 from django.core.files.storage import default_storage
@@ -36,7 +23,6 @@ class Command(BaseCommand):
         self.antes = self.depois = 0
         self.convertidas = self.erros = 0
 
-        # Agrupa por URL: a mesma foto pode estar em mais de um registro.
         fotos = {}
         for imagem in ProdutoImagem.objects.only("id", "url_imagem"):
             fotos.setdefault(imagem.url_imagem, []).append(imagem.id)
@@ -81,7 +67,7 @@ class Command(BaseCommand):
                 nova = salvar(arquivo, os.path.dirname(caminho))
             with transaction.atomic():
                 atualizar_banco(nova)
-        except Exception as erro:  # foto corrompida etc.: segue com as outras
+        except Exception as erro:
             self.erros += 1
             self.stdout.write(self.style.ERROR(f"  não consegui converter {caminho}: {type(erro).__name__}: {erro}"))
             return
@@ -89,7 +75,6 @@ class Command(BaseCommand):
         novo_tamanho = default_storage.size(novo_caminho)
         mini = novo_caminho[: -len(".webp")] + SUFIXO_MINI
         novo_tamanho_mini = default_storage.size(mini) if default_storage.exists(mini) else 0
-        # Apaga o original só se nenhum registro ainda aponta para ele.
         ainda_usado = ProdutoImagem.objects.filter(url_imagem=url).exists() or Usuario.objects.filter(avatar=url).exists()
         if not ainda_usado and caminho != novo_caminho:
             default_storage.delete(caminho)

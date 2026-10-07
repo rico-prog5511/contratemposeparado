@@ -1,37 +1,3 @@
-/* =====================================================================
-   CONTRATEMPO — styles-retro.css
-   Design system global. Toda página herda isto via base.html.
-   Estilos específicos de uma página ficam em static/css/<pagina>.css
-
-   Sumário
-   01. Tokens (cores oficiais, tipografia, espaçamentos)
-   02. Base / reset
-   03. Layout (container, página, seções)
-   04. Botões
-   05. Header, navegação e menus
-   06. Breadcrumb
-   07. Mensagens (django.contrib.messages)
-   08. Painéis, badges e utilitários
-   09. Cards de produto
-   10. Estados vazios
-   11. Formulários
-   12. Tabelas
-   13. Abas e paginação
-   14. Área da conta (menu lateral)
-   15. Resumo de valores
-   16. Cards de opção (radio)
-   17. Diálogo de confirmação
-   18. Footer
-   19. Responsivo
-   ===================================================================== */
-
-/* ===== 01. TOKENS ===== */
-
-/* Fonte do logotipo [contratempo]: Adult Swim.
-   Coloque o arquivo da fonte em static/fonts/ com um destes nomes:
-   adult-swim.woff2, adult-swim.woff, adult-swim.ttf ou adult-swim.otf.
-   Sem o arquivo, o logo usa Helvetica/Arial em negrito (base do logo
-   original do Adult Swim). */
 @font-face {
     font-family: "Adult Swim";
     src: url("../fonts/adult-swim.woff2") format("woff2"),
@@ -42,67 +8,48 @@
 }
 
 :root {
-    /* Cores oficiais do contratempo */
     --cor-header: #313170;
     --cor-fundo: #ACA9BB;
     --cor-secundaria: #787586;
     --cor-destaque: #6D191D;
     --cor-acento: #A54C49;
 
-    /* Tons derivados das cores oficiais (claros/escuros para contraste) */
     --cor-header-escuro: #24245A;
     --cor-header-claro: #E4E3EE;
-    --page-bg: #F4F3F8;          /* fundo das páginas (versão bem clara do lilás oficial) */
-    /* "tempo" do logo. Sobre o azul do cabeçalho, o vermelho escuro
-       (#6D191D) quase some; o vermelho claro oficial mantém a leitura. */
+    --page-bg: #F4F3F8;
     --marca-tempo: var(--cor-acento);
-    --paper: #FFFFFF;            /* superfície de cards e painéis */
-    --paper-2: #EEECF4;          /* superfície secundária / hover */
-    --ink: #1B1A33;              /* texto principal e bordas fortes */
-    --ink-muted: #545166;        /* texto secundário (contraste AA sobre paper e fundo) */
+    --paper: #FFFFFF;
+    --paper-2: #EEECF4;
+    --ink: #1B1A33;
+    --ink-muted: #545166;
     --line: rgba(27, 26, 51, 0.18);
 
-    /* Cores "por função" — mudam no tema escuro (ver 01b) */
-    --txt-azul: var(--cor-header);       /* azul usado como TEXTO */
-    --txt-vermelho: var(--cor-destaque); /* vermelho usado como TEXTO (preços, rótulos) */
+    --txt-azul: var(--cor-header);
+    --txt-vermelho: var(--cor-destaque);
     --txt-acento: var(--cor-acento);
-    --borda-azul: var(--cor-header);     /* azul usado como BORDA */
-    --surface: #FFFFFF;                  /* caixas internas e campos */
-    --sombra: var(--ink);                /* sombras deslocadas */
+    --borda-azul: var(--cor-header);
+    --surface: #FFFFFF;
+    --sombra: var(--ink);
 
-    /* Tipografia: Helvetica no site todo. Ela não vem no Windows (lá o
-       navegador usa a Arial, quase idêntica) e é paga, por isso não é
-       hospedada aqui: usa a do aparelho. Os três nomes continuam existindo
-       (títulos, textos e etiquetas) para dar para trocar uma só no futuro. */
     --font-helvetica: "Helvetica Neue", Helvetica, Arial, sans-serif;
     --font-display: var(--font-helvetica);
     --font-body: var(--font-helvetica);
     --font-mono: var(--font-helvetica);
     --font-marca: "Adult Swim", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-    /* Forma */
     --radius: 6px;
     --radius-pill: 999px;
     --borda: 1.5px solid var(--ink);
     --shadow-card: 5px 5px 0 var(--cor-header);
     --shadow-soft: 0 10px 30px rgba(27, 26, 51, 0.18);
-    /* Cards de produto: sem borda, com sombra suave ao redor */
     --sombra-produto: 0 1px 2px rgba(27, 26, 51, 0.06), 0 4px 18px rgba(27, 26, 51, 0.1);
-    /* "Elevação suave": sombra de todos os cards clicáveis ao passar o mouse ou focar */
     --sombra-elevacao: 0 12px 26px rgba(27, 26, 51, 0.2);
 
-    /* Medidas */
     --header-height: 72px;
     --container-width: 1200px;
     --gutter: 24px;
 }
 
-/* =====================================================================
-   01b. TEMA ESCURO
-   Ativado pelo painel de acessibilidade (html[data-tema="escuro"]), que
-   também pode seguir o tema do sistema. O azul do cabeçalho/rodapé e os
-   vermelhos dos botões continuam os mesmos; mudam fundos, textos e bordas.
-   ===================================================================== */
 :root[data-tema="escuro"] {
     color-scheme: dark;
     --page-bg: #121120;
@@ -119,19 +66,16 @@
     --sombra: #05040C;
     --borda: 1.5px solid #5D5B84;
     --shadow-card: 5px 5px 0 #05040C;
-    /* no escuro a sombra some no fundo: um contorno de luz bem fraco separa o card */
     --sombra-produto: 0 0 0 1px rgba(236, 235, 243, 0.08), 0 6px 22px rgba(0, 0, 0, 0.45);
     --sombra-elevacao: 0 12px 26px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--borda-azul);
 }
 
-/* ===== 02. BASE ===== */
 *,
 *::before,
 *::after {
     box-sizing: border-box;
 }
 
-/* O atributo hidden sempre esconde, mesmo em elementos com display próprio (grid, flex...). */
 [hidden] { display: none !important; }
 
 html {
@@ -145,7 +89,7 @@ body {
     display: flex;
     flex-direction: column;
     font-family: var(--font-body);
-    font-size: 0.9375rem;   /* 15px; em rem para acompanhar o "aumentar texto" */
+    font-size: 0.9375rem;
     background: var(--page-bg);
     color: var(--ink);
     line-height: 1.55;
@@ -226,7 +170,6 @@ textarea {
     white-space: nowrap;
 }
 
-/* ===== 03. LAYOUT ===== */
 .container {
     width: 100%;
     max-width: var(--container-width);
@@ -268,8 +211,6 @@ textarea {
     color: var(--txt-vermelho);
 }
 
-/* Só vertical: com "margin: 56px 0" a seção perdia o "margin: 0 auto" do
-   .container e ficava encostada à esquerda. */
 .section { margin-top: 56px; margin-bottom: 56px; }
 .section-head {
     display: flex;
@@ -300,7 +241,6 @@ textarea {
 .stack { display: flex; flex-direction: column; gap: 16px; }
 .cluster { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 
-/* Layout de duas colunas com lateral fixa (carrinho, checkout, pedidos) */
 .layout-aside {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 340px;
@@ -309,7 +249,6 @@ textarea {
 }
 .layout-aside > aside { position: sticky; top: calc(var(--header-height) + 20px); }
 
-/* ===== 04. BOTÕES ===== */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -403,7 +342,6 @@ textarea {
 
 .inline-form { display: inline; margin: 0; }
 
-/* ===== 05. HEADER ===== */
 .header {
     min-height: var(--header-height);
     background: var(--cor-header);
@@ -424,8 +362,6 @@ textarea {
     white-space: nowrap;
 }
 
-/* Logotipo em texto: [contratempo] (partials/marca.html), na fonte
-   Adult Swim. O tamanho vem do elemento onde ele é usado. */
 .marca {
     font-family: var(--font-marca);
     font-weight: 700;
@@ -472,7 +408,6 @@ textarea {
 .main-nav > ul > li > a:hover::after,
 .main-nav > ul > li > a.active::after { width: 100%; }
 
-/* Submenus (categorias em "Produtos" e menu da conta) */
 .has-dropdown {
     display: flex;
     align-items: center;
@@ -659,10 +594,8 @@ textarea {
     cursor: pointer;
 }
 
-/* Busca e "Anunciar" dentro do menu mobile */
 .nav-mobile-extra { display: none; }
 
-/* ===== 06. BREADCRUMB ===== */
 .breadcrumb {
     width: 100%;
     max-width: var(--container-width);
@@ -686,7 +619,6 @@ textarea {
     white-space: nowrap;
 }
 
-/* ===== 07. MENSAGENS ===== */
 .messages {
     width: 100%;
     max-width: var(--container-width);
@@ -733,7 +665,6 @@ textarea {
 .messages .warning, .alert-warning { border-color: var(--cor-acento); color: var(--txt-vermelho); }
 .alert p { margin: 0; color: inherit; }
 
-/* ===== 08. PAINÉIS, BADGES E UTILITÁRIOS ===== */
 .panel {
     background: var(--paper);
     border: var(--borda);
@@ -778,13 +709,11 @@ textarea {
 }
 .badge-plain::before { display: none; }
 
-/* Status de anúncios */
 .badge--ativo { color: #fff; background: var(--cor-header); border-color: var(--cor-header); }
 .badge--pausado { color: var(--ink-muted); }
 .badge--vendido { color: #fff; background: var(--cor-destaque); border-color: var(--cor-destaque); }
 .badge--encerrado { color: var(--ink-muted); border-style: dashed; }
 
-/* Status de pedidos */
 .badge--aguardando_pagamento { color: var(--txt-acento); }
 .badge--pagamento_aprovado,
 .badge--processamento { color: var(--txt-azul); }
@@ -792,7 +721,6 @@ textarea {
 .badge--entregue { color: var(--page-bg); background: var(--ink); border-color: var(--ink); }
 .badge--cancelado { color: var(--txt-vermelho); border-style: dashed; }
 
-/* Condição do produto */
 .badge--novo { color: var(--txt-azul); }
 .badge--semi_novo { color: var(--txt-acento); }
 .badge--usado { color: var(--ink-muted); }
@@ -839,15 +767,12 @@ textarea {
 }
 .key-value dd { margin: 0; color: var(--ink); }
 
-/* ===== 09. CARDS DE PRODUTO ===== */
 .product-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 22px;
 }
 
-/* Card de produto: sem borda, com sombra suave ao redor (sobe um pouco no hover).
-   No alto contraste a borda volta (acessibilidade.css). */
 .product-card {
     background: var(--paper);
     border-radius: var(--radius);
@@ -857,12 +782,6 @@ textarea {
     flex-direction: column;
     transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
-/* Efeito de seleção de TODOS os cards clicáveis: "elevação suave".
-   Ao passar o mouse ou focar com o teclado (focus-within: o foco está num
-   link/botão de dentro do card), o card sobe um pouco, ganha sombra difusa
-   e a borda fica azul. Vale para produtos, faixas de preço (home),
-   categorias, artigos do guia, resumo da conta e opções do checkout — a
-   opção já escolhida no checkout mantém o próprio visual. */
 :is(.product-card, .home-faixa, .category-card, .guia-card, .stat-card, .option-card) {
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
@@ -872,8 +791,6 @@ textarea {
     border-color: var(--borda-azul);
     box-shadow: var(--sombra-elevacao);
 }
-/* Quem pediu menos movimento (sistema ou painel de acessibilidade): só a sombra, sem subir.
-   Mesma lista de seletores da regra acima + "html", para ter prioridade sobre ela. */
 @media (prefers-reduced-motion: reduce) {
     html :is(.product-card, .home-faixa, .category-card, .guia-card, .stat-card,
              .option-card:not(.option-card--off):not(:has(input:checked))):is(:hover, :focus-within) { transform: none; }
@@ -958,7 +875,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 }
 .product-card .btn { margin: 0 16px 16px; width: auto; }
 
-/* ===== 10. ESTADOS VAZIOS ===== */
 .empty-state {
     text-align: center;
     padding: 56px 24px;
@@ -985,10 +901,7 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 .empty-state .cluster { justify-content: center; }
 .product-grid > .empty-state { grid-column: 1 / -1; }
 
-/* ===== 11. FORMULÁRIOS ===== */
-
 .form-group { margin-bottom: 18px; }
-/* Opções de rádio agrupadas em <fieldset>/<legend> (partials/form_field.html) */
 .form-fieldset { border: 0; padding: 0; margin-left: 0; margin-right: 0; min-width: 0; }
 .form-fieldset > legend { padding: 0; }
 .form-group > label,
@@ -1089,7 +1002,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 }
 .form-footer a { color: var(--txt-vermelho); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
-/* Checkbox e radio */
 .check {
     display: flex;
     align-items: flex-start;
@@ -1119,7 +1031,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
     text-transform: none;
 }
 
-/* RadioSelect do Django (<div><div><label><input> ...) como pílulas */
 .radio-pills > div {
     display: flex;
     flex-wrap: wrap;
@@ -1143,7 +1054,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 }
 .radio-pills input { accent-color: var(--cor-fundo); }
 
-/* Campo de senha com botão mostrar/ocultar */
 .password-wrap { position: relative; }
 .password-wrap input { padding-right: 76px !important; }
 .password-toggle {
@@ -1163,7 +1073,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
     cursor: pointer;
 }
 
-/* Filtros inline (busca em listas) */
 .filter-bar {
     display: flex;
     flex-wrap: wrap;
@@ -1173,7 +1082,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 }
 .filter-bar .input { flex: 1; min-width: 200px; }
 
-/* ===== 12. TABELAS ===== */
 .table-wrap {
     width: 100%;
     overflow-x: auto;
@@ -1215,7 +1123,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 .data-table .cell-actions { white-space: nowrap; text-align: right; }
 .data-table .num { font-family: var(--font-mono); white-space: nowrap; }
 
-/* ===== 13. ABAS E PAGINAÇÃO ===== */
 .tabs {
     display: flex;
     gap: 4px;
@@ -1285,7 +1192,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 .pagination .disabled { opacity: 0.4; }
 .pagination .gap { border: 0; background: none; }
 
-/* ===== 14. ÁREA DA CONTA ===== */
 .account-layout {
     display: grid;
     grid-template-columns: 250px minmax(0, 1fr);
@@ -1369,7 +1275,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
 .avatar-lg { width: 88px; height: 88px; font-size: 2rem; }
 
-/* ===== 15. RESUMO DE VALORES ===== */
 .summary {
     background: var(--paper);
     border: var(--borda);
@@ -1405,7 +1310,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 .summary-items .summary-item-name { flex: 1; min-width: 0; color: var(--ink); line-height: 1.3; }
 .summary-items .summary-item-name small { display: block; color: var(--ink-muted); }
 
-/* ===== 16. CARDS DE OPÇÃO (radio de endereço / pagamento) ===== */
 .option-list { display: flex; flex-direction: column; gap: 12px; }
 .option-card {
     position: relative;
@@ -1436,8 +1340,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 .option-card .option-actions { display: flex; gap: 12px; margin-top: 8px; font-size: 0.82rem; }
 .option-card .option-actions a { color: var(--txt-azul); text-decoration: underline; text-underline-offset: 3px; }
 
-/* Guia do colecionador: cards de artigo (home, /guia/ e "continue lendo").
-   O link do título cobre o card inteiro (::after), então o card todo é clicável. */
 .guia-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
 .guia-card {
     position: relative;
@@ -1488,7 +1390,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
     gap: 16px;
 }
 
-/* ===== 17. DIÁLOGO DE CONFIRMAÇÃO ===== */
 .confirm-dialog {
     width: min(440px, calc(100vw - 32px));
     padding: 0;
@@ -1509,7 +1410,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
     padding: 18px 26px 24px;
 }
 
-/* ===== 18. FOOTER ===== */
 .site-footer {
     background: var(--cor-header);
     color: var(--cor-header-claro);
@@ -1542,7 +1442,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 }
 .site-footer .footer-links a { color: var(--cor-header-claro); width: fit-content; }
 .site-footer .footer-links a:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
-/* "Preferências de cookies": um botão com cara de link do rodapé */
 .footer-link-botao {
     width: fit-content;
     padding: 0;
@@ -1555,7 +1454,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 }
 .footer-link-botao:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
 
-/* Aviso de cookies (partials/cookies.html + js/cookies.js) */
 .cookie-aviso {
     position: fixed;
     left: 50%;
@@ -1584,11 +1482,9 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 .cookie-categoria p { margin: 4px 0 0 28px; font-size: 0.86rem; }
 .cookie-link { margin-top: 14px !important; font-size: 0.86rem; }
 .cookie-link a { color: var(--txt-vermelho); text-decoration: underline; }
-/* Botões flutuantes sobem enquanto o aviso estiver na tela */
 .acess-botao,
 .acess-painel { margin-bottom: var(--cookie-aviso-altura, 0px); }
 @media print { .cookie-aviso { display: none !important; } }
-/* Logos das formas de pagamento (partials/pagamentos.html) */
 .payment-logos { margin-top: 18px; }
 .payment-logos-title {
     display: block;
@@ -1628,7 +1524,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
     padding-top: 18px;
 }
 
-/* ===== 19. RESPONSIVO ===== */
 @media (max-width: 1100px) {
     .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .search-box input { width: 130px; }
@@ -1721,7 +1616,7 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
 @media (max-width: 640px) {
     :root { --gutter: 16px; }
 
-    body { font-size: 0.90625rem; } /* 14.5px; em rem para acompanhar o "tamanho do texto" do painel */
+    body { font-size: 0.90625rem; }
     .guia-grid { grid-template-columns: minmax(0, 1fr); }
     .cookie-aviso {
         left: 0;
@@ -1757,7 +1652,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
     .footer-grid { grid-template-columns: 1fr; gap: 28px; }
     .site-footer .footer-bottom { flex-direction: column; }
 
-    /* Tabelas viram cards empilhados (cada <td> usa data-label) */
     .table-wrap { background: transparent; border: 0; overflow: visible; }
     .data-table thead { display: none; }
     .data-table,
@@ -1809,7 +1703,6 @@ html[data-animacoes="pausar"] :is(.product-card, .home-faixa, .category-card, .g
     }
 }
 
-/* ===== SUGESTÕES DA BUSCA ===== */
 .search-box { position: relative; }
 .search-suggest {
     position: absolute;

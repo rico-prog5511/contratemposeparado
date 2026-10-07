@@ -1,15 +1,3 @@
-"""
-marketplace/views_anuncios.py
-
-Área do vendedor: listar, criar, editar, visualizar, mudar status,
-excluir anúncios e gerenciar o estoque em lote.
-
-Imagens: cada foto é reduzida, convertida para WebP e limpa dos dados
-escondidos (GPS etc.) por imagens.salvar_foto_produto, que salva em
-MEDIA_ROOT/produtos/<id>/ a foto e uma miniatura; a URL pública da foto
-vai para ProdutoImagem.url_imagem (coluna VARCHAR já existente).
-"""
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -55,8 +43,6 @@ def _salvar_imagens(produto, arquivos):
         ordem += 1
 
 
-# ===== LISTA =====
-
 @login_required
 def anuncios(request):
     base = Produto.objects.filter(vendedor=request.user)
@@ -95,14 +81,7 @@ def anuncios(request):
     })
 
 
-# ===== CRIAR / EDITAR =====
-
 def _salvar_com_sku_gerado(produto, tentativas=5):
-    """
-    Salva o anúncio novo com o próximo SKU livre (sku.gerar_sku). Se outra
-    pessoa publicar ao mesmo tempo e pegar o mesmo código, o banco recusa
-    (coluna UNIQUE) e tentamos o seguinte.
-    """
     for tentativa in range(tentativas):
         produto.sku = gerar_sku(produto.categoria, produto.franquia, produto.marca)
         try:
@@ -163,11 +142,10 @@ def anuncio_editar(request, produto_id):
                 imagem = produto.imagens.filter(pk=int(principal_id)).first()
                 if imagem and not imagem.principal:
                     imagem.principal = True
-                    imagem.save()  # o save() do model desmarca as outras
+                    imagem.save()
 
             _salvar_imagens(produto, form.cleaned_data["imagens"])
 
-            # Se a principal foi removida, promove a primeira restante.
             if not produto.imagens.filter(principal=True).exists():
                 primeira = produto.imagens.order_by("ordem_exibicao").first()
                 if primeira:
@@ -189,8 +167,6 @@ def anuncio_editar(request, produto_id):
         ),
     })
 
-
-# ===== VISUALIZAR =====
 
 @login_required
 def anuncio_detalhe(request, produto_id):
@@ -220,8 +196,6 @@ def anuncio_detalhe(request, produto_id):
         "breadcrumbs": _breadcrumbs({"label": produto.nome, "url": None}),
     })
 
-
-# ===== STATUS / EXCLUSÃO =====
 
 @login_required
 @require_POST
@@ -267,8 +241,6 @@ def anuncio_excluir(request, produto_id):
     messages.success(request, f'Anúncio "{nome}" excluído.')
     return redirect("anuncios")
 
-
-# ===== ESTOQUE EM LOTE =====
 
 @login_required
 def estoque(request):

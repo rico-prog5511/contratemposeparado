@@ -1,6 +1,3 @@
-/* static/css/sobre-nos.css — estilos exclusivos da página Sobre nós */
-
-/* INTRODUÇÃO */
 .about-intro {
     max-width: var(--container-width);
     margin: 28px auto 0;
@@ -21,7 +18,6 @@
 }
 .about-intro-text > p { font-size: 1.1rem; max-width: 560px; margin: 0; }
 
-/* HISTÓRIA */
 .about-story {
     max-width: var(--container-width);
     margin: 0 auto;
@@ -37,7 +33,6 @@
 .about-text p { font-size: 1rem; line-height: 1.8; margin-bottom: 20px; }
 .about-text strong { color: var(--ink); }
 
-/* VALORES */
 .about-values {
     padding: 72px var(--gutter);
     background: var(--paper);
@@ -70,7 +65,6 @@
 .about-value h3 { margin: 0 0 12px; font-size: 1.35rem; letter-spacing: 0.02em; }
 .about-value p { margin: 0; font-size: 0.95rem; }
 
-/* PROPOSTA */
 .about-purpose {
     max-width: var(--container-width);
     margin: 0 auto;
@@ -127,7 +121,6 @@
 }
 .about-link:hover { background: var(--cor-header); border-color: var(--cor-header); color: #fff; }
 
-/* FINAL */
 .about-end {
     padding: 88px var(--gutter);
     text-align: center;
@@ -154,7 +147,6 @@
 }
 .about-end-button:hover { background: var(--cor-acento); transform: translate(-1px, -1px); }
 
-/* Sem espaço entre o bloco final e o footer */
 .about-end + * { margin-top: 0; }
 body:has(.about-end) .site-footer { margin-top: 0; }
 
@@ -177,7 +169,6 @@ body:has(.about-end) .site-footer { margin-top: 0; }
     .about-end { padding: 64px var(--gutter); }
 }
 
-/* Logo [contratempo] no bloco final */
 .about-end > .about-end-marca {
     font-family: var(--font-display);
     font-size: 1.7rem;
@@ -186,7 +177,6 @@ body:has(.about-end) .site-footer { margin-top: 0; }
     color: #fff;
 }
 
-/* Nome no pôster na fonte do logo (Adult Swim) */
 .about-poster span,
 .about-poster strong { font-family: var(--font-marca); letter-spacing: -0.03em; }
 .about-poster span { font-size: 1.4rem; font-weight: 700; color: #fff; }

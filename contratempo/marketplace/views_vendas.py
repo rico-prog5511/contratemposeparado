@@ -1,13 +1,3 @@
-"""
-marketplace/views_vendas.py
-
-Área do vendedor, parte pós-venda:
-  - Minhas vendas: pedidos dos produtos do vendedor, endereço de entrega
-    e avanço do status (aprovar pagamento → preparar → enviar com
-    código de rastreio). O comprador é avisado por e-mail a cada etapa.
-  - Perguntas recebidas: responder as perguntas feitas nos anúncios.
-"""
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -27,8 +17,6 @@ from .views_conta import _proximo
 def _breadcrumbs(*itens):
     return [{"label": "Minha conta", "url": reverse("perfil")}, *itens]
 
-
-# ===== MINHAS VENDAS =====
 
 @login_required
 def vendas(request):
@@ -84,13 +72,10 @@ def venda_detalhe(request, pedido_id):
 @login_required
 @require_POST
 def venda_avancar(request, pedido_id):
-    """Leva o pedido à próxima etapa. Para "enviado", exige o rastreio."""
     with transaction.atomic():
         pedido = get_object_or_404(Pedido.objects.select_for_update(), pk=pedido_id, vendedor=request.user)
         proximo = Pedido.PROXIMO_STATUS_VENDEDOR.get(pedido.status_pedido)
 
-        # Protege contra clique duplo / aba antiga: o formulário informa
-        # de qual status ele partiu.
         if not proximo or request.POST.get("status_atual") != pedido.status_pedido:
             messages.error(request, "O pedido já foi atualizado. Confira o status atual.")
             return redirect("venda_detalhe", pedido_id=pedido.id)
@@ -129,8 +114,6 @@ def venda_cancelar(request, pedido_id):
     messages.success(request, f"Pedido #{pedido.id} cancelado. As unidades voltaram ao estoque e o comprador foi avisado.")
     return redirect("venda_detalhe", pedido_id=pedido.id)
 
-
-# ===== PERGUNTAS RECEBIDAS =====
 
 @login_required
 def perguntas_recebidas(request):

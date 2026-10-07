@@ -1,5 +1,3 @@
-"""Ponto de entrada WSGI (usado pelo servidor web em produção)."""
-
 import os
 
 from django.core.wsgi import get_wsgi_application

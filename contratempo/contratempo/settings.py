@@ -1,5 +1,3 @@
-"""Configurações do contratempo. Senhas e chaves vêm do arquivo .env."""
-
 import os
 from pathlib import Path
 
@@ -7,12 +5,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def _carregar_env(caminho):
-    """
-    Lê o arquivo .env (CHAVE=valor por linha) para os.environ.
-    Cada máquina tem o seu .env com as próprias senhas; ele não vai
-    junto quando o projeto é copiado. Modelo: .env.exemplo.
-    Variáveis já definidas no terminal têm prioridade.
-    """
     if not caminho.exists():
         return
     for linha in caminho.read_text(encoding="utf-8").splitlines():
@@ -25,11 +17,6 @@ def _carregar_env(caminho):
 
 _carregar_env(BASE_DIR.parent / ".env")
 
-# Produção x desenvolvimento, controlado pelo .env:
-#   DJANGO_DEBUG=0                         -> modo produção (site publicado)
-#   DJANGO_ALLOWED_HOSTS=seunome.pythonanywhere.com
-#   DJANGO_SECRET_KEY=<chave longa e secreta>
-# Sem essas variáveis, vale o modo desenvolvimento (DEBUG ligado).
 DEBUG = os.environ.get("DJANGO_DEBUG", "1").strip().lower() in ("1", "true", "sim")
 
 _CHAVE_DESENVOLVIMENTO = "django-insecure-i*pz9sw&-17%74%bn9=u#9egxsehb@is48$z98tiygg+_+d_ps"
@@ -43,18 +30,13 @@ ALLOWED_HOSTS = [h.strip() for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "").s
 if DEBUG:
     ALLOWED_HOSTS += ["localhost", "127.0.0.1", "[::1]"]
 
-# Formulários enviados pelo domínio publicado (HTTPS) são aceitos pelo CSRF.
 CSRF_TRUSTED_ORIGINS = [f"https://{h.lstrip('.')}" for h in ALLOWED_HOSTS if h not in ("localhost", "127.0.0.1", "[::1]")]
 
 if not DEBUG:
-    # O PythonAnywhere entrega o HTTPS por um proxy; este cabeçalho avisa o Django.
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    # O redirecionamento para HTTPS é feito pelo PythonAnywhere (aba Web >
-    # "Force HTTPS"). HSTS fica desligado: o domínio pythonanywhere.com não
-    # é seu, e um erro de HSTS trava o acesso ao site por meses.
     SILENCED_SYSTEM_CHECKS = ["security.W004", "security.W008"]
 
 INSTALLED_APPS = [
@@ -83,7 +65,6 @@ WSGI_APPLICATION = 'contratempo.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        # Valores vêm do .env (veja .env.exemplo na raiz do projeto).
         "NAME": os.environ.get("DB_NAME", "contratempo_db"),
         "USER": os.environ.get("DB_USER", "root"),
         "PASSWORD": os.environ.get("DB_PASSWORD", ""),
@@ -95,8 +76,6 @@ DATABASES = {
     }
 }
 
-# DB_ENGINE=sqlite no .env: usa um arquivo local em vez do MySQL.
-# Útil em máquinas sem servidor MySQL (o HeidiSQL também abre esse arquivo).
 if os.environ.get("DB_ENGINE", "mysql").lower() == "sqlite":
     DATABASES = {
         "default": {
@@ -147,48 +126,23 @@ TEMPLATES = [
 ]
 
 STATIC_URL = "static/"
-# Os estáticos ficam em marketplace/static/; uma pasta static/ na raiz é opcional.
 STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
-STATIC_ROOT = BASE_DIR / "staticfiles"  # usado só em produção (collectstatic)
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# Em produção, CSS/JS ganham uma "impressão digital" no nome a cada mudança
-# (ex.: styles-retro.3f9a1c2b.css), para nenhum navegador ficar preso a uma
-# cópia velha em cache. Exige rodar o collectstatic a cada atualização — o
-# atualizar.sh já faz isso. Detalhes em marketplace/estaticos.py.
 if not DEBUG:
     STORAGES = {
         "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
         "staticfiles": {"BACKEND": "marketplace.estaticos.EstaticosComVersao"},
     }
 
-# Uploads (imagens de anúncios e avatares). ProdutoImagem.url_imagem e
-# Usuario.avatar guardam a URL pública gerada por default_storage.
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 LOGIN_URL = "login"
 
-# ---------------------------------------------------------------------
-# E-MAIL (Gmail SMTP)
-# As credenciais vêm de variáveis de ambiente — nunca escreva a senha
-# aqui. No Gmail, use uma "senha de app" (Conta Google > Segurança >
-# Verificação em duas etapas > Senhas de app), não a senha normal.
-#
-# Preencha EMAIL_HOST_USER e EMAIL_HOST_PASSWORD no arquivo .env da raiz
-# do projeto (ou defina no terminal com $env:EMAIL_HOST_USER = "...").
-#
-# Sem essas variáveis, os e-mails são impressos no terminal do
-# runserver (útil em desenvolvimento para copiar os links).
-# ---------------------------------------------------------------------
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "").strip()
-# O Google mostra a senha de app em blocos ("abcd efgh ijkl mnop");
-# os espaços são removidos para evitar erro de login.
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "").replace(" ", "").strip()
 
-# Brevo (brevo.com): usado quando há BREVO_API_KEY no .env. Necessário no
-# PythonAnywhere grátis, onde o Gmail recusa o login vindo do servidor.
-# O remetente continua sendo EMAIL_HOST_USER, que precisa estar confirmado
-# no Brevo. Detalhes em marketplace/email_brevo.py.
 BREVO_API_KEY = os.environ.get("BREVO_API_KEY", "").strip()
 
 if BREVO_API_KEY:
@@ -205,10 +159,8 @@ else:
 
 DEFAULT_FROM_EMAIL = f"contratempo <{EMAIL_HOST_USER or 'nao-responda@contratempo.local'}>"
 
-# Validade dos links de confirmação de cadastro e de nova senha (3 dias).
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 3
 
-# Mostra no terminal do runserver os erros do app (ex.: falha de e-mail).
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,

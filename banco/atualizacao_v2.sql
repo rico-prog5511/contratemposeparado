@@ -1,32 +1,10 @@
--- =====================================================================
--- CONTRATEMPO — atualização do banco da versão 1 para a versão 2
---
--- Equivale a `python manage.py migrate` (migrations marketplace 0002 e
--- 0003). Use UM dos dois, nunca os dois: este script também registra as
--- migrations em django_migrations.
---
--- Faça backup antes:
---   mysqldump -u root -p contratempo_db > backup_contratempo.sql
--- Depois:
---   mysql -u root -p contratempo_db < banco/atualizacao_v2.sql
--- =====================================================================
-
 SET NAMES utf8mb4;
 USE `contratempo_db`;
 
 START TRANSACTION;
 
--- =====================================================================
--- 1. USUÁRIOS: confirmação de e-mail
--- =====================================================================
-
--- Contas existentes continuam liberadas (DEFAULT 1).
 ALTER TABLE `usuarios`
   ADD COLUMN `email_confirmado` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'contas criadas pelo site começam em 0 até clicar no link do e-mail' AFTER `last_login`;
-
--- =====================================================================
--- 2. PEDIDOS: um pedido por vendedor, frete e rastreio
--- =====================================================================
 
 ALTER TABLE `pedidos`
   MODIFY COLUMN `valor_total` decimal(10,2) NOT NULL COMMENT 'produtos + frete',
@@ -39,7 +17,6 @@ ALTER TABLE `pedidos`
   ADD CONSTRAINT `fk_pedidos_vendedor` FOREIGN KEY (`vendedor_id`) REFERENCES `usuarios` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   ADD CONSTRAINT `chk_pedidos_valor_frete` CHECK ((`valor_frete` >= 0));
 
--- Pedidos antigos: vendedor = dono do primeiro item que ainda existe.
 UPDATE `pedidos` p
   JOIN (
     SELECT ip.pedido_id, MIN(ip.id) AS primeiro_item
@@ -51,10 +28,6 @@ UPDATE `pedidos` p
   JOIN `produtos` pr ON pr.id = ip.produto_id
    SET p.vendedor_id = pr.vendedor_id
  WHERE p.vendedor_id IS NULL;
-
--- =====================================================================
--- 3. NOVAS TABELAS
--- =====================================================================
 
 CREATE TABLE `tabela_frete` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -96,11 +69,6 @@ CREATE TABLE `perguntas_produto` (
   CONSTRAINT `fk_perguntas_produto_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Perguntas públicas dos compradores aos vendedores';
 
--- =====================================================================
--- 4. DADOS INICIAIS
--- =====================================================================
-
--- Valores de exemplo por região — ajuste em /admin/ > Tabela de frete.
 INSERT INTO `tabela_frete` (`uf`, `regiao`, `valor`, `prazo_dias`) VALUES
   ('SP', 'sudeste', '19.90', 5),
   ('RJ', 'sudeste', '19.90', 5),
@@ -148,10 +116,6 @@ INSERT INTO `perguntas_frequentes` (`tema`, `pergunta`, `resposta`, `ordem`) VAL
   ('vendas', 'Como respondo às perguntas dos compradores?', 'Em Minha conta > Perguntas recebidas, ou direto na página do seu anúncio. O comprador é avisado por e-mail quando você responde.', 14),
   ('seguranca', 'Meus dados de cartão ficam salvos?', 'Não. Guardamos apenas o tipo da forma de pagamento, a bandeira e os 4 últimos dígitos, para você identificar o cartão. Veja a Política de privacidade para mais detalhes.', 15),
   ('seguranca', 'A contratempo pede minha senha por e-mail?', 'Nunca. Nossos e-mails só trazem links para o próprio site. Se receber um pedido de senha, não responda e avise a gente pela página de contato.', 16);
-
--- =====================================================================
--- 5. REGISTRO DAS MIGRATIONS
--- =====================================================================
 
 INSERT INTO `django_migrations` (`app`, `name`, `applied`) VALUES
   ('marketplace', '0002_frete_vendas_perguntas', NOW(6)),

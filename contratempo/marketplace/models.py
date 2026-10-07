@@ -1,14 +1,3 @@
-"""
-marketplace/models.py
-
-Models do contratempo mapeados para as tabelas já existentes em
-contratempo_db.sql. Todos usam managed = True: o Django é responsável
-por futuras migrations, e a tabela inicial criada pelo SQL é "adotada"
-via `migrate --fake-initial` (ver seção H do guia).
-
-Não existe Model de Favorito — a funcionalidade foi removida do projeto.
-"""
-
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
@@ -16,24 +5,7 @@ from django.db import models
 from django.utils import timezone
 
 
-# ===== USUÁRIO PERSONALIZADO =====
-
 class UsuarioManager(BaseUserManager):
-    """
-    Manager customizado: usa e-mail como identificador de login e
-    normaliza (lowercase) o e-mail antes de salvar, para manter
-    consistência com a collation case-insensitive do MySQL.
-
-    IMPORTANTE: o parâmetro precisa se chamar exatamente "password"
-    (não "senha"). O comando `createsuperuser` do Django sempre
-    chama create_superuser(**user_data) passando a senha digitada
-    com a chave "password" — se o parâmetro tivesse outro nome, a
-    senha real cairia em **extra_fields (e seria sobrescrita por
-    set_password(None), gerando uma senha inutilizável). O nome da
-    COLUNA no banco continua sendo "senha" (mapeado via db_column
-    no campo `password` do Model abaixo); só o parâmetro do manager
-    precisa seguir a convenção do Django.
-    """
 
     def _criar_usuario(self, email, password, **extra_fields):
         if not email:
@@ -63,10 +35,6 @@ class UsuarioManager(BaseUserManager):
 
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
-    """
-    Mapeia a tabela `usuarios`. Substitui completamente o User padrão
-    do Django (AUTH_USER_MODEL = "marketplace.Usuario").
-    """
 
     STATUS_CONTA_CHOICES = [
         ("ativo", "Ativo"),
@@ -77,8 +45,6 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     id = models.BigAutoField(primary_key=True)
     nome_completo = models.CharField(max_length=150)
     email = models.EmailField(max_length=254, unique=True)
-    # "password" é o nome esperado internamente pelo Django
-    # (set_password/check_password); mapeamos para a coluna "senha".
     password = models.CharField(max_length=128, db_column="senha")
     data_nascimento = models.DateField(null=True, blank=True)
     telefone = models.CharField(max_length=20, null=True, blank=True)
@@ -90,10 +56,6 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    # is_superuser já é fornecido pelo PermissionsMixin
-    # Contas criadas pelo site começam com False até o usuário clicar no
-    # link enviado por e-mail. O default True mantém liberados os
-    # usuários antigos e os criados por createsuperuser/admin.
     email_confirmado = models.BooleanField(default=True)
 
     objects = UsuarioManager()
@@ -110,13 +72,10 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         return f"{self.nome_completo} <{self.email}>"
 
     def desativar_conta(self):
-        """Soft-delete: nunca excluir fisicamente um usuário com produtos."""
         self.is_active = False
         self.status_conta = "inativo"
         self.save(update_fields=["is_active", "status_conta"])
 
-
-# ===== ENDEREÇOS E FORMAS DE PAGAMENTO =====
 
 class Endereco(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -148,12 +107,6 @@ class Endereco(models.Model):
 
 
 class FormaPagamento(models.Model):
-    """
-    Cartão salvo do usuário. PIX e boleto não são cadastrados: são
-    escolhidos direto no checkout (ver views_checkout.OPCOES_SEM_CADASTRO).
-    Nunca guarda o número completo nem o CVV — só bandeira, 4 últimos
-    dígitos e validade.
-    """
 
     TIPO_CHOICES = [
         ("cartao_credito", "Cartão de crédito"),
@@ -194,7 +147,6 @@ class FormaPagamento(models.Model):
 
     @property
     def descricao(self):
-        """Ex.: "Cartão de crédito Visa final 4242" (vai para o pedido)."""
         final = f"final {self.ultimos_digitos}" if self.ultimos_digitos else ""
         return " ".join(p for p in (self.get_tipo_display(), self.bandeira, final) if p)
 
@@ -206,19 +158,12 @@ class FormaPagamento(models.Model):
 
     @property
     def vencido(self):
-        """O cartão vale até o último dia do mês da validade."""
         if not (self.validade_mes and self.validade_ano):
             return False
         hoje = timezone.localdate()
         return (self.validade_ano, self.validade_mes) < (hoje.year, hoje.month)
 
 
-# ===== CATEGORIAS E FRANQUIAS =====
-
-# Como o campo `marca` do produto é chamado em cada categoria. A escolha é
-# pelas palavras do nome/slug da categoria (sem acento), então funciona
-# também para categorias novas criadas no admin. Vale a primeira que bater.
-# (começos de palavra, rótulo, exemplo para o campo)
 ROTULOS_MARCA = [
     (("livro", "quadrinho", "hq", "manga", "gibi", "revista"), "Autor / editora", "Ex.: Frank Miller, Panini"),
     (("music", "disco", "vini", "cd", "fita", "lp"), "Artista / banda", "Ex.: Legião Urbana"),
@@ -230,7 +175,6 @@ ROTULO_MARCA_PADRAO = ("Marca / autor", "Ex.: Bandai, Frank Miller")
 
 
 def rotulo_marca(categoria):
-    """(rótulo, exemplo) do campo marca para a categoria (ou o padrão, sem categoria)."""
     if categoria is None:
         return ROTULO_MARCA_PADRAO
     from .busca import normalizar
@@ -259,7 +203,6 @@ class Categoria(models.Model):
 
     @property
     def rotulo_marca(self):
-        """Ex.: "Autor / editora" para Quadrinhos, "Artista / banda" para Discos."""
         return rotulo_marca(self)[0]
 
 
@@ -279,8 +222,6 @@ class Franquia(models.Model):
         return self.nome
 
 
-# ===== PRODUTOS =====
-
 class Produto(models.Model):
     CONDICAO_CHOICES = [
         ("novo", "Novo"),
@@ -297,7 +238,7 @@ class Produto(models.Model):
     id = models.BigAutoField(primary_key=True)
     vendedor = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT,  # nunca apagar produtos junto do usuário
+        on_delete=models.PROTECT,
         related_name="produtos",
         db_column="vendedor_id",
     )
@@ -356,7 +297,6 @@ class ProdutoImagem(models.Model):
         ordering = ["ordem_exibicao"]
 
     def save(self, *args, **kwargs):
-        # Garante uma única imagem principal por produto.
         if self.principal:
             ProdutoImagem.objects.filter(
                 produto_id=self.produto_id, principal=True
@@ -366,8 +306,6 @@ class ProdutoImagem(models.Model):
     def __str__(self):
         return f"Imagem de {self.produto.nome} (#{self.ordem_exibicao})"
 
-
-# ===== CARRINHO =====
 
 class Carrinho(models.Model):
     STATUS_CHOICES = [
@@ -386,9 +324,6 @@ class Carrinho(models.Model):
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default="ativo")
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
-    # A coluna gerada `usuario_carrinho_ativo` existe no banco para
-    # garantir (via UNIQUE) um único carrinho ativo por usuário, mas
-    # não precisa ser exposta como campo do Model.
 
     class Meta:
         db_table = "carrinhos"
@@ -397,7 +332,6 @@ class Carrinho(models.Model):
 
     @classmethod
     def obter_carrinho_ativo(cls, usuario):
-        """Ponto único para obter/criar o carrinho ativo de um usuário."""
         carrinho, _ = cls.objects.get_or_create(
             usuario=usuario, status="ativo"
         )
@@ -439,8 +373,6 @@ class ItemCarrinho(models.Model):
         return f"{self.quantidade}x {self.produto.nome}"
 
 
-# ===== PEDIDOS =====
-
 class Pedido(models.Model):
     STATUS_CHOICES = [
         ("aguardando_pagamento", "Aguardando pagamento"),
@@ -454,16 +386,14 @@ class Pedido(models.Model):
     id = models.BigAutoField(primary_key=True)
     usuario = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT,  # histórico de vendas nunca é apagado
+        on_delete=models.PROTECT,
         related_name="pedidos",
         db_column="usuario_id",
     )
-    # O checkout gera UM pedido por vendedor: cada vendedor envia, cobra
-    # frete e atualiza o status do seu pedido de forma independente.
     vendedor = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
-        null=True,  # pedidos antigos, anteriores à divisão por vendedor
+        null=True,
         related_name="vendas",
         db_column="vendedor_id",
     )
@@ -486,7 +416,7 @@ class Pedido(models.Model):
     status_pedido = models.CharField(
         max_length=25, choices=STATUS_CHOICES, default="aguardando_pagamento"
     )
-    valor_total = models.DecimalField(max_digits=10, decimal_places=2)  # produtos + frete
+    valor_total = models.DecimalField(max_digits=10, decimal_places=2)
     valor_frete = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     prazo_entrega_dias = models.PositiveSmallIntegerField(null=True, blank=True)
     codigo_rastreio = models.CharField(max_length=50, null=True, blank=True)
@@ -494,8 +424,6 @@ class Pedido(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
 
-    # Etapas que o VENDEDOR pode aplicar, a partir de cada status.
-    # "entregue" é confirmado pelo comprador (ou pelo admin).
     PROXIMO_STATUS_VENDEDOR = {
         "aguardando_pagamento": "pagamento_aprovado",
         "pagamento_aprovado": "processamento",
@@ -520,7 +448,7 @@ class ItemPedido(models.Model):
     id = models.BigAutoField(primary_key=True)
     pedido = models.ForeignKey(
         Pedido,
-        on_delete=models.PROTECT,  # nunca apagar item junto do pedido
+        on_delete=models.PROTECT,
         related_name="itens",
         db_column="pedido_id",
     )
@@ -544,8 +472,6 @@ class ItemPedido(models.Model):
     def __str__(self):
         return f"{self.quantidade}x {self.nome_produto} (pedido #{self.pedido_id})"
 
-
-# ===== CONTATO =====
 
 class Contato(models.Model):
     STATUS_CHOICES = [
@@ -579,8 +505,6 @@ class Contato(models.Model):
     def __str__(self):
         return f"{self.assunto} — {self.nome}"
 
-
-# ===== AVALIAÇÕES =====
 
 class Avaliacao(models.Model):
     STATUS_CHOICES = [
@@ -620,11 +544,6 @@ class Avaliacao(models.Model):
         unique_together = [("usuario", "produto", "pedido")]
 
     def clean(self):
-        """
-        Regra de negócio que o banco NÃO garante sozinho: só quem
-        realmente comprou o produto (nesse pedido, já entregue) pode
-        avaliá-lo. Chamado por full_clean() no ModelForm/Admin/serializer.
-        """
         from django.core.exceptions import ValidationError
 
         if not (1 <= self.nota <= 5):
@@ -648,15 +567,8 @@ class Avaliacao(models.Model):
     def __str__(self):
         return f"{self.produto.nome} — nota {self.nota} ({self.usuario})"
 
-# ===== FRETE =====
 
 class TabelaFrete(models.Model):
-    """
-    Valor e prazo de entrega por UF de destino, editáveis no /admin/.
-    O checkout cobra UM frete por vendedor (cada vendedor envia seu
-    pacote). Os valores iniciais vêm da migration 0003 e devem ser
-    ajustados à realidade do negócio.
-    """
 
     REGIAO_CHOICES = [
         ("norte", "Norte"),
@@ -683,8 +595,6 @@ class TabelaFrete(models.Model):
         return f"{self.uf} — R$ {self.valor} ({self.prazo_dias} dias)"
 
 
-# ===== DÚVIDAS FREQUENTES =====
-
 class PerguntaFrequente(models.Model):
     TEMA_CHOICES = [
         ("conta", "Conta e cadastro"),
@@ -710,8 +620,6 @@ class PerguntaFrequente(models.Model):
     def __str__(self):
         return self.pergunta
 
-
-# ===== PERGUNTAS AO VENDEDOR =====
 
 class PerguntaProduto(models.Model):
     STATUS_CHOICES = [
@@ -748,14 +656,7 @@ class PerguntaProduto(models.Model):
         return f"{self.produto.nome}: {self.pergunta[:50]}"
 
 
-# ===== DENÚNCIAS DE ANÚNCIOS =====
-
 class Denuncia(models.Model):
-    """
-    Denúncia de um anúncio feita por um usuário. A equipe analisa no
-    /admin/ (Denúncias): "procedente" encerra o anúncio, "improcedente"
-    só arquiva. O vendedor não fica sabendo quem denunciou.
-    """
 
     MOTIVO_CHOICES = [
         ("falsificado", "Produto falsificado ou pirata"),

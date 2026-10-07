@@ -1,17 +1,3 @@
-"""
-marketplace/relatorios.py
-
-Números do relatório anual do admin (/admin/marketplace/pedido/relatorio-anual/)
-e do cartão "Movimentado no ano" do painel.
-
-"Movimentado" = soma dos pedidos NÃO cancelados (produtos + frete),
-pela data em que o pedido foi feito.
-
-Os meses são separados em Python (timezone.localtime), e não com
-TruncMonth no banco: assim o relatório não depende das tabelas de fuso
-horário do MySQL (que não vêm instaladas no Windows).
-"""
-
 from collections import defaultdict
 from datetime import datetime
 from decimal import Decimal
@@ -33,7 +19,6 @@ def inicio_do_ano(ano):
 
 
 def _intervalo(inicio, fim):
-    """Filtro da lista de pedidos do admin entre duas datas."""
     return {"data_criacao__gte": str(inicio), "data_criacao__lt": str(fim)}
 
 
@@ -42,7 +27,6 @@ def link_pedidos(**filtros):
 
 
 def anos_disponiveis():
-    """Anos que têm pedidos (mais o atual), do mais recente ao mais antigo."""
     datas = Pedido.objects.aggregate(primeiro=Min("data_criacao"), ultimo=Max("data_criacao"))
     atual = timezone.localdate().year
     if not datas["primeiro"]:
@@ -53,7 +37,6 @@ def anos_disponiveis():
 
 
 def resumo_do_ano(ano):
-    """Total movimentado e número de pedidos válidos no ano (para o cartão)."""
     pedidos = (
         Pedido.objects
         .filter(data_criacao__gte=inicio_do_ano(ano), data_criacao__lt=inicio_do_ano(ano + 1))
@@ -107,7 +90,6 @@ def relatorio_anual(ano):
             v["pedidos"] += 1
             v["total"] += pedido.valor_total
 
-    # Barras proporcionais ao maior mês e links para os pedidos de cada mês
     maior = max((m["total"] for m in meses), default=ZERO)
     for m in meses:
         m["percentual"] = round(100 * m["total"] / maior) if maior else 0

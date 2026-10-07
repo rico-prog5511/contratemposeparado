@@ -1,22 +1,8 @@
--- =====================================================================
--- CONTRATEMPO — atualização do banco da versão 3 para a versão 4
---
--- Formas de pagamento passam a ser só cartões, com validade. PIX e
--- boleto agora são escolhidos direto no checkout. Equivale a
--- `python manage.py migrate` (migration marketplace 0005). Use UM dos
--- dois, nunca os dois. O rodar.bat já aplica as migrations sozinho.
---
---   mysql -u root -p contratempo_db < banco/atualizacao_v4.sql
--- =====================================================================
-
 SET NAMES utf8mb4;
 USE `contratempo_db`;
 
--- PIX, boleto e "outro" salvos deixam de existir. Pedidos antigos não
--- mudam: guardam o texto do pagamento e a ligação vira NULL (SET NULL).
 DELETE FROM `formas_pagamento` WHERE `tipo` NOT IN ('cartao_credito', 'cartao_debito');
 
--- Quem ficou sem principal tem o cartão mais antigo promovido.
 UPDATE `formas_pagamento` f
 JOIN (
   SELECT MIN(`id`) AS `id` FROM `formas_pagamento`

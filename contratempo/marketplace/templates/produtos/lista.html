@@ -23,7 +23,6 @@
         <p class="catalog-count mono">{{ page_obj.paginator.count }} produto{{ page_obj.paginator.count|pluralize }}</p>
     </header>
 
-    <!-- Categorias em pílulas -->
     <nav class="catalog-categories" aria-label="Categorias">
         <a href="{% url 'produtos' %}{% if busca %}?q={{ busca|urlencode }}{% endif %}" class="chip {% if not categoria_atual %}active{% endif %}">Todas</a>
         {% for categoria in categorias %}
@@ -33,7 +32,6 @@
 
     <div class="catalog-layout">
 
-        <!-- FILTROS -->
         <aside class="catalog-filters" id="filtros" aria-label="Filtros">
             <details class="filters-panel" open data-filters>
                 <summary>
@@ -118,7 +116,6 @@
             </details>
         </aside>
 
-        <!-- RESULTADOS -->
         <section class="catalog-results" aria-label="Produtos">
             {% if etiquetas %}
                 <div class="filtros-ativos">

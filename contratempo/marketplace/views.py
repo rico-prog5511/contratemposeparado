@@ -1,16 +1,3 @@
-"""
-marketplace/views.py
-
-Vitrine pública: home, catálogo/busca, categorias, detalhe do produto,
-carrinho e páginas institucionais (sobre nós, contato, privacidade).
-
-As demais áreas ficam em arquivos próprios:
-    views_conta.py     — login, cadastro, perfil, endereços, pagamentos
-    views_checkout.py  — checkout e pedidos
-    views_anuncios.py  — área do vendedor (anúncios e estoque)
-    views_errors.py    — páginas 403 / 404 / 500
-"""
-
 import os
 from decimal import Decimal
 
@@ -50,11 +37,10 @@ from .models import (
     Usuario,
 )
 
-PRODUTOS_POR_PAGINA = 12  # ordenações e filtros do catálogo: catalogo.py
+PRODUTOS_POR_PAGINA = 12
 
 
 def produtos_ativos():
-    """Queryset base de tudo que aparece na vitrine."""
     return (
         Produto.objects
         .filter(status_anuncio="ativo")
@@ -69,8 +55,6 @@ def _url_segura(request, url):
     )
 
 
-# ===== HOME E INSTITUCIONAL =====
-
 def home(request):
     produtos_recentes = produtos_ativos().order_by("-data_criacao")[:4]
 
@@ -82,17 +66,11 @@ def home(request):
     })
 
 
-# Foto de fundo do 1º slide do banner da home. Para usar/trocar: coloque o
-# arquivo em marketplace/static/img/banner/ com o nome banner-1 (.jpg,
-# .jpeg, .png ou .webp). Sem o arquivo, o slide fica com o fundo vermelho.
-# As versões leves (banner-1-<largura>.webp) são geradas por
-# `python manage.py otimizar_banner` (o atualizar.sh já roda).
 FOTO_BANNER = "img/banner/banner-1"
-LARGURAS_BANNER = (800, 1280, 1920)  # da menor para a maior (a maior é o src padrão)
+LARGURAS_BANNER = (800, 1280, 1920)
 
 
 def _foto_banner():
-    """{"src", "srcset"} da foto do banner, ou None se não houver foto."""
     original = next(
         (f"{FOTO_BANNER}.{ext}" for ext in ("webp", "jpg", "jpeg", "png") if finders.find(f"{FOTO_BANNER}.{ext}")),
         None,
@@ -100,8 +78,6 @@ def _foto_banner():
     if original is None:
         return None
     data_original = os.path.getmtime(finders.find(original))
-    # Só usa as versões leves se foram geradas DEPOIS da foto atual (trocou a
-    # foto e ainda não rodou o comando? usa a original até rodar).
     versoes = []
     for largura in LARGURAS_BANNER:
         caminho = f"{FOTO_BANNER}-{largura}.webp"
@@ -113,8 +89,6 @@ def _foto_banner():
     return {"src": static(original), "srcset": ""}
 
 
-# Faixas de preço da home: (nome, preço mínimo exclusivo, preço máximo inclusivo).
-# Os limites batem com o filtro do catálogo (preco_min usa >=, por isso o +0,01).
 FAIXAS_PRECO = [
     ("Pra começar a coleção", None, 50),
     ("Achados", 50, 200),
@@ -124,7 +98,6 @@ FAIXAS_PRECO = [
 
 
 def _faixas_preco():
-    """Faixas com quantos anúncios ativos cada uma tem. Faixas vazias não aparecem."""
     def filtro(acima_de, ate):
         q = Q()
         if acima_de is not None:
@@ -163,11 +136,6 @@ def _faixas_preco():
 
 
 def produtos_vistos(request):
-    """
-    Cards dos "Vistos recentemente" da home. Os ids vêm do navegador
-    (localStorage, ver vistos.js) na ordem do mais recente; aqui só entram
-    anúncios ainda ativos, e no máximo 4.
-    """
     ids = [int(i) for i in request.GET.get("ids", "").split(",")[:12] if i.isdigit()]
     por_id = {p.id: p for p in produtos_ativos().filter(id__in=ids)}
     produtos = [por_id[i] for i in ids if i in por_id][:4]
@@ -243,8 +211,6 @@ def contato(request):
     })
 
 
-# ===== CATÁLOGO, BUSCA E CATEGORIAS =====
-
 def produtos(request):
     qs = produtos_ativos()
 
@@ -266,8 +232,6 @@ def produtos(request):
         if vendedor_atual:
             qs = qs.filter(vendedor=vendedor_atual)
 
-    # Filtros, contagens e ordenação ficam em catalogo.py. `qs` até aqui é a
-    # "base" (busca + categoria + vendedor), sobre a qual as contagens são feitas.
     filtros = catalogo.ler_filtros(request.GET)
     filtros["_bem_avaliados"] = catalogo.vendedores_bem_avaliados()
     opcoes = catalogo.opcoes(qs, filtros)
@@ -310,10 +274,6 @@ def produtos(request):
 
 
 def sugestoes_busca(request):
-    """
-    JSON das sugestões que aparecem enquanto a pessoa digita na busca do
-    topo (ver main.js). Usa a mesma busca do catálogo, sem acentos.
-    """
     termo = request.GET.get("q", "").strip()[:100]
     if len("".join(palavras_busca(termo))) < 2:
         return JsonResponse({"produtos": [], "categorias": []})
@@ -355,7 +315,6 @@ def categorias(request):
 
 
 def _calcular_frete_cep(cep):
-    """Resultado da calculadora de frete da página de produto."""
     if not cep:
         return None
     uf = uf_por_cep(cep)
@@ -368,7 +327,6 @@ def _calcular_frete_cep(cep):
 
 
 def _resumo_vendedor(vendedor):
-    """Nota média, total vendido e anúncios ativos de um vendedor."""
     avaliacoes = Avaliacao.objects.filter(produto__vendedor=vendedor, status="publicada")
     return {
         "media": avaliacoes.aggregate(m=Avg("nota"))["m"],
@@ -414,8 +372,6 @@ def produto_detalhe(request, produto_id):
     eh_dono = request.user.is_authenticated and produto.vendedor_id == request.user.id
     disponivel = produto.status_anuncio == "ativo" and produto.quantidade_disponivel > 0
 
-    # Perguntas: todas as respondidas + as pendentes do próprio usuário
-    # (o vendedor vê todas, para poder responder aqui mesmo).
     perguntas = produto.perguntas.filter(status="publicada").select_related("usuario")
     if not eh_dono:
         visiveis = Q(resposta__isnull=False)
@@ -423,7 +379,6 @@ def produto_detalhe(request, produto_id):
             visiveis |= Q(usuario=request.user)
         perguntas = perguntas.filter(visiveis)
 
-    # CEP da calculadora: o informado agora ou o do endereço principal.
     cep = request.GET.get("cep", "").strip()
     if not cep and request.user.is_authenticated:
         principal = request.user.enderecos.filter(endereco_principal=True).first()
@@ -486,7 +441,6 @@ def denunciar_produto(request, produto_id):
 
 
 def vendedor_perfil(request, usuario_id):
-    """Página pública do vendedor: reputação, avaliações e anúncios."""
     vendedor = get_object_or_404(Usuario, pk=usuario_id, is_active=True)
 
     avaliacoes = (
@@ -554,7 +508,6 @@ def fazer_pergunta(request, produto_id):
         messages.error(request, "A pergunta pode ter no máximo 500 caracteres.")
         return redirect(destino)
 
-    # Evita envio duplicado (clique duplo / F5).
     if PerguntaProduto.objects.filter(produto=produto, usuario=request.user, pergunta=texto).exists():
         messages.info(request, "Você já enviou essa pergunta.")
         return redirect(destino)
@@ -585,14 +538,7 @@ def faq(request):
     })
 
 
-# ===== CARRINHO =====
-
 def validar_itens_carrinho(itens):
-    """
-    Confere cada item contra o estado atual do produto e atualiza o
-    preço unitário se o vendedor tiver alterado o preço. Devolve a lista
-    de problemas que impedem o checkout (vazia = tudo certo).
-    """
     problemas = []
     for item in itens:
         produto = item.produto
@@ -636,8 +582,6 @@ def carrinho(request):
     itens = itens_do_carrinho(carrinho_ativo)
     problemas = validar_itens_carrinho(itens)
 
-    # Estimativa de frete pelo endereço principal (o valor final é o do
-    # endereço escolhido no checkout).
     principal = request.user.enderecos.filter(endereco_principal=True).first()
     envios, faixa = calcular_envios(itens, principal.estado if principal else None)
 

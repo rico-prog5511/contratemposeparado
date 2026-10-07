@@ -1,17 +1,3 @@
-"""
-marketplace/catalogo.py
-
-Filtros, contagens e ordenação da página de produtos (views.produtos).
-
-Cada filtro é uma "dimensão" (franquia, condição, marca, década...). Para
-mostrar quantos produtos cada opção teria, a contagem de uma dimensão usa
-TODOS os outros filtros ligados, menos ela mesma — assim marcar "Bandai"
-não zera a contagem de "Hasbro", mas marcar "Novo" muda a contagem das
-marcas. Opções que dariam zero produtos aparecem desabilitadas.
-
-Tudo usa campos que já existem no banco (nada novo).
-"""
-
 from collections import Counter
 from decimal import Decimal, InvalidOperation
 
@@ -21,7 +7,7 @@ from django.db.models.functions import Coalesce
 from .models import Avaliacao, Franquia, Produto
 
 NOTA_BEM_AVALIADO = 4
-DECADA_MINIMA = 1950  # anos anteriores entram numa opção só: "Antes de 1950"
+DECADA_MINIMA = 1950
 
 ORDENACOES = {
     "recentes": "Mais recentes",
@@ -33,8 +19,6 @@ ORDENACOES = {
     "nome": "Nome (A–Z)",
 }
 
-
-# ----- Leitura dos filtros da URL -----
 
 def _decimal(valor):
     try:
@@ -49,7 +33,6 @@ def _inteiro(valor, minimo=1000, maximo=2100):
 
 
 def ler_filtros(get):
-    """request.GET -> dicionário com os filtros válidos (o que for inválido é ignorado)."""
     decadas = sorted({int(d) for d in get.getlist("decada") if d.isdigit() and int(d) % 10 == 0 and 1800 <= int(d) <= 2100})
     return {
         "franquia": [s for s in get.getlist("franquia") if s],
@@ -66,7 +49,6 @@ def ler_filtros(get):
 
 
 def vendedores_bem_avaliados():
-    """Ids dos vendedores com nota média >= 4 (mesma regra da página do vendedor)."""
     return list(
         Avaliacao.objects.filter(status="publicada")
         .values("produto__vendedor")
@@ -84,7 +66,6 @@ def _q_decadas(decadas):
 
 
 def aplicar(qs, f, exceto=None):
-    """Aplica os filtros em `qs`, menos a dimensão `exceto` (usada nas contagens)."""
     if f["franquia"] and exceto != "franquia":
         qs = qs.filter(franquia__slug__in=f["franquia"])
     if f["condicao"] and exceto != "condicao":
@@ -132,10 +113,7 @@ def ordenar(qs, chave):
     return qs.order_by("-data_criacao", "-id")
 
 
-# ----- Opções com contagem -----
-
 def _decada(ano):
-    """1987 -> 1980. Tudo antes de 1950 vira uma opção só ("Antes de 1950", valor 1940)."""
     return ano // 10 * 10 if ano >= DECADA_MINIMA else DECADA_MINIMA - 10
 
 
@@ -146,14 +124,12 @@ def _rotulo_decada(d):
 
 
 def opcoes(base, f):
-    """Listas de opções de cada filtro, com contagem e marcação. `base` = busca + categoria + vendedor."""
     def lista(valores_contagens, selecionados, rotulos=None):
         return [
             {"valor": v, "rotulo": (rotulos or {}).get(v, v), "total": n, "marcado": v in selecionados}
             for v, n in valores_contagens
         ]
 
-    # Franquias: todas as ativas aparecem, com a contagem atual.
     cont_franquia = dict(aplicar(base, f, "franquia").values_list("franquia__slug").annotate(n=Count("id")))
     franquias = [
         {"valor": fr.slug, "rotulo": fr.nome, "total": cont_franquia.get(fr.slug, 0), "marcado": fr.slug in f["franquia"]}
@@ -166,9 +142,6 @@ def opcoes(base, f):
         for v, r in Produto.CONDICAO_CHOICES
     ]
 
-    # Marcas e décadas: a lista mostra TODAS as que existem nesta busca/categoria
-    # (para não mudar de formato a cada clique); a contagem considera os outros
-    # filtros, e as que dariam zero ficam desabilitadas.
     com_marca = base.exclude(marca__isnull=True).exclude(marca="")
     todas_marcas = set(com_marca.values_list("marca", flat=True).distinct()) | set(f["marca"])
     cont_marca = dict(aplicar(com_marca, f, "marca").values_list("marca").annotate(n=Count("id")))
@@ -177,7 +150,6 @@ def opcoes(base, f):
         f["marca"],
     )
 
-    # Décadas: calculadas em Python a partir do ano (funciona igual no SQLite e no MySQL).
     com_ano = base.exclude(ano__isnull=True)
     todas_decadas = {_decada(ano) for ano in com_ano.values_list("ano", flat=True)} | set(f["decada"])
     cont_decada = Counter(_decada(ano) for ano in aplicar(com_ano, f, "decada").values_list("ano", flat=True))
@@ -196,10 +168,7 @@ def opcoes(base, f):
     return {"franquias": franquias, "condicoes": condicoes, "marcas": marcas, "decadas": decadas, "extras": extras}
 
 
-# ----- Etiquetas dos filtros ligados -----
-
 def _sem(get, chave, valor=None):
-    """Querystring sem um valor (ou sem a chave inteira) e sem a página."""
     copia = get.copy()
     copia.pop("page", None)
     if valor is None:
@@ -210,7 +179,6 @@ def _sem(get, chave, valor=None):
 
 
 def etiquetas(get, f, op):
-    """[{rotulo, url}] — cada filtro ligado, com o link que o remove."""
     nomes_franquia = {o["valor"]: o["rotulo"] for o in op["franquias"]}
     nomes_condicao = dict(Produto.CONDICAO_CHOICES)
     lista = []
@@ -231,7 +199,7 @@ def etiquetas(get, f, op):
         lista.append({"rotulo": rotulo, "url": "?" + copia.urlencode()})
     if f["preco_min"] is not None or f["preco_max"] is not None:
         de, ate = f["preco_min"], f["preco_max"]
-        brl = lambda v: f"R$ {v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")  # noqa: E731
+        brl = lambda v: f"R$ {v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
         rotulo = f"{brl(de)} a {brl(ate)}" if de is not None and ate is not None else (f"A partir de {brl(de)}" if de is not None else f"Até {brl(ate)}")
         copia = get.copy()
         for chave in ("preco_min", "preco_max", "page"):
@@ -252,7 +220,6 @@ def total_ligados(f):
 
 
 def url_limpar(get):
-    """Mantém busca, categoria, vendedor e ordenação; tira todos os filtros."""
     copia = get.copy()
     for chave in list(copia.keys()):
         if chave not in ("q", "categoria", "vendedor", "ordenar"):

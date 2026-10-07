@@ -1,25 +1,3 @@
--- =====================================================================
--- CONTRATEMPO — script completo do banco de dados (MySQL 8.0+)
---
--- Cria o banco do zero, já na versão 3 (frete, vendas por vendedor,
--- confirmação de e-mail, perguntas frequentes, perguntas ao vendedor e
--- denúncias de anúncios). Gerado a partir do esquema real do
--- contratempo_db + migrations do Django (marketplace 0001 a 0004).
---
--- USO (instalação nova):
---   mysql -u root -p < banco/contratempo_db.sql
---   python manage.py migrate      <- não cria tabelas (já estão marcadas
---                                     como aplicadas); só registra os
---                                     content types e as permissões do admin
---   python manage.py createsuperuser
---
--- ATENÇÃO: para um banco que JÁ EXISTE, não use este arquivo — use
--- `python manage.py migrate` ou banco/atualizacao_v2.sql.
---
--- Não contém dados pessoais (usuários, pedidos, senhas). Contém só os
--- dados de referência: categorias, franquias, tabela de frete e FAQ.
--- =====================================================================
-
 SET NAMES utf8mb4;
 SET time_zone = '-03:00';
 
@@ -29,11 +7,6 @@ CREATE DATABASE IF NOT EXISTS `contratempo_db`
 USE `contratempo_db`;
 
 SET FOREIGN_KEY_CHECKS = 0;
-
-
--- =====================================================================
--- 1. USUÁRIOS E DADOS PESSOAIS
--- =====================================================================
 
 CREATE TABLE `usuarios` (
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -90,11 +63,6 @@ CREATE TABLE `formas_pagamento` (
   KEY `idx_formas_pagamento_usuario` (`usuario_id`),
   CONSTRAINT `fk_formas_pagamento_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Formas de pagamento associadas ao usuário (sem dados sensíveis de cartão)';
-
-
--- =====================================================================
--- 2. CATÁLOGO
--- =====================================================================
 
 CREATE TABLE `categorias` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -161,11 +129,6 @@ CREATE TABLE `produto_imagens` (
   CONSTRAINT `fk_produto_imagens_produto` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Imagens vinculadas a cada produto';
 
-
--- =====================================================================
--- 3. CARRINHO
--- =====================================================================
-
 CREATE TABLE `carrinhos` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `usuario_id` bigint NOT NULL,
@@ -193,11 +156,6 @@ CREATE TABLE `itens_carrinho` (
   CONSTRAINT `fk_itens_carrinho_produto` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `chk_itens_carrinho_quantidade` CHECK ((`quantidade` > 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Itens (produtos) dentro de um carrinho';
-
-
--- =====================================================================
--- 4. PEDIDOS
--- =====================================================================
 
 CREATE TABLE `pedidos` (
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -245,11 +203,6 @@ CREATE TABLE `itens_pedido` (
   CONSTRAINT `chk_itens_pedido_quantidade` CHECK ((`quantidade` > 0)),
   CONSTRAINT `chk_itens_pedido_subtotal` CHECK ((`subtotal` >= 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Itens comprados em cada pedido (histórico preservado mesmo se o produto mudar)';
-
-
--- =====================================================================
--- 5. PÓS-VENDA E ATENDIMENTO
--- =====================================================================
 
 CREATE TABLE `avaliacoes` (
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -319,11 +272,6 @@ CREATE TABLE `denuncias` (
   CONSTRAINT `fk_denuncias_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Denúncias de anúncios, analisadas no admin';
 
-
--- =====================================================================
--- 6. FRETE E AJUDA
--- =====================================================================
-
 CREATE TABLE `tabela_frete` (
   `id` int NOT NULL AUTO_INCREMENT,
   `uf` char(2) NOT NULL,
@@ -347,11 +295,6 @@ CREATE TABLE `perguntas_frequentes` (
   PRIMARY KEY (`id`),
   KEY `idx_perguntas_frequentes_tema` (`tema`,`ordem`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Página de dúvidas frequentes (editável no admin)';
-
-
--- =====================================================================
--- 7. TABELAS INTERNAS DO DJANGO (auth, admin, sessões, migrations)
--- =====================================================================
 
 CREATE TABLE `auth_group` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -444,17 +387,8 @@ CREATE TABLE `auth_group_permissions` (
   CONSTRAINT `auth_group_permissions_group_id_b120cbf9_fk_auth_group_id` FOREIGN KEY (`group_id`) REFERENCES `auth_group` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
--- =====================================================================
--- 8. VIEWS
--- =====================================================================
-
 CREATE OR REPLACE VIEW `vw_pedidos_resumo` AS select `ped`.`id` AS `pedido_id`,`ped`.`usuario_id` AS `usuario_id`,`ped`.`status_pedido` AS `status_pedido`,`ped`.`valor_total` AS `valor_total`,`ped`.`data_criacao` AS `data_criacao`,count(`ip`.`id`) AS `total_itens` from (`pedidos` `ped` left join `itens_pedido` `ip` on((`ip`.`pedido_id` = `ped`.`id`))) group by `ped`.`id`,`ped`.`usuario_id`,`ped`.`status_pedido`,`ped`.`valor_total`,`ped`.`data_criacao`;
 CREATE OR REPLACE VIEW `vw_produtos_ativos` AS select `p`.`id` AS `id`,`p`.`nome` AS `nome`,`p`.`preco` AS `preco`,`p`.`quantidade_disponivel` AS `quantidade_disponivel`,`p`.`condicao` AS `condicao`,`c`.`nome` AS `categoria`,`f`.`nome` AS `franquia`,`p`.`vendedor_id` AS `vendedor_id`,`pi`.`url_imagem` AS `imagem_principal` from (((`produtos` `p` join `categorias` `c` on((`c`.`id` = `p`.`categoria_id`))) left join `franquias` `f` on((`f`.`id` = `p`.`franquia_id`))) left join `produto_imagens` `pi` on(((`pi`.`produto_id` = `p`.`id`) and (`pi`.`principal` = 1)))) where (`p`.`status_anuncio` = 'ativo');
-
--- =====================================================================
--- 9. DADOS DE REFERÊNCIA
--- =====================================================================
 
 INSERT INTO `categorias` (`id`, `nome`, `slug`, `descricao`, `ativo`) VALUES
   (1, 'Jogos', 'jogos', 'Jogos físicos e de tabuleiro', 1),
@@ -481,7 +415,6 @@ INSERT INTO `franquias` (`id`, `nome`, `slug`, `descricao`, `ativo`) VALUES
   (9, 'Senhor dos Anéis', 'senhor-dos-aneis', 'Franquia O Senhor dos Anéis', 1),
   (10, 'The Witcher', 'the-witcher', 'Todos os produtos de The Witcher', 1);
 
--- Valores de exemplo por região — ajuste em /admin/ > Tabela de frete.
 INSERT INTO `tabela_frete` (`uf`, `regiao`, `valor`, `prazo_dias`) VALUES
   ('SP', 'sudeste', '19.90', 5),
   ('RJ', 'sudeste', '19.90', 5),
@@ -530,11 +463,6 @@ INSERT INTO `perguntas_frequentes` (`tema`, `pergunta`, `resposta`, `ordem`) VAL
   ('seguranca', 'Meus dados de cartão ficam salvos?', 'Não. Guardamos apenas o tipo da forma de pagamento, a bandeira e os 4 últimos dígitos, para você identificar o cartão. Veja a Política de privacidade para mais detalhes.', 15),
   ('seguranca', 'A contratempo pede minha senha por e-mail?', 'Nunca. Nossos e-mails só trazem links para o próprio site. Se receber um pedido de senha, não responda e avise a gente pela página de contato.', 16);
 
--- =====================================================================
--- 10. REGISTRO DAS MIGRATIONS DO DJANGO
--- =====================================================================
-
--- Diz ao Django que estas tabelas já existem (evita que o `migrate` tente recriá-las).
 INSERT INTO `django_migrations` (`app`, `name`, `applied`) VALUES
   ('contenttypes', '0001_initial', NOW(6)),
   ('contenttypes', '0002_remove_content_type_name', NOW(6)),

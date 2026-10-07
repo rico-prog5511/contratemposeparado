@@ -1,9 +1,5 @@
 {% extends "admin/base_site.html" %}
 {% load marketplace_extras %}
-{% comment %}
-Relatório anual do admin. Dados: marketplace/relatorios.py → relatorio_anual().
-"Movimentado" = pedidos não cancelados (produtos + frete), pela data do pedido.
-{% endcomment %}
 
 {% block bodyclass %}{{ block.super }} ct-relatorio-pagina{% endblock %}
 
@@ -27,7 +23,6 @@ Relatório anual do admin. Dados: marketplace/relatorios.py → relatorio_anual(
         <a href="{{ url_ano }}" class="ct-relatorio-link">Ver todos os pedidos de {{ ano }} →</a>
     </form>
 
-    <!-- TOTAIS -->
     <section aria-labelledby="ct-totais">
         <h2 id="ct-totais" class="ct-relatorio-titulo">Totais de {{ ano }}</h2>
         <ul class="ct-cartoes">
@@ -62,7 +57,6 @@ Relatório anual do admin. Dados: marketplace/relatorios.py → relatorio_anual(
 
     {% if totais.pedidos or totais.cancelados %}
     <div class="ct-relatorio-grade">
-        <!-- MÊS A MÊS -->
         <section class="module ct-relatorio-meses" aria-labelledby="ct-meses">
             <table>
                 <caption id="ct-meses">Mês a mês</caption>
@@ -104,7 +98,6 @@ Relatório anual do admin. Dados: marketplace/relatorios.py → relatorio_anual(
         </section>
 
         <div class="ct-relatorio-lateral">
-            <!-- POR STATUS -->
             <section class="module" aria-labelledby="ct-status">
                 <table>
                     <caption id="ct-status">Por status</caption>
@@ -122,7 +115,6 @@ Relatório anual do admin. Dados: marketplace/relatorios.py → relatorio_anual(
                 <p class="ct-relatorio-nota ct-relatorio-nota--modulo">“Entregue” é o dinheiro de vendas já concluídas; os demais ainda estão em andamento.</p>
             </section>
 
-            <!-- TOP VENDEDORES -->
             {% if top_vendedores %}
             <section class="module" aria-labelledby="ct-vendedores">
                 <table>

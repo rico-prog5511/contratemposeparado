@@ -1,9 +1,4 @@
 {% extends "emails/base.html" %}
-{% comment %}
-Usado pelo PasswordResetView do Django (html_email_template_name).
-O Django passa: user, protocol, domain, uid, token. Aqui o `link` é
-montado no próprio template porque o fluxo nativo não usa enviar_email().
-{% endcomment %}
 {% block kicker %}Segurança{% endblock %}
 {% block conteudo %}
 <p style="margin:0 0 14px; font-size:15px; line-height:1.6;">Recebemos um pedido para criar uma nova senha para a conta <strong>{{ user.email }}</strong>.</p>

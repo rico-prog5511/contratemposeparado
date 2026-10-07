@@ -10,5 +10,4 @@ class MarketplaceConfig(AppConfig):
 
         from .busca import registrar_funcao_sqlite
 
-        # Busca sem acentos também no SQLite (ver busca.py).
         connection_created.connect(registrar_funcao_sqlite, dispatch_uid="marketplace_sem_acento")

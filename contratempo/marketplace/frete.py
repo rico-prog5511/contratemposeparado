@@ -1,20 +1,8 @@
-"""
-marketplace/frete.py
-
-Cálculo de frete por UF de destino (tabela TabelaFrete, editável no admin).
-
-Regra: cada vendedor envia seu próprio pacote, então o comprador paga
-UM frete por vendedor, com o valor e o prazo da UF de entrega.
-"""
-
 from collections import OrderedDict
 from decimal import Decimal
 
 from .models import TabelaFrete
 
-# Faixas de CEP dos Correios (5 primeiros dígitos) -> UF.
-# Usado na calculadora da página de produto, onde o visitante só
-# informa o CEP. No checkout usamos direto o campo `estado` do endereço.
 FAIXAS_CEP = [
     (1000, 19999, "SP"), (20000, 28999, "RJ"), (29000, 29999, "ES"),
     (30000, 39999, "MG"), (40000, 48999, "BA"), (49000, 49999, "SE"),
@@ -34,7 +22,6 @@ def limpar_cep(cep):
 
 
 def uf_por_cep(cep):
-    """Devolve a UF de um CEP (8 dígitos) ou None se for inválido."""
     digitos = limpar_cep(cep)
     if len(digitos) != 8:
         return None
@@ -46,17 +33,12 @@ def uf_por_cep(cep):
 
 
 def faixa_para_uf(uf):
-    """TabelaFrete ativa da UF, ou None se a UF não é atendida."""
     if not uf:
         return None
     return TabelaFrete.objects.filter(uf=uf.upper(), ativo=True).first()
 
 
 def agrupar_por_vendedor(itens):
-    """
-    Agrupa itens do carrinho por vendedor, na ordem em que aparecem.
-    Devolve uma lista de dicts: {vendedor, itens, subtotal}.
-    """
     grupos = OrderedDict()
     for item in itens:
         vendedor = item.produto.vendedor
@@ -67,11 +49,6 @@ def agrupar_por_vendedor(itens):
 
 
 def calcular_envios(itens, uf):
-    """
-    Monta os envios (um por vendedor) com frete e prazo para a UF.
-    Devolve (envios, faixa). Se a UF não for atendida, faixa é None e o
-    frete de cada envio fica None.
-    """
     faixa = faixa_para_uf(uf)
     envios = agrupar_por_vendedor(itens)
     for envio in envios:

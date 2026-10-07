@@ -1,10 +1,3 @@
-"""
-marketplace/views_conta.py
-
-Autenticação e área "Minha conta": login, cadastro, logout, perfil,
-edição de dados, senha, endereços e formas de pagamento.
-"""
-
 import time
 
 from django.contrib import messages
@@ -25,11 +18,10 @@ from .imagens import salvar_foto_perfil
 from .models import Endereco, FormaPagamento, Pedido, Produto, Usuario
 
 SESSAO_REENVIO = "ultimo_envio_confirmacao"
-INTERVALO_REENVIO = 60  # segundos entre reenvios do link de confirmação
+INTERVALO_REENVIO = 60
 
 
 def _proximo(request, padrao):
-    """Destino pós-ação: ?next= (se for do próprio site) ou o padrão."""
     proximo = request.POST.get("next") or request.GET.get("next")
     if proximo and url_has_allowed_host_and_scheme(
         proximo, allowed_hosts={request.get_host()}, require_https=request.is_secure()
@@ -39,7 +31,6 @@ def _proximo(request, padrao):
 
 
 def _next_seguro(request):
-    """O ?next= só volta para o template se apontar para o próprio site."""
     proximo = request.GET.get("next", "")
     if proximo and url_has_allowed_host_and_scheme(
         proximo, allowed_hosts={request.get_host()}, require_https=request.is_secure()
@@ -48,12 +39,9 @@ def _next_seguro(request):
     return ""
 
 
-
 def _breadcrumbs_conta(*itens):
     return [{"label": "Minha conta", "url": reverse("perfil")}, *itens]
 
-
-# ===== LOGIN / CADASTRO / LOGOUT =====
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -76,7 +64,7 @@ def login_view(request):
         else:
             login(request, usuario)
             if not form.cleaned_data["lembrar"]:
-                request.session.set_expiry(0)  # expira ao fechar o navegador
+                request.session.set_expiry(0)
             messages.success(request, f"Bem-vindo(a) de volta, {usuario.nome_completo.split()[0]}!")
             return redirect(_proximo(request, "perfil"))
 
@@ -134,11 +122,6 @@ def confirmar_email(request, uidb64, token):
 
 @require_POST
 def reenviar_confirmacao(request):
-    """
-    Reenvia o link de confirmação. A resposta é sempre a mesma, exista
-    ou não a conta, para não revelar quais e-mails estão cadastrados.
-    Limite: um envio por minuto por sessão.
-    """
     ultimo = request.session.get(SESSAO_REENVIO, 0)
     if time.time() - ultimo < INTERVALO_REENVIO:
         messages.error(request, "Aguarde um minuto antes de pedir um novo e-mail.")
@@ -152,8 +135,6 @@ def reenviar_confirmacao(request):
     messages.success(request, f"Se houver um cadastro pendente para {email}, um novo link foi enviado.")
     return redirect("login")
 
-
-# ----- RECUPERAÇÃO DE SENHA — fluxo nativo do Django com templates próprios -----
 
 class RecuperarSenhaView(auth_views.PasswordResetView):
     template_name = "conta/senha_reset_form.html"
@@ -180,7 +161,6 @@ class NovaSenhaView(auth_views.PasswordResetConfirmView):
 
     def form_valid(self, form):
         resposta = super().form_valid(form)
-        # Quem recebeu o link no e-mail provou que o e-mail é dele.
         if not self.user.email_confirmado:
             self.user.email_confirmado = True
             self.user.save(update_fields=["email_confirmado"])
@@ -197,8 +177,6 @@ def logout_view(request):
     messages.success(request, "Você saiu da sua conta.")
     return redirect("home")
 
-
-# ===== PERFIL =====
 
 @login_required
 def perfil(request):
@@ -247,7 +225,7 @@ def alterar_senha(request):
 
     if request.method == "POST" and form.is_valid():
         usuario = form.save()
-        update_session_auth_hash(request, usuario)  # mantém o usuário logado
+        update_session_auth_hash(request, usuario)
         messages.success(request, "Senha alterada com sucesso.")
         return redirect("perfil")
 
@@ -269,8 +247,6 @@ def desativar_conta(request):
     messages.success(request, "Sua conta foi desativada. Sentiremos sua falta!")
     return redirect("home")
 
-
-# ===== ENDEREÇOS =====
 
 def _definir_endereco_principal(endereco):
     Endereco.objects.filter(usuario_id=endereco.usuario_id).exclude(pk=endereco.pk).update(endereco_principal=False)
@@ -324,7 +300,7 @@ def endereco_form(request, endereco_id=None):
 def endereco_excluir(request, endereco_id):
     endereco = get_object_or_404(Endereco, pk=endereco_id, usuario=request.user)
     era_principal = endereco.endereco_principal
-    endereco.delete()  # pedidos guardam endereco_snapshot, então o histórico é preservado
+    endereco.delete()
     if era_principal:
         outro = request.user.enderecos.order_by("data_cadastro").first()
         if outro:
@@ -341,8 +317,6 @@ def endereco_principal(request, endereco_id):
     messages.success(request, f'"{endereco.nome_endereco}" agora é seu endereço principal.')
     return redirect(_proximo(request, "enderecos"))
 
-
-# ===== FORMAS DE PAGAMENTO =====
 
 def _definir_pagamento_principal(forma):
     FormaPagamento.objects.filter(usuario_id=forma.usuario_id).exclude(pk=forma.pk).update(principal=False)
@@ -397,7 +371,7 @@ def pagamento_form(request, forma_id=None):
 def pagamento_excluir(request, forma_id):
     forma = get_object_or_404(FormaPagamento, pk=forma_id, usuario=request.user)
     era_principal = forma.principal
-    forma.delete()  # pedidos guardam forma_pagamento_snapshot
+    forma.delete()
     if era_principal:
         outra = request.user.formas_pagamento.order_by("data_cadastro").first()
         if outra:

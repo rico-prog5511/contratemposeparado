@@ -1,22 +1,3 @@
-"""
-marketplace/email_brevo.py
-
-Envio de e-mails pela API do Brevo (brevo.com), em vez do Gmail.
-
-Por quê: no plano grátis do PythonAnywhere o Gmail recusa o login vindo
-do servidor (o mesmo usuário e senha funcionam no PC). O Brevo é chamado
-por HTTPS — api.brevo.com está na lista de sites liberados do plano grátis
-— e envia até 300 e-mails/dia de graça.
-
-Como ligar: coloque BREVO_API_KEY no .env (ver .env.exemplo). O remetente
-continua sendo DEFAULT_FROM_EMAIL ("contratempo <EMAIL_HOST_USER>"), e esse
-endereço precisa estar confirmado no Brevo (Senders, domains & IPs).
-Sem a chave, o site segue usando o Gmail/terminal como antes.
-
-Não usa biblioteca nova: só urllib (o PythonAnywhere já configura o proxy
-nas variáveis de ambiente, que o urllib respeita sozinho).
-"""
-
 import base64
 import json
 import urllib.error
@@ -30,7 +11,6 @@ URL_API = "https://api.brevo.com/v3/smtp/email"
 
 
 class BrevoErro(Exception):
-    """Resposta de erro da API do Brevo (status HTTP + mensagem dele)."""
 
     def __init__(self, status, codigo, mensagem):
         self.status, self.codigo, self.mensagem = status, codigo, mensagem
@@ -47,7 +27,6 @@ def _contatos(enderecos):
 
 
 def montar_payload(mensagem):
-    """EmailMessage/EmailMultiAlternatives do Django -> JSON da API do Brevo."""
     payload = {
         "sender": _contato(mensagem.from_email or settings.DEFAULT_FROM_EMAIL),
         "to": _contatos(mensagem.to),
@@ -69,7 +48,7 @@ def montar_payload(mensagem):
             payload["htmlContent"] = conteudo
 
     anexos = []
-    for anexo in mensagem.attachments:  # (nome, conteúdo, tipo); o site hoje não manda anexos
+    for anexo in mensagem.attachments:
         if isinstance(anexo, tuple):
             nome, conteudo = anexo[0], anexo[1]
             dados = conteudo.encode() if isinstance(conteudo, str) else conteudo
@@ -80,7 +59,6 @@ def montar_payload(mensagem):
 
 
 class BrevoEmailBackend(BaseEmailBackend):
-    """EMAIL_BACKEND que envia cada mensagem por um POST na API do Brevo."""
 
     def __init__(self, fail_silently=False, **kwargs):
         super().__init__(fail_silently=fail_silently, **kwargs)

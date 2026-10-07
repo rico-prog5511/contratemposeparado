@@ -1,16 +1,7 @@
-/* static/js/produto.js — específico da página de detalhe do produto
- *
- *   - miniaturas trocam a imagem principal (setas do teclado navegam)
- *   - clicar na imagem principal abre a galeria ampliada (lightbox):
- *     setas ← →, deslizar no celular, Esc ou clique fora para fechar
- *   - botões +/- da quantidade
- */
-
 document.addEventListener("DOMContentLoaded", function () {
     var imagemPrincipal = document.getElementById("imagem-principal");
     var miniaturas = document.querySelectorAll(".produto-miniatura");
 
-    /* ----- MINIATURAS ----- */
     function mostrarNaPrincipal(indice) {
         var miniatura = miniaturas[indice];
         if (!imagemPrincipal || !miniatura) return;
@@ -39,7 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    /* ----- LIGHTBOX ----- */
     var lightbox = document.getElementById("lightbox");
     var dados = document.getElementById("lightbox-dados");
     var abrir = document.querySelector("[data-lightbox-open]");
@@ -67,7 +57,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (anterior) anterior.addEventListener("click", function () { mostrar(atual - 1); });
         if (proxima) proxima.addEventListener("click", function () { mostrar(atual + 1); });
 
-        // Clique no fundo escuro (fora da imagem) fecha
         lightbox.addEventListener("click", function (e) {
             if (e.target === lightbox) lightbox.close();
         });
@@ -78,7 +67,6 @@ document.addEventListener("DOMContentLoaded", function () {
             if (e.key === "ArrowLeft") mostrar(atual - 1);
         });
 
-        // Deslizar no celular
         var inicioX = null;
         lightbox.addEventListener("touchstart", function (e) { inicioX = e.touches[0].clientX; }, { passive: true });
         lightbox.addEventListener("touchend", function (e) {
@@ -88,13 +76,11 @@ document.addEventListener("DOMContentLoaded", function () {
             inicioX = null;
         });
 
-        // Ao fechar, a imagem principal acompanha a última vista
         lightbox.addEventListener("close", function () {
             if (miniaturas.length) mostrarNaPrincipal(atual);
         });
     }
 
-    /* ----- QUANTIDADE ----- */
     var input = document.getElementById("quantidade");
     if (input) {
         var limitar = function (valor) {

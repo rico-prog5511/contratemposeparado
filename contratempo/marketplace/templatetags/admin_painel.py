@@ -1,10 +1,3 @@
-"""
-Resumo da página inicial do admin (templates/admin/index.html).
-
-Cada cartão só aparece para quem tem permissão de ver aquela tabela, e
-leva à lista do admin já filtrada.
-"""
-
 from datetime import timedelta
 
 from django import template

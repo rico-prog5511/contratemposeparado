@@ -1,23 +1,5 @@
-/* static/js/main.js — comportamento global (todas as páginas via base.html)
- *
- * Tudo aqui é melhoria progressiva: sem JavaScript, links e formulários
- * continuam funcionando (o Django faz a validação e o processamento).
- *
- * Recursos ativados por atributos no HTML:
- *   .menu-toggle              abre/fecha o menu mobile
- *   .has-dropdown             submenus (categorias, conta)
- *   .messages li              alertas fecháveis (sucesso some sozinho)
- *   form[data-confirm]        pede confirmação antes de enviar
- *   [data-password-toggle]    mostrar/ocultar senha
- *   [data-mask="cep|telefone"] máscara de digitação
- *   [data-cep-lookup]         preenche endereço pelo CEP (ViaCEP)
- *   [data-auto-submit]        envia o form ao mudar um select/checkbox
- *   [data-match="#id"]        confere se dois campos são iguais
- */
-
 document.addEventListener("DOMContentLoaded", function () {
 
-    /* ----- MENU MOBILE ----- */
     var toggle = document.querySelector(".menu-toggle");
     var nav = document.querySelector(".main-nav");
 
@@ -37,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    /* ----- SUBMENUS (categorias e conta) ----- */
     function fecharSubmenu(item) {
         item.classList.remove("open");
         var botao = item.querySelector(".dropdown-toggle");
@@ -71,7 +52,6 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".has-dropdown.open").forEach(fecharSubmenu);
     });
 
-    /* ----- MENSAGENS (django.contrib.messages) ----- */
     function removerMensagem(item) {
         item.classList.add("saindo");
         setTimeout(function () { item.remove(); }, 250);
@@ -82,20 +62,17 @@ document.addEventListener("DOMContentLoaded", function () {
         if (fechar) {
             fechar.addEventListener("click", function () { removerMensagem(item); });
         }
-        // Sucesso some sozinho; erros ficam até o usuário fechar.
         if (item.classList.contains("success")) {
             setTimeout(function () { removerMensagem(item); }, 6000);
         }
     });
 
-    /* ----- CONFIRMAÇÃO ANTES DE ENVIAR (excluir, cancelar, desativar…) ----- */
     var dialogo = document.getElementById("confirm-dialog");
 
     document.querySelectorAll("form[data-confirm]").forEach(function (form) {
         form.addEventListener("submit", function (e) {
             if (form.dataset.confirmado === "1") return;
 
-            // Navegadores sem <dialog>: usa o confirm() nativo.
             if (!dialogo || typeof dialogo.showModal !== "function") {
                 if (!window.confirm(form.dataset.confirm)) e.preventDefault();
                 return;
@@ -124,7 +101,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    /* ----- MOSTRAR / OCULTAR SENHA ----- */
     document.querySelectorAll("[data-password-toggle]").forEach(function (btn) {
         var input = btn.parentElement.querySelector("input");
         if (!input) return;
@@ -136,7 +112,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    /* ----- MÁSCARAS (CEP e telefone) ----- */
     var mascaras = {
         cep: function (v) {
             v = v.replace(/\D/g, "").slice(0, 8);
@@ -158,10 +133,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (input.value) input.value = aplicar(input.value);
     });
 
-    /* ---------------------------------------------------------------
-       BUSCA DE ENDEREÇO PELO CEP (ViaCEP)
-       Os campos a preencher têm data-cep-field="<chave da resposta>".
-       --------------------------------------------------------------- */
     document.querySelectorAll("[data-cep-lookup]").forEach(function (input) {
         var form = input.form;
         var status = document.createElement("div");
@@ -195,10 +166,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    /* ---------------------------------------------------------------
-       ENVIO AUTOMÁTICO (ordenação, quantidade no carrinho)
-       O botão de envio fica em <noscript> no HTML para quem não tem JS.
-       --------------------------------------------------------------- */
     document.querySelectorAll("[data-auto-submit]").forEach(function (campo) {
         campo.addEventListener("change", function () {
             if (typeof campo.form.requestSubmit === "function") {
@@ -209,7 +176,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    /* ----- CAMPOS QUE PRECISAM SER IGUAIS (confirmar senha) ----- */
     document.querySelectorAll("[data-match]").forEach(function (campo) {
         var original = document.querySelector(campo.dataset.match);
         if (!original) return;
@@ -223,12 +189,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-/* ---------------------------------------------------------------
-   SUGESTÕES DA BUSCA (form.search-box[data-sugestoes])
-   Busca enquanto digita (mín. 2 letras) e mostra produtos e
-   categorias. Setas ↑ ↓ navegam, Enter abre, Esc fecha. Sem JS,
-   a busca continua funcionando normalmente pelo formulário.
-   --------------------------------------------------------------- */
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll("form[data-sugestoes]").forEach(function (form, n) {
         var input = form.querySelector("input[name='q']");
@@ -333,10 +293,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 fetch(form.dataset.sugestoes + "?q=" + encodeURIComponent(termo), { headers: { "Accept": "application/json" } })
                     .then(function (r) { return r.ok ? r.json() : null; })
                     .then(function (dados) {
-                        // Ignora respostas atrasadas de termos antigos
                         if (dados && input.value.trim() === termo) mostrar(dados, termo);
                     })
-                    .catch(function () { /* sem sugestões: a busca normal continua funcionando */ });
+                    .catch(function () {  });
             }, 220);
         });
 
@@ -364,11 +323,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-/* ---------------------------------------------------------------
-   ERROS DE FORMULÁRIO: ao voltar do envio com erro, o foco vai para
-   o primeiro campo inválido (o leitor de tela lê o rótulo e o erro,
-   ligados pelo aria-describedby que o Django gera).
-   --------------------------------------------------------------- */
 document.addEventListener("DOMContentLoaded", function () {
     var invalido = document.querySelector("main [aria-invalid='true']");
     if (!invalido) return;

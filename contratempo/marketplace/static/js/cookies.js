@@ -1,24 +1,8 @@
-/* =====================================================================
-   cookies.js — aviso e preferências de cookies (LGPD).
-
-   Categorias:
-     essenciais  sempre ligados: login (sessionid), segurança dos
-                 formulários (csrftoken), avisos (messages), esta própria
-                 escolha (ct_cookies) e as preferências de acessibilidade.
-     funcionais  opcionais: "Vistos recentemente" (vistos.js).
-
-   A escolha fica no cookie "ct_cookies" por 12 meses; depois o aviso
-   volta. Enquanto a pessoa não escolhe, os opcionais ficam DESLIGADOS.
-
-   Outros scripts perguntam com window.ctCookies.permitido("funcionais")
-   e escutam o evento "ct:cookies" para reagir a mudanças.
-   Carregado no <head> (antes dos outros scripts).
-   ===================================================================== */
 (function () {
     "use strict";
 
     var NOME = "ct_cookies";
-    var VERSAO = "1";            // mude para pedir o consentimento de novo (ex.: categoria nova)
+    var VERSAO = "1";
     var DURACAO = 365 * 24 * 60 * 60;
 
     function ler() {
@@ -56,7 +40,6 @@
         var caixaFuncionais = dialogo.querySelector("[name='funcionais']");
         var raiz = document.documentElement;
 
-        // O aviso fica preso no rodapé da tela: os botões flutuantes sobem para não ficar embaixo dele.
         function ajustarEspaco() {
             raiz.style.setProperty("--cookie-aviso-altura", aviso.hidden ? "0px" : aviso.offsetHeight + "px");
         }
@@ -77,14 +60,13 @@
         }
 
         mostrarAviso(!window.ctCookies.escolhido());
-        // A altura do aviso muda quando as fontes terminam de carregar ou a tela gira.
         if (window.ResizeObserver) new ResizeObserver(ajustarEspaco).observe(aviso);
         else window.addEventListener("resize", ajustarEspaco);
 
         aviso.querySelector("[data-cookies-aceitar]").addEventListener("click", function () { escolher(true); });
         aviso.querySelector("[data-cookies-recusar]").addEventListener("click", function () { escolher(false); });
         document.querySelectorAll("[data-cookies-abrir]").forEach(function (botao) {
-            botao.hidden = false;  // sem JavaScript o botão não teria função
+            botao.hidden = false;
             botao.addEventListener("click", abrirPreferencias);
         });
 

@@ -1,6 +1,3 @@
-/* static/css/compra.css — carrinho, checkout, pedido concluído e pedidos */
-
-/* ===== CARRINHO ===== */
 .cart-items { display: flex; flex-direction: column; gap: 14px; }
 
 .cart-item {
@@ -57,7 +54,6 @@
 .cart-item-price strong { font-family: var(--font-mono); font-size: 1.05rem; color: var(--txt-vermelho); }
 .cart-continue { align-self: flex-start; margin-top: 6px; }
 
-/* ===== CHECKOUT ===== */
 .checkout-steps {
     list-style: none;
     display: flex;
@@ -154,7 +150,6 @@
 .review-grid .panel + .panel { margin-top: 0; }
 .review-grid p { color: var(--ink); font-size: 0.9rem; }
 
-/* ===== PEDIDO CONCLUÍDO ("Já feito") ===== */
 .done-ticket {
     position: relative;
     margin-top: 24px;
@@ -190,7 +185,6 @@
 }
 .done-total { margin: 18px 0 0; padding-top: 14px; border-top: 1.5px solid var(--ink); }
 
-/* ===== MEUS PEDIDOS ===== */
 .order-list { display: flex; flex-direction: column; gap: 16px; }
 .order-card {
     background: var(--paper);
@@ -246,7 +240,6 @@
 .order-card-body .order-summary p { margin: 0; color: var(--ink); font-size: 0.92rem; }
 .order-card-body .order-summary small { color: var(--ink-muted); }
 
-/* DETALHE DO PEDIDO */
 .timeline {
     list-style: none;
     display: flex;
@@ -309,7 +302,6 @@
 }
 .rating-form[open] summary { margin-bottom: 12px; }
 
-/* Estrelas clicáveis (radio invertido para o hover funcionar da direita p/ esquerda) */
 .star-input {
     display: inline-flex;
     flex-direction: row-reverse;
@@ -363,7 +355,6 @@
     .checkout-recap { flex-direction: column; align-items: flex-start; }
 }
 
-/* ===== FRETE, PACOTES POR VENDEDOR E RASTREIO ===== */
 .option-frete { margin-top: 8px !important; font-size: 0.85rem; color: var(--ink) !important; }
 .option-frete strong { font-family: var(--font-mono); color: var(--txt-vermelho); }
 .option-frete--off { color: var(--txt-vermelho) !important; font-weight: 600; }
@@ -403,7 +394,6 @@
 .tracking-box strong { display: block; font-size: 1.2rem; color: var(--txt-vermelho); letter-spacing: 0.06em; }
 .tracking-box small { color: var(--ink-muted); font-size: 0.8rem; }
 
-/* Próximo passo do vendedor */
 .next-step {
     display: grid;
     grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
@@ -424,7 +414,6 @@
 .next-step-form .input { background: var(--surface); }
 .ship-to p { color: var(--ink); }
 
-/* Compra concluída com vários pedidos */
 .done-order {
     margin-top: 16px;
     padding: 16px 18px;

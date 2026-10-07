@@ -1,10 +1,3 @@
-{% comment %}
-Estado vazio reutilizável.
-Uso:
-    {% include "partials/empty_state.html" with titulo="..." texto="..." link_url=url link_label="..." icone="carrinho" %}
-Ícones: carrinho, caixa, busca, pin, cartao, estrela (padrão: caixa)
-Opcional: link2_url / link2_label para um segundo botão.
-{% endcomment %}
 <div class="empty-state">
     <div class="empty-icon" aria-hidden="true">
         {% if icone == "carrinho" %}

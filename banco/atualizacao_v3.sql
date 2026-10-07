@@ -1,13 +1,3 @@
--- =====================================================================
--- CONTRATEMPO — atualização do banco da versão 2 para a versão 3
---
--- Adiciona a tabela de denúncias de anúncios. Equivale a
--- `python manage.py migrate` (migration marketplace 0004). Use UM dos
--- dois, nunca os dois. O rodar.bat já aplica as migrations sozinho.
---
---   mysql -u root -p contratempo_db < banco/atualizacao_v3.sql
--- =====================================================================
-
 SET NAMES utf8mb4;
 USE `contratempo_db`;
 

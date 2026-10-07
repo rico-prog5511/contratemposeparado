@@ -1,4 +1,3 @@
-{% comment %}Card de um artigo do Guia do colecionador (home, /guia/ e "continue lendo").{% endcomment %}
 <article class="guia-card">
     <span class="guia-card-assunto">{{ artigo.assunto }}</span>
     <h3><a href="{% url 'guia_artigo' artigo.slug %}" class="guia-card-link">{{ artigo.titulo }}</a></h3>

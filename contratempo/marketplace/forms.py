@@ -1,10 +1,3 @@
-"""
-marketplace/forms.py
-
-Formulários do contratempo. Todos os campos correspondem aos Models de
-marketplace/models.py — nenhum campo novo foi criado no banco.
-"""
-
 from datetime import date
 
 from django import forms
@@ -25,17 +18,14 @@ from .sku import PADRAO as PADRAO_SKU
 from .sku import normalizar_sku
 
 LIMITE_IMAGENS_ANUNCIO = 8
-TAMANHO_MAXIMO_IMAGEM = 5 * 1024 * 1024  # 5 MB
+TAMANHO_MAXIMO_IMAGEM = 5 * 1024 * 1024
 
-
-# ===== UPLOAD DE VÁRIAS IMAGENS =====
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
 
 
 class MultipleImageField(forms.ImageField):
-    """ImageField que aceita vários arquivos (padrão da documentação do Django)."""
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("widget", MultipleFileInput(attrs={"accept": "image/*"}))
@@ -57,8 +47,6 @@ def validar_tamanho_imagem(arquivo):
             f'"{arquivo.name}" tem mais de 5 MB. Envie uma imagem menor.'
         )
 
-
-# ===== CONTA =====
 
 class LoginForm(forms.Form):
     email = forms.EmailField(
@@ -214,7 +202,6 @@ def _so_digitos(valor):
 
 
 def validar_cvv(valor, bandeira):
-    """Devolve o CVV só com dígitos: 4 no American Express, 3 nos demais."""
     cvv = (valor or "").strip()
     tamanho = 4 if bandeira == "American Express" else 3
     if not (cvv.isdigit() and len(cvv) == tamanho):
@@ -223,7 +210,6 @@ def validar_cvv(valor, bandeira):
 
 
 class ValidadeField(forms.CharField):
-    """Validade no formato MM/AA (ou MM/AAAA). Devolve (mês, ano com 4 dígitos)."""
 
     def __init__(self, **kwargs):
         kwargs.setdefault("label", "Validade")
@@ -253,12 +239,6 @@ class ValidadeField(forms.CharField):
 
 
 class CartaoForm(forms.ModelForm):
-    """
-    Cadastro de cartão. Pede os dados como uma loja de verdade, mas o
-    número completo e o CVV só são conferidos e DESCARTADOS: o banco
-    guarda apenas bandeira, 4 últimos dígitos e validade.
-    `token_externo` fica para a integração com um gateway de pagamento.
-    """
 
     tipo = forms.ChoiceField(
         label="Tipo", choices=FormaPagamento.TIPO_CHOICES, initial="cartao_credito", widget=forms.RadioSelect,
@@ -322,7 +302,6 @@ class CartaoForm(forms.ModelForm):
 
 
 class CartaoEdicaoForm(forms.ModelForm):
-    """Edição de um cartão salvo: o número não muda, só apelido, validade e principal."""
 
     validade = ValidadeField(help_text="Atualize quando chegar o cartão novo.")
 
@@ -344,8 +323,6 @@ class CartaoEdicaoForm(forms.ModelForm):
             cartao.save()
         return cartao
 
-
-# ===== CONTATO =====
 
 class ContatoForm(forms.ModelForm):
     ASSUNTOS = [
@@ -372,8 +349,6 @@ class ContatoForm(forms.ModelForm):
         }
 
 
-# ===== ANÚNCIOS =====
-
 class ProdutoForm(forms.ModelForm):
     imagens = MultipleImageField(
         label="Adicionar imagens",
@@ -394,7 +369,7 @@ class ProdutoForm(forms.ModelForm):
             "franquia": "Franquia",
             "descricao": "Descrição",
             "condicao": "Condição",
-            "marca": "Marca / autor",  # muda conforme a categoria (ver __init__)
+            "marca": "Marca / autor",
             "ano": "Ano",
             "preco": "Preço (R$)",
             "quantidade_disponivel": "Estoque",
@@ -405,7 +380,6 @@ class ProdutoForm(forms.ModelForm):
             "quantidade_disponivel": "Quantas unidades você tem para vender.",
         }
         error_messages = {
-            # O banco não deixa dois anúncios (de qualquer vendedor) com o mesmo código.
             "sku": {"unique": "Este código já está em uso. Escolha outro ou deixe em branco para o site gerar um."},
         }
         widgets = {
@@ -423,16 +397,14 @@ class ProdutoForm(forms.ModelForm):
     def __init__(self, *args, imagens_existentes=0, **kwargs):
         super().__init__(*args, **kwargs)
         self.imagens_existentes = imagens_existentes
-        self.tamanho_maximo_imagem = TAMANHO_MAXIMO_IMAGEM  # o upload.js avisa antes de enviar
+        self.tamanho_maximo_imagem = TAMANHO_MAXIMO_IMAGEM
 
-        # SKU no padrão XXX-XXX-XXX (ver sku.py). Ao criar, em branco = gerado pelo site.
         self.fields["sku"].help_text = (
             f"Opcional. Formato: 3 partes de 3 letras ou números, como {EXEMPLO_SKU}. "
             + ("Deixe em branco para o anúncio ficar sem código." if self.instance.pk
                else "Se deixar em branco, o site gera um automaticamente.")
         )
         self.fields["sku"].widget.attrs.update({
-            # 11 = XXX-XXX-XXX; um código antigo mais longo continua cabendo no campo.
             "placeholder": f"Ex.: {EXEMPLO_SKU}", "maxlength": max(11, len(self.instance.sku or "")),
             "autocapitalize": "characters", "spellcheck": "false", "class": "mono",
         })
@@ -441,9 +413,6 @@ class ProdutoForm(forms.ModelForm):
         self.fields["categoria"].queryset = categorias
         self.fields["categoria"].empty_label = "Selecione uma categoria"
 
-        # Nome do campo "marca" conforme a categoria: "Autor / editora" em
-        # Quadrinhos, "Artista / banda" em Discos... O JavaScript troca na
-        # hora (anuncios/form.html); aqui vale para a página já carregada.
         self.rotulos_marca = {
             str(c.id): dict(zip(("rotulo", "exemplo"), rotulo_marca(c))) for c in categorias
         }
@@ -455,7 +424,6 @@ class ProdutoForm(forms.ModelForm):
         self.fields["marca"].widget.attrs.update({"placeholder": atual["exemplo"], "data-marca-campo": ""})
         self.fields["franquia"].queryset = Franquia.objects.filter(ativo=True).order_by("nome")
         self.fields["franquia"].empty_label = "Nenhuma / não se aplica"
-        # "vendido" é definido pelo sistema quando o estoque zera.
         self.fields["status_anuncio"].choices = [
             (valor, rotulo) for valor, rotulo in Produto.STATUS_CHOICES if valor != "vendido"
         ] if self.instance.status_anuncio != "vendido" else Produto.STATUS_CHOICES
@@ -473,11 +441,9 @@ class ProdutoForm(forms.ModelForm):
         return ano
 
     def clean_sku(self):
-        # SKU é UNIQUE e aceita NULL: string vazia viraria duplicata.
         digitado = (self.cleaned_data.get("sku") or "").strip()
         if not digitado:
             return None
-        # Anúncio antigo com código fora do padrão: continua valendo se não mudou.
         if self.instance.pk and digitado == self.instance.sku:
             return digitado
         sku = normalizar_sku(digitado)
@@ -505,14 +471,7 @@ class ProdutoForm(forms.ModelForm):
         return dados
 
 
-# ===== AVALIAÇÕES =====
-
 class AvaliacaoForm(forms.Form):
-    """
-    Form simples (não ModelForm): Avaliacao.clean() compara self.nota
-    diretamente e quebraria se a nota estivesse ausente. A view monta a
-    Avaliacao e chama full_clean() só depois deste form ser válido.
-    """
 
     nota = forms.TypedChoiceField(
         label="Nota",

@@ -1,15 +1,9 @@
-﻿# instalar.ps1 — prepara o contratempo numa máquina nova (rode pelo instalar.bat).
-# Pode ser executado de novo sem problema: pula o que já estiver pronto.
-#
-# Pré-requisitos: Python 3.10+ e MySQL Server 8 instalados.
-
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
 function Passo($texto) { Write-Host "`n==> $texto" -ForegroundColor Cyan }
 function Falha($texto) { Write-Host "`nERRO: $texto" -ForegroundColor Red; exit 1 }
 
-# 1. Python ------------------------------------------------------------
 Passo "Procurando o Python"
 $python = $null
 foreach ($candidato in @("py -3", "python")) {
@@ -21,8 +15,6 @@ foreach ($candidato in @("py -3", "python")) {
 if (-not $python) { Falha "Python 3.10 ou mais novo não encontrado. Instale em python.org marcando 'Add python.exe to PATH'." }
 Write-Host "Python $versao ($python)"
 
-# 2. Ambiente virtual ----------------------------------------------------
-# Uma venv copiada de outro computador não funciona: é recriada.
 $venvPython = Join-Path $PSScriptRoot "venv\Scripts\python.exe"
 if (Test-Path $venvPython) {
     & $venvPython -c "import sys" 2>$null
@@ -37,13 +29,11 @@ if (-not (Test-Path $venvPython)) {
     if (-not (Test-Path $venvPython)) { Falha "não foi possível criar a venv." }
 }
 
-# 3. Pacotes -------------------------------------------------------------
 Passo "Instalando os pacotes (Django, mysqlclient, Pillow)"
 & $venvPython -m pip install --upgrade pip --quiet --disable-pip-version-check
 & $venvPython -m pip install -r requirements.txt --quiet --disable-pip-version-check
 if ($LASTEXITCODE -ne 0) { Falha "falha ao instalar os pacotes do requirements.txt." }
 
-# 4. Arquivo .env ----------------------------------------------------------
 if (-not (Test-Path ".env")) {
     Passo "Criando o arquivo .env (configuração desta máquina)"
     $conteudo = Get-Content ".env.exemplo" -Raw -Encoding UTF8
@@ -60,7 +50,6 @@ if (-not (Test-Path ".env")) {
     Write-Host "`nArquivo .env já existe — mantido."
 }
 
-# 5. Banco de dados --------------------------------------------------------
 Passo "Preparando o banco MySQL"
 & $venvPython banco\criar_banco.py
 if ($LASTEXITCODE -ne 0) { Falha "corrija o problema acima e rode o instalar.bat de novo." }
@@ -73,14 +62,12 @@ Passo "Aplicando as migrations do Django"
 & $venvPython contratempo\manage.py migrate --noinput
 if ($LASTEXITCODE -ne 0) { Falha "o migrate falhou (veja a mensagem acima)." }
 
-# SQLite recém-criado: carrega os dados exportados da outra máquina.
 if ($sqliteNovo -and (Test-Path "banco\dados.json")) {
     Passo "Carregando os dados exportados (banco\dados.json)"
     & $venvPython -X utf8 contratempo\manage.py loaddata banco\dados.json
     if ($LASTEXITCODE -ne 0) { Falha "não foi possível carregar banco\dados.json." }
 }
 
-# 6. Administrador -----------------------------------------------------------
 $resposta = Read-Host "`nCriar um usuário administrador para o /admin/ agora? (s/n)"
 if ($resposta -match "^[sS]") {
     & $venvPython contratempo\manage.py createsuperuser

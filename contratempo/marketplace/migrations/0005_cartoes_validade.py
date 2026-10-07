@@ -1,15 +1,3 @@
-"""
-Formas de pagamento passam a ser só cartões (com validade).
-
-PIX e boleto agora são escolhidos direto no checkout, então as formas
-"pix", "boleto" e "outro" já salvas são apagadas. Pedidos antigos não
-mudam: guardam o texto em forma_pagamento_snapshot e a ligação vira NULL
-(on_delete=SET_NULL). Quem ficou sem cartão principal tem o mais antigo
-promovido.
-
-Equivale a banco/atualizacao_v4.sql (use um OU outro).
-"""
-
 from django.db import migrations, models
 
 TIPOS_CARTAO = ("cartao_credito", "cartao_debito")

@@ -1,20 +1,8 @@
-"""
-marketplace/urls.py
-
-Incluído em contratempo/contratempo/urls.py com:
-    path("", include("marketplace.urls"))
-
-Os nomes originais (home, sobre_nos, privacidade, produtos,
-produto_detalhe, adicionar_ao_carrinho, carrinho, contato, perfil,
-login) foram mantidos.
-"""
-
 from django.urls import path
 
 from . import views, views_anuncios, views_checkout, views_conta, views_vendas
 
 urlpatterns = [
-    # ----- Vitrine e institucional -----
     path("", views.home, name="home"),
     path("sobre-nos/", views.sobre_nos, name="sobre_nos"),
     path("privacidade/", views.privacidade, name="privacidade"),
@@ -34,13 +22,11 @@ urlpatterns = [
     path("produtos/<int:produto_id>/denunciar/", views.denunciar_produto, name="denunciar_produto"),
     path("vendedores/<int:usuario_id>/", views.vendedor_perfil, name="vendedor_perfil"),
 
-    # ----- Carrinho -----
     path("produtos/<int:produto_id>/carrinho/adicionar/", views.adicionar_ao_carrinho, name="adicionar_ao_carrinho"),
     path("carrinho/", views.carrinho, name="carrinho"),
     path("carrinho/item/<int:item_id>/atualizar/", views.atualizar_item_carrinho, name="atualizar_item_carrinho"),
     path("carrinho/item/<int:item_id>/remover/", views.remover_item_carrinho, name="remover_item_carrinho"),
 
-    # ----- Checkout e pedidos (comprador) -----
     path("checkout/", views_checkout.checkout_endereco, name="checkout_endereco"),
     path("checkout/pagamento/", views_checkout.checkout_pagamento, name="checkout_pagamento"),
     path("checkout/revisao/", views_checkout.checkout_revisao, name="checkout_revisao"),
@@ -58,7 +44,6 @@ urlpatterns = [
         views_checkout.avaliar_produto, name="avaliar_produto",
     ),
 
-    # ----- Autenticação, confirmação de e-mail e recuperação de senha -----
     path("login/", views_conta.login_view, name="login"),
     path("cadastro/", views_conta.cadastro, name="cadastro"),
     path("sair/", views_conta.logout_view, name="logout"),
@@ -70,7 +55,6 @@ urlpatterns = [
     path("senha/nova/<uidb64>/<token>/", views_conta.NovaSenhaView.as_view(), name="password_reset_confirm"),
     path("senha/nova/concluido/", views_conta.NovaSenhaConcluidaView.as_view(), name="password_reset_complete"),
 
-    # ----- Minha conta -----
     path("conta/", views_conta.perfil, name="perfil"),
     path("conta/editar/", views_conta.editar_perfil, name="editar_perfil"),
     path("conta/senha/", views_conta.alterar_senha, name="alterar_senha"),
@@ -88,7 +72,6 @@ urlpatterns = [
     path("conta/pagamentos/<int:forma_id>/excluir/", views_conta.pagamento_excluir, name="pagamento_excluir"),
     path("conta/pagamentos/<int:forma_id>/principal/", views_conta.pagamento_principal, name="pagamento_principal"),
 
-    # ----- Anúncios (área do vendedor) -----
     path("anuncios/", views_anuncios.anuncios, name="anuncios"),
     path("anuncios/novo/", views_anuncios.anuncio_criar, name="anuncio_criar"),
     path("anuncios/estoque/", views_anuncios.estoque, name="estoque"),
@@ -97,7 +80,6 @@ urlpatterns = [
     path("anuncios/<int:produto_id>/status/", views_anuncios.anuncio_status, name="anuncio_status"),
     path("anuncios/<int:produto_id>/excluir/", views_anuncios.anuncio_excluir, name="anuncio_excluir"),
 
-    # ----- Vendas e perguntas (área do vendedor) -----
     path("vendas/", views_vendas.vendas, name="vendas"),
     path("vendas/<int:pedido_id>/", views_vendas.venda_detalhe, name="venda_detalhe"),
     path("vendas/<int:pedido_id>/avancar/", views_vendas.venda_avancar, name="venda_avancar"),

@@ -1,8 +1,5 @@
-/* static/css/catalogo.css — catálogo, busca e categorias */
-
 .catalog-count { margin: 0; font-size: 0.8rem; color: var(--ink-muted); }
 
-/* Pílulas de categoria */
 .catalog-categories {
     display: flex;
     gap: 8px;
@@ -25,7 +22,6 @@
 .chip:hover { background: var(--paper-2); }
 .chip.active { background: var(--cor-header); border-color: var(--cor-header); color: #fff; }
 
-/* Layout */
 .catalog-layout {
     display: grid;
     grid-template-columns: 250px minmax(0, 1fr);
@@ -33,7 +29,6 @@
     align-items: start;
 }
 
-/* Filtros */
 .catalog-filters { position: sticky; top: calc(var(--header-height) + 20px); }
 .filters-panel {
     background: var(--paper);
@@ -93,7 +88,6 @@
 .price-range .input { min-height: 38px; padding: 6px 8px; font-size: 0.85rem; }
 .filters-actions { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
 
-/* Contagem ao lado de cada opção e opções que dariam zero produtos */
 .filtro-total { font-size: 0.78rem; color: var(--ink-muted); }
 .filtro-ajuda { display: block; font-size: 0.74rem; color: var(--ink-muted); }
 .check--vazio { opacity: 0.5; }
@@ -101,7 +95,6 @@
 .filtro-busca { min-height: 36px; padding: 6px 10px; margin-bottom: 10px; font-size: 0.85rem; }
 .filtro-anos { margin-top: 12px; }
 
-/* Etiquetas dos filtros ligados (acima dos produtos) */
 .filtros-ativos {
     display: flex;
     flex-wrap: wrap;
@@ -133,7 +126,6 @@
 .etiqueta-filtro [aria-hidden] { font-size: 0.75rem; }
 .etiqueta-filtro:hover { background: var(--cor-header); border-color: var(--cor-header); color: #fff; }
 
-/* Barra de ordenação */
 .catalog-toolbar {
     display: flex;
     justify-content: flex-end;
@@ -145,7 +137,6 @@
 
 .catalog-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
-/* Categorias */
 .category-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));

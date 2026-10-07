@@ -1,15 +1,6 @@
-"""
-Dados iniciais:
-  1. Tabela de frete para as 27 UFs (valores de exemplo por região —
-     ajuste em /admin/ > Tabela de frete).
-  2. Perguntas frequentes iniciais (editáveis em /admin/).
-  3. Preenche Pedido.vendedor nos pedidos antigos, a partir dos itens.
-"""
-
 from django.db import migrations
 
 REGIOES = {
-    # região: (UFs, valor, prazo em dias úteis)
     "sudeste": (["SP", "RJ", "MG", "ES"], "19.90", 5),
     "sul": (["PR", "SC", "RS"], "24.90", 7),
     "centro_oeste": (["DF", "GO", "MT", "MS"], "29.90", 8),

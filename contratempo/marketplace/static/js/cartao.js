@@ -1,10 +1,3 @@
-/* =====================================================================
-   cartao.js — máscaras dos campos de cartão e o CVV do checkout.
-
-   Usado em "Novo cartão" (conta/pagamento_form.html) e na etapa de
-   pagamento do checkout. Sem JavaScript tudo continua funcionando: o
-   servidor aceita os dados com ou sem espaços e barra.
-   ===================================================================== */
 (function () {
     "use strict";
 
@@ -18,7 +11,6 @@
         var mascara = MASCARAS[campo.dataset.mascara];
         if (!mascara) return;
         campo.addEventListener("input", function () {
-            // Mantém o cursor depois do mesmo número de dígitos de antes.
             var antesDoCursor = campo.value.slice(0, campo.selectionStart).replace(/\D/g, "").length;
             var digitos = campo.value.replace(/\D/g, "").slice(0, mascara.max);
             var novo = mascara.formatar(digitos);
@@ -33,7 +25,6 @@
         });
     }
 
-    /* Checkout: o CVV só aparece (e só é exigido) quando um cartão está escolhido. */
     function iniciarCheckout(form) {
         var bloco = form.querySelector("[data-cvv-campo]");
         if (!bloco) return;

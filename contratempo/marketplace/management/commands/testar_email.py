@@ -1,10 +1,3 @@
-"""
-python manage.py testar_email destino@exemplo.com
-
-Mostra a configuração de e-mail em uso e envia uma mensagem de teste,
-explicando o erro caso o envio falhe.
-"""
-
 from django.conf import settings
 from django.core.mail import send_mail
 from django.core.management.base import BaseCommand

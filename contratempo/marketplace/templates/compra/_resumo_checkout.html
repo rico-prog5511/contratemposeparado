@@ -1,9 +1,4 @@
 {% load static marketplace_extras %}
-{% comment %}
-Resumo lateral das 3 etapas do checkout. Mostra os produtos agrupados
-por vendedor (cada grupo vira um pedido, com seu próprio frete).
-Espera: envios, faixa, subtotal, frete, total, total_itens.
-{% endcomment %}
 <div class="summary">
     <h2>Resumo da compra</h2>
     {% for envio in envios %}

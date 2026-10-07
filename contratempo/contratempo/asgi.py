@@ -1,5 +1,3 @@
-"""Ponto de entrada ASGI (alternativa ao WSGI; não usado no PythonAnywhere)."""
-
 import os
 
 from django.core.asgi import get_asgi_application

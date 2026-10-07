@@ -1,11 +1,3 @@
-"""
-banco/criar_banco.py — usado pelo instalar.bat
-
-Cria o banco do contratempo a partir de banco/contratempo_db.sql, usando
-os dados de conexão do arquivo .env. Se o banco já existir, não mexe em
-nada (o `manage.py migrate` que roda depois aplica o que faltar).
-"""
-
 import sys
 from pathlib import Path
 
@@ -18,7 +10,7 @@ try:
 except ImportError:
     sys.exit("ERRO: o pacote mysqlclient não está instalado (rode o instalar.bat).")
 
-from contratempo import settings  # só lê o .env e as configurações; não inicia o Django
+from contratempo import settings
 
 cfg = settings.DATABASES["default"]
 if "sqlite" in cfg["ENGINE"]:
@@ -48,7 +40,7 @@ if cur.fetchone():
 script = (RAIZ / "banco" / "contratempo_db.sql").read_text(encoding="utf-8")
 script = script.replace("`contratempo_db`", f"`{nome}`")
 cur.execute(script)
-while cur.nextset() is not None:  # executa todos os comandos do arquivo
+while cur.nextset() is not None:
     pass
 con.commit()
 con.close()

@@ -24,7 +24,6 @@
         {% csrf_token %}
         {% include "partials/form_errors.html" %}
 
-        <!-- FOTOS -->
         <section class="panel">
             <h2 class="panel-title">Fotos <span class="eyebrow">até {{ limite_imagens }}</span></h2>
 
@@ -61,7 +60,6 @@
             <ul class="upload-preview" data-upload-preview aria-label="Novas imagens selecionadas"></ul>
         </section>
 
-        <!-- INFORMAÇÕES -->
         <section class="panel">
             <h2 class="panel-title">Informações do produto</h2>
             {% include "partials/form_field.html" with field=form.nome %}
@@ -77,7 +75,6 @@
             {% include "partials/form_field.html" with field=form.descricao %}
         </section>
 
-        <!-- VENDA -->
         <section class="panel">
             <h2 class="panel-title">Preço e estoque</h2>
             <div class="form-row form-row-3">
@@ -100,7 +97,6 @@
 <script src="{% static 'js/upload.js' %}"></script>
 {{ form.rotulos_marca|json_script:"rotulos-marca" }}
 <script>
-/* Troca o nome do campo "marca" conforme a categoria (Autor / editora, Artista / banda...). */
 (function () {
     var categoria = document.getElementById("{{ form.categoria.id_for_label }}");
     var campo = document.querySelector("[data-marca-campo]");

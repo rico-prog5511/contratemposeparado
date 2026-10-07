@@ -1,19 +1,3 @@
-/* static/js/acessibilidade.js — painel de acessibilidade
- *
- * As escolhas ficam no localStorage ("ct-acessibilidade") e viram
- * atributos no <html>, que o acessibilidade.css usa:
- *   data-texto="-1..4"          tamanho do texto
- *   data-tema="escuro"          tema escuro (também quando "Do sistema" e o sistema está escuro)
- *   data-contraste="alto"       alto contraste
- *   data-leitura="facil"        fonte Atkinson Hyperlegible (dislexia/baixa visão)
- *   data-links="destacar"       links sublinhados e em negrito
- *   data-espacamento="amplo"    mais espaço entre linhas, letras e palavras
- *   data-animacoes="pausar"     sem animações (o carrossel da home para)
- *
- * Um trecho curto em base.html aplica as escolhas ANTES da página
- * aparecer (sem "piscar"); este arquivo cuida do painel.
- */
-
 (function () {
     var CHAVE = "ct-acessibilidade";
     var PADRAO = { texto: 0, tema: "claro", contraste: false, leitura: false, links: false, espacamento: false, animacoes: false };
@@ -32,7 +16,7 @@
     }
 
     function salvar(p) {
-        try { localStorage.setItem(CHAVE, JSON.stringify(p)); } catch (e) { /* modo privado: só vale nesta página */ }
+        try { localStorage.setItem(CHAVE, JSON.stringify(p)); } catch (e) {  }
     }
 
     function carregarFonteLeitura() {
@@ -59,7 +43,6 @@
         atributo("data-espacamento", p.espacamento, "amplo");
         atributo("data-animacoes", p.animacoes, "pausar");
         if (p.leitura) carregarFonteLeitura();
-        // Outros scripts (carrossel da home) reagem a esta mudança
         document.dispatchEvent(new CustomEvent("ct:acessibilidade", { detail: p }));
     }
 
