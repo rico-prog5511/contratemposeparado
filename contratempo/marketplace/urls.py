@@ -6,6 +6,7 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("sobre-nos/", views.sobre_nos, name="sobre_nos"),
     path("privacidade/", views.privacidade, name="privacidade"),
+    path("regras-de-anuncio/", views.regras_anuncio, name="regras_anuncio"),
     path("acessibilidade/", views.acessibilidade, name="acessibilidade"),
     path("cookies/", views.politica_cookies, name="politica_cookies"),
     path("guia/", views.guia, name="guia"),

@@ -259,7 +259,7 @@ CREATE TABLE `denuncias` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `produto_id` bigint NOT NULL,
   `usuario_id` bigint NOT NULL COMMENT 'quem denunciou (não é mostrado ao vendedor)',
-  `motivo` enum('falsificado','proibido','enganoso','golpe','ofensivo','outro') NOT NULL,
+  `motivo` enum('falsificado','proibido','adulto','enganoso','golpe','ofensivo','outro') NOT NULL,
   `descricao` text,
   `status` enum('pendente','procedente','improcedente') NOT NULL DEFAULT 'pendente' COMMENT 'procedente = anúncio encerrado',
   `data_denuncia` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -486,6 +486,7 @@ INSERT INTO `django_migrations` (`app`, `name`, `applied`) VALUES
   ('marketplace', '0002_frete_vendas_perguntas', NOW(6)),
   ('marketplace', '0003_dados_iniciais', NOW(6)),
   ('marketplace', '0004_denuncias', NOW(6)),
-  ('marketplace', '0005_cartoes_validade', NOW(6));
+  ('marketplace', '0005_cartoes_validade', NOW(6)),
+  ('marketplace', '0006_denuncia_motivo_adulto', NOW(6));
 
 SET FOREIGN_KEY_CHECKS = 1;

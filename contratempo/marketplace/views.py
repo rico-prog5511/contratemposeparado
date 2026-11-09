@@ -23,6 +23,7 @@ from .busca import palavras as palavras_busca
 from .emails import enviar_nova_pergunta
 from .forms import ContatoForm
 from .frete import calcular_envios, faixa_para_uf, resumo_envios, uf_por_cep
+from .moderacao import pausar_se_atingiu_limite, retido_pela_moderacao
 from .templatetags.marketplace_extras import brl, imagem_principal
 from .models import (
     Avaliacao,
@@ -185,6 +186,12 @@ def acessibilidade(request):
 def privacidade(request):
     return render(request, "privacidade.html", {
         "breadcrumbs": [{"label": "Política de privacidade", "url": None}],
+    })
+
+
+def regras_anuncio(request):
+    return render(request, "regras_anuncio.html", {
+        "breadcrumbs": [{"label": "Regras de anúncio", "url": None}],
     })
 
 
@@ -370,6 +377,8 @@ def produto_detalhe(request, produto_id):
     )
 
     eh_dono = request.user.is_authenticated and produto.vendedor_id == request.user.id
+    if retido_pela_moderacao(produto) and not (eh_dono or request.user.is_staff):
+        raise Http404("Anúncio retirado pela moderação.")
     disponivel = produto.status_anuncio == "ativo" and produto.quantidade_disponivel > 0
 
     perguntas = produto.perguntas.filter(status="publicada").select_related("usuario")
@@ -436,8 +445,9 @@ def denunciar_produto(request, produto_id):
         return redirect(destino)
 
     Denuncia.objects.create(produto=produto, usuario=request.user, motivo=motivo, descricao=descricao or None)
+    pausar_se_atingiu_limite(produto)
     messages.success(request, "Denúncia enviada. Obrigado! Nossa equipe vai analisar o anúncio — o vendedor não fica sabendo quem denunciou.")
-    return redirect(destino)
+    return redirect("produtos" if retido_pela_moderacao(produto) else destino)
 
 
 def vendedor_perfil(request, usuario_id):

@@ -661,6 +661,7 @@ class Denuncia(models.Model):
     MOTIVO_CHOICES = [
         ("falsificado", "Produto falsificado ou pirata"),
         ("proibido", "Item proibido ou ilegal"),
+        ("adulto", "Conteúdo adulto (+18)"),
         ("enganoso", "Descrição ou fotos enganosas"),
         ("golpe", "Suspeita de golpe"),
         ("ofensivo", "Conteúdo ofensivo"),

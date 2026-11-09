@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Regras de anúncio | contratempo{% endblock %}
+{% block meta_description %}O que pode e o que não pode ser anunciado na contratempo e como funcionam as denúncias.{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/institucional.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="inst-intro">
+    <div class="container">
+        <h1>Regras de <em>anúncio.</em></h1>
+        <p>A contratempo é um espaço de colecionáveis aberto a todas as idades. Estas regras valem para títulos, descrições e fotos.</p>
+    </div>
+</section>
+
+<div class="container legal-layout">
+    <nav class="legal-toc" aria-label="Nesta página">
+        <span class="form-label">Nesta página</span>
+        <ol>
+            <li><a href="#proibido">O que não pode</a></li>
+            <li><a href="#permitido">O que pode</a></li>
+            <li><a href="#fiscalizacao">Como fiscalizamos</a></li>
+            <li><a href="#denunciar">Como denunciar</a></li>
+        </ol>
+    </nav>
+
+    <article class="legal-text">
+        <section id="proibido">
+            <h2>1. O que não pode ser anunciado</h2>
+            <ul>
+                <li><strong>Conteúdo para maiores de 18 anos:</strong> pornografia, conteúdo erótico, revistas e filmes adultos, hentai e artigos sexuais.</li>
+                <li><strong>Armas e munição</strong> de verdade, inclusive armas brancas.</li>
+                <li><strong>Drogas</strong> e produtos ligados ao seu consumo.</li>
+                <li><strong>Bebidas alcoólicas e cigarros</strong>, mesmo em embalagens de coleção.</li>
+                <li><strong>Falsificações e cópias piratas</strong> de produtos, jogos, filmes e músicas.</li>
+                <li><strong>Documentos e dinheiro falsos</strong>, além de dados pessoais de outras pessoas.</li>
+                <li><strong>Animais</strong> e produtos feitos de espécies protegidas.</li>
+                <li><strong>Itens roubados</strong> ou de origem que você não possa comprovar.</li>
+                <li><strong>Fotos ou textos ofensivos</strong>, discriminatórios ou que façam apologia a crimes.</li>
+            </ul>
+        </section>
+
+        <section id="permitido">
+            <h2>2. O que pode</h2>
+            <p>Action figures, cartas, HQs, mangás, discos, consoles, jogos, filmes, roupas licenciadas e outros colecionáveis.</p>
+            <p>Jogos, filmes e HQs vendidos normalmente em lojas podem ser anunciados, mesmo com classificação indicativa alta, desde que não sejam pornográficos. Nesses casos, informe a classificação por extenso, como “classificação 18 anos”.</p>
+            <p>Réplicas e reproduções são permitidas quando o anúncio deixa claro que não se trata do item original. Armas de brinquedo são permitidas quando não puderem ser confundidas com armas reais.</p>
+        </section>
+
+        <section id="fiscalizacao">
+            <h2>3. Como fiscalizamos</h2>
+            <ul>
+                <li><strong>Antes de publicar:</strong> o site verifica o título, a descrição e a marca e bloqueia termos proibidos.</li>
+                <li><strong>Depois de publicar:</strong> qualquer pessoa cadastrada pode denunciar um anúncio. Quando um anúncio recebe várias denúncias, ele sai do ar até a nossa equipe analisar.</li>
+                <li><strong>Se a denúncia for aceita:</strong> o anúncio é encerrado e não pode voltar ao ar. Quem insiste em anunciar itens proibidos tem a conta suspensa.</li>
+                <li><strong>Se a denúncia não for aceita:</strong> o anúncio continua normalmente.</li>
+            </ul>
+        </section>
+
+        <section id="denunciar">
+            <h2>4. Como denunciar</h2>
+            <p>Abra o anúncio, use o link “Denunciar anúncio” e escolha o motivo. O vendedor não fica sabendo quem denunciou. Para outros assuntos, fale com a gente pela página de <a href="{% url 'contato' %}">contato</a>.</p>
+        </section>
+    </article>
+</div>
+
+{% endblock %}

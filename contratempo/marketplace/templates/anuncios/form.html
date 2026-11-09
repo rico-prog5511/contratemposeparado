@@ -83,6 +83,15 @@
                 {% include "partials/form_field.html" with field=form.sku %}
             </div>
             {% include "partials/form_field.html" with field=form.status_anuncio classe="radio-pills" %}
+            {% if not produto %}
+                <div class="form-group{% if form.aceito_regras.errors %} has-error{% endif %}">
+                    <label class="check" for="{{ form.aceito_regras.id_for_label }}">
+                        {{ form.aceito_regras }}
+                        <span>Li as <a href="{% url 'regras_anuncio' %}" target="_blank" rel="noopener">regras de anúncio</a> e este anúncio não tem nada proibido.</span>
+                    </label>
+                    {{ form.aceito_regras.errors }}
+                </div>
+            {% endif %}
         </section>
 
         <div class="form-actions listing-actions">

@@ -13,6 +13,7 @@ from .models import (
     Usuario,
     rotulo_marca,
 )
+from .moderacao import retido_pela_moderacao, termo_proibido
 from .sku import EXEMPLO as EXEMPLO_SKU
 from .sku import PADRAO as PADRAO_SKU
 from .sku import normalizar_sku
@@ -356,6 +357,10 @@ class ProdutoForm(forms.ModelForm):
         help_text=f"Até {LIMITE_IMAGENS_ANUNCIO} imagens (JPG, PNG ou WEBP, máx. 5 MB cada). "
                   "Pode escolher uma por vez ou várias juntas: elas vão se somando.",
     )
+    aceito_regras = forms.BooleanField(
+        label="Li as regras de anúncio e este anúncio não tem nada proibido.",
+        error_messages={"required": "Para publicar, confirme que o anúncio segue as regras."},
+    )
 
     class Meta:
         model = Produto
@@ -398,6 +403,8 @@ class ProdutoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.imagens_existentes = imagens_existentes
         self.tamanho_maximo_imagem = TAMANHO_MAXIMO_IMAGEM
+        if self.instance.pk:
+            del self.fields["aceito_regras"]
 
         self.fields["sku"].help_text = (
             f"Opcional. Formato: 3 partes de 3 letras ou números, como {EXEMPLO_SKU}. "
@@ -468,6 +475,17 @@ class ProdutoForm(forms.ModelForm):
         dados = super().clean()
         if dados.get("status_anuncio") == "ativo" and dados.get("quantidade_disponivel") == 0:
             self.add_error("quantidade_disponivel", "Um anúncio ativo precisa ter pelo menos 1 unidade em estoque.")
+        if (self.instance.pk and dados.get("status_anuncio") == "ativo"
+                and self.instance.status_anuncio != "ativo" and retido_pela_moderacao(self.instance)):
+            self.add_error("status_anuncio", "Este anúncio foi retirado por denúncias e não pode ser reativado.")
+        for campo in ("nome", "descricao", "marca"):
+            encontrado = termo_proibido(dados.get(campo))
+            if encontrado:
+                termo, motivo = encontrado
+                self.add_error(campo, (
+                    f'"{termo}" indica {motivo}, que não pode ser anunciado aqui (veja as regras de anúncio). '
+                    "Se for um engano, reescreva este trecho."
+                ))
         return dados
 
 

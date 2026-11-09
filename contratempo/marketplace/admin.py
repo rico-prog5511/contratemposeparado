@@ -10,6 +10,7 @@ from django.utils.html import format_html
 
 from .relatorios import anos_disponiveis, relatorio_anual
 from .imagens import url_miniatura
+from .moderacao import em_analise, suspender_reincidentes
 from .templatetags.marketplace_extras import brl, imagem_principal
 from .models import (
     Avaliacao,
@@ -106,13 +107,25 @@ class DenunciaAdmin(admin.ModelAdmin):
         Denuncia.objects.filter(
             Q(pk__in=ids_denuncias) | Q(produto_id__in=ids_produtos, status="pendente")
         ).update(status="procedente", data_analise=agora)
-        self.message_user(request, f"{total_produtos} anúncio(s) encerrado(s).", messages.SUCCESS)
+        ids_vendedores = list(Produto.objects.filter(pk__in=ids_produtos).values_list("vendedor_id", flat=True).distinct())
+        suspensos = suspender_reincidentes(ids_vendedores)
+        aviso = f" {suspensos} vendedor(es) suspenso(s) por reincidência." if suspensos else ""
+        self.message_user(request, f"{total_produtos} anúncio(s) encerrado(s).{aviso}", messages.SUCCESS)
 
     @admin.action(description="Improcedente: manter o anúncio")
     def marcar_improcedente(self, request, queryset):
         ids = list(queryset.values_list("id", flat=True))
+        ids_produtos = list(queryset.values_list("produto_id", flat=True).distinct())
+        pausados = [p for p in Produto.objects.filter(pk__in=ids_produtos, status_anuncio="pausado") if em_analise(p)]
         total = Denuncia.objects.filter(pk__in=ids).update(status="improcedente", data_analise=timezone.now())
-        self.message_user(request, f"{total} denúncia(s) arquivada(s).", messages.SUCCESS)
+        reativados = 0
+        for produto in pausados:
+            if not em_analise(produto) and produto.quantidade_disponivel > 0:
+                produto.status_anuncio = "ativo"
+                produto.save(update_fields=["status_anuncio", "data_atualizacao"])
+                reativados += 1
+        aviso = f" {reativados} anúncio(s) de volta ao ar." if reativados else ""
+        self.message_user(request, f"{total} denúncia(s) arquivada(s).{aviso}", messages.SUCCESS)
 
 
 @admin.register(PerguntaProduto)

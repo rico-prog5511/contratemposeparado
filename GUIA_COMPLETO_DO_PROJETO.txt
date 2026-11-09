@@ -887,8 +887,22 @@ bloco {% block conta %}.
   de 10+ caracteres). Uma denúncia pendente por pessoa por anúncio. No
   /admin/ > Denúncias, a equipe seleciona e aplica:
     "Procedente" -> anúncio encerrado + todas as denúncias dele resolvidas
-    "Improcedente" -> só arquiva.
+    "Improcedente" -> só arquiva; se o anúncio tinha sido pausado pelas
+    denúncias e elas caíram abaixo do limite, ele volta ao ar.
   O vendedor nunca sabe quem denunciou.
+
+  Moderação automática (marketplace/moderacao.py):
+    - Ao criar anúncio, é obrigatório aceitar as regras (/regras-de-anuncio/).
+    - O título, a descrição e a marca passam por uma lista de termos
+      proibidos (TERMOS_PROIBIDOS), que ignora acentos e troca de letras
+      por números. Para mudar a lista, basta editar esse arquivo.
+    - Com 3 denúncias pendentes de pessoas diferentes, o anúncio é pausado
+      e sai da loja, inclusive pelo link direto, até a análise.
+    - Anúncio em análise ou com denúncia procedente não pode ser reativado
+      nem excluído pelo vendedor.
+    - Com 3 anúncios diferentes com denúncia procedente, a conta é suspensa
+      e os anúncios ativos dela são pausados (contas de equipe não entram).
+      O middleware BloquearContaSuspensa encerra a sessão de quem é suspenso.
 
 9.10 DESATIVAR CONTA
   Exige pausar/encerrar os anúncios ativos antes. A conta é desativada

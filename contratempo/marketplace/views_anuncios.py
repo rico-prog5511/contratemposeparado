@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 
 from .forms import LIMITE_IMAGENS_ANUNCIO, ProdutoForm
 from .models import ItemPedido, Produto, ProdutoImagem
+from .moderacao import em_analise, retido_pela_moderacao
 from .sku import gerar_sku
 from .imagens import salvar_foto_produto
 from .views_conta import _proximo
@@ -193,6 +194,8 @@ def anuncio_detalhe(request, produto_id):
         "em_carrinhos": produto.itens_carrinho.filter(carrinho__status="ativo").count(),
         "media_avaliacoes": produto.avaliacoes.filter(status="publicada").aggregate(m=Avg("nota"))["m"],
         "total_avaliacoes": produto.avaliacoes.filter(status="publicada").count(),
+        "em_analise": em_analise(produto),
+        "retido": retido_pela_moderacao(produto),
         "breadcrumbs": _breadcrumbs({"label": produto.nome, "url": None}),
     })
 
@@ -204,6 +207,9 @@ def anuncio_status(request, produto_id):
     acao = request.POST.get("acao")
 
     if acao == "ativar":
+        if retido_pela_moderacao(produto):
+            messages.error(request, "Este anúncio foi retirado por denúncias e não pode ser reativado.")
+            return redirect("anuncio_detalhe", produto_id=produto.id)
         if produto.quantidade_disponivel == 0:
             messages.error(request, "Adicione estoque antes de reativar o anúncio.")
             return redirect("anuncio_editar", produto_id=produto.id)
@@ -228,6 +234,9 @@ def anuncio_status(request, produto_id):
 @require_POST
 def anuncio_excluir(request, produto_id):
     produto = _meu_anuncio(request, produto_id)
+    if produto.denuncias.exclude(status="improcedente").exists():
+        messages.error(request, "Este anúncio tem denúncias registradas e não pode ser excluído. Use “Encerrar” no lugar.")
+        return redirect("anuncio_detalhe", produto_id=produto.id)
     if produto.itens_pedido.exists():
         messages.error(
             request,
@@ -270,7 +279,7 @@ def estoque(request):
 
                 produto.quantidade_disponivel = novo
                 campos = ["quantidade_disponivel", "data_atualizacao"]
-                if produto.status_anuncio == "vendido" and novo > 0:
+                if produto.status_anuncio == "vendido" and novo > 0 and not retido_pela_moderacao(produto):
                     produto.status_anuncio = "ativo"
                     campos.append("status_anuncio")
                 elif produto.status_anuncio == "ativo" and novo == 0:

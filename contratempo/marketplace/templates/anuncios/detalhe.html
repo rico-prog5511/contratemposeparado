@@ -23,6 +23,12 @@
         </div>
     </header>
 
+    {% if em_analise %}
+        <div class="alert alert-warning" role="status" style="margin-bottom: 20px;"><div class="alert-text"><p>Este anúncio recebeu várias denúncias e está fora do ar até a nossa equipe analisar. Veja as <a href="{% url 'regras_anuncio' %}" class="link-button">regras de anúncio</a>.</p></div></div>
+    {% elif retido %}
+        <div class="alert alert-error" role="status" style="margin-bottom: 20px;"><div class="alert-text"><p>Este anúncio foi encerrado porque uma denúncia foi aceita pela nossa equipe. Ele não pode voltar ao ar. Veja as <a href="{% url 'regras_anuncio' %}" class="link-button">regras de anúncio</a>.</p></div></div>
+    {% endif %}
+
     {% if produto.status_anuncio == "ativo" and produto.quantidade_disponivel == 0 %}
         <div class="alert alert-warning" style="margin-bottom: 20px;"><div class="alert-text"><p>O anúncio está ativo, mas sem estoque — compradores não conseguem comprar. <a href="{% url 'estoque' %}" class="link-button">Atualizar estoque</a></p></div></div>
     {% endif %}
