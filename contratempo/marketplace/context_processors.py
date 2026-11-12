@@ -1,6 +1,22 @@
+from django.contrib.staticfiles import finders
 from django.db.models import Sum
+from django.templatetags.static import static
 
 from .models import Categoria, ItemCarrinho
+
+ARQUIVOS_FONTE_LOGO = (
+    ("fonts/adult-swim.woff2", "woff2"),
+    ("fonts/adult-swim.woff", "woff"),
+    ("fonts/adult-swim.ttf", "truetype"),
+    ("fonts/adult-swim.otf", "opentype"),
+)
+
+
+def fonte_logo(request):
+    return {"fonte_logo": [
+        {"url": static(caminho), "formato": formato}
+        for caminho, formato in ARQUIVOS_FONTE_LOGO if finders.find(caminho)
+    ]}
 
 
 def menu_categorias(request):

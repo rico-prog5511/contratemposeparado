@@ -65,7 +65,8 @@ def login_view(request):
             login(request, usuario)
             if not form.cleaned_data["lembrar"]:
                 request.session.set_expiry(0)
-            messages.success(request, f"Bem-vindo(a) de volta, {usuario.nome_completo.split()[0]}!")
+            nomes = usuario.nome_completo.split()
+            messages.success(request, f"Bem-vindo(a) de volta, {nomes[0]}!" if nomes else "Bem-vindo(a) de volta!")
             return redirect(_proximo(request, "perfil"))
 
     return render(request, "conta/login.html", {
@@ -241,6 +242,10 @@ def desativar_conta(request):
     usuario = request.user
     if Produto.objects.filter(vendedor=usuario, status_anuncio="ativo").exists():
         messages.error(request, "Pause ou encerre seus anúncios ativos antes de desativar a conta.")
+        return redirect("editar_perfil")
+    em_andamento = ("aguardando_pagamento", "pagamento_aprovado", "processamento")
+    if Pedido.objects.filter(vendedor=usuario, status_pedido__in=em_andamento).exists():
+        messages.error(request, "Você tem vendas em andamento. Envie ou cancele esses pedidos antes de desativar a conta.")
         return redirect("editar_perfil")
     usuario.desativar_conta()
     logout(request)

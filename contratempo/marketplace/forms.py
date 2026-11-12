@@ -1,7 +1,9 @@
 from datetime import date
+from decimal import Decimal
 
 from django import forms
 from django.contrib.auth import password_validation
+from PIL import Image
 
 from .models import (
     Categoria,
@@ -20,6 +22,10 @@ from .sku import normalizar_sku
 
 LIMITE_IMAGENS_ANUNCIO = 8
 TAMANHO_MAXIMO_IMAGEM = 5 * 1024 * 1024
+PIXELS_MAXIMOS_IMAGEM = 40_000_000
+PRECO_MAXIMO = Decimal("1000000.00")
+ESTOQUE_MAXIMO = 999
+DIGITOS = "0123456789"
 
 
 class MultipleFileInput(forms.ClearableFileInput):
@@ -43,10 +49,27 @@ class MultipleImageField(forms.ImageField):
 
 
 def validar_tamanho_imagem(arquivo):
-    if arquivo and arquivo.size > TAMANHO_MAXIMO_IMAGEM:
+    if not arquivo:
+        return
+    if arquivo.size > TAMANHO_MAXIMO_IMAGEM:
         raise forms.ValidationError(
             f'"{arquivo.name}" tem mais de 5 MB. Envie uma imagem menor.'
         )
+    imagem = getattr(arquivo, "image", None)
+    if imagem is not None and imagem.width * imagem.height > PIXELS_MAXIMOS_IMAGEM:
+        raise forms.ValidationError(
+            f'"{arquivo.name}" tem dimensões grandes demais (mais de 40 megapixels). Envie uma imagem menor.'
+        )
+    try:
+        arquivo.seek(0)
+        with Image.open(arquivo) as teste:
+            teste.load()
+    except Exception:
+        raise forms.ValidationError(
+            f'Não foi possível abrir "{arquivo.name}": o arquivo parece corrompido ou incompleto. Tente enviar de novo.'
+        ) from None
+    finally:
+        arquivo.seek(0)
 
 
 class LoginForm(forms.Form):
@@ -192,20 +215,24 @@ class EnderecoForm(forms.ModelForm):
         return estado
 
     def clean_cep(self):
-        digitos = "".join(c for c in self.cleaned_data["cep"] if c.isdigit())
+        digitos = _so_digitos(self.cleaned_data["cep"])
         if len(digitos) != 8:
             raise forms.ValidationError("O CEP precisa ter 8 dígitos.")
         return f"{digitos[:5]}-{digitos[5:]}"
 
 
 def _so_digitos(valor):
-    return "".join(c for c in (valor or "") if c.isdigit())
+    return "".join(c for c in (valor or "") if c in DIGITOS)
+
+
+def _numero(texto):
+    return bool(texto) and all(c in DIGITOS for c in texto)
 
 
 def validar_cvv(valor, bandeira):
     cvv = (valor or "").strip()
     tamanho = 4 if bandeira == "American Express" else 3
-    if not (cvv.isdigit() and len(cvv) == tamanho):
+    if not (_numero(cvv) and len(cvv) == tamanho):
         raise forms.ValidationError(f"O código de segurança tem {tamanho} dígitos.")
     return cvv
 
@@ -231,12 +258,18 @@ class ValidadeField(forms.CharField):
         if texto in self.empty_values:
             return None
         partes = texto.replace(" ", "").split("/")
-        if len(partes) != 2 or not all(p.isdigit() for p in partes) or len(partes[1]) not in (2, 4):
+        if len(partes) != 2 or not all(_numero(p) for p in partes) or len(partes[0]) > 2 or len(partes[1]) not in (2, 4):
             raise forms.ValidationError("Use o formato MM/AA, como está no cartão.")
         mes, ano = int(partes[0]), int(partes[1])
         if not 1 <= mes <= 12:
             raise forms.ValidationError("O mês da validade vai de 01 a 12.")
-        return mes, (2000 + ano if ano < 100 else ano)
+        ano = 2000 + ano if ano < 100 else ano
+        hoje = date.today()
+        if (ano, mes) < (hoje.year, hoje.month):
+            raise forms.ValidationError("Este cartão já está vencido. Confira a validade.")
+        if ano > hoje.year + 20:
+            raise forms.ValidationError("Confira o ano da validade.")
+        return mes, ano
 
 
 class CartaoForm(forms.ModelForm):
@@ -393,7 +426,7 @@ class ProdutoForm(forms.ModelForm):
                 "rows": 7, "placeholder": "Estado de conservação, medidas, itens inclusos, detalhes de colecionador…",
             }),
             "preco": forms.NumberInput(attrs={"step": "0.01", "min": "0.01", "placeholder": "0,00"}),
-            "quantidade_disponivel": forms.NumberInput(attrs={"min": "0"}),
+            "quantidade_disponivel": forms.NumberInput(attrs={"min": "0", "max": "999"}),
             "ano": forms.NumberInput(attrs={"placeholder": "Ex.: 1998"}),
             "condicao": forms.RadioSelect,
             "status_anuncio": forms.RadioSelect,
@@ -439,7 +472,15 @@ class ProdutoForm(forms.ModelForm):
         preco = self.cleaned_data["preco"]
         if preco is not None and preco <= 0:
             raise forms.ValidationError("O preço precisa ser maior que zero.")
+        if preco is not None and preco > PRECO_MAXIMO:
+            raise forms.ValidationError("O preço máximo por anúncio é R$ 1.000.000,00.")
         return preco
+
+    def clean_quantidade_disponivel(self):
+        quantidade = self.cleaned_data["quantidade_disponivel"]
+        if quantidade is not None and quantidade > ESTOQUE_MAXIMO:
+            raise forms.ValidationError(f"O estoque máximo por anúncio é de {ESTOQUE_MAXIMO} unidades.")
+        return quantidade
 
     def clean_ano(self):
         ano = self.cleaned_data.get("ano")
@@ -500,5 +541,6 @@ class AvaliacaoForm(forms.Form):
     comentario = forms.CharField(
         label="Comentário",
         required=False,
+        max_length=1000,
         widget=forms.Textarea(attrs={"rows": 3, "placeholder": "Conte como foi sua experiência (opcional)"}),
     )

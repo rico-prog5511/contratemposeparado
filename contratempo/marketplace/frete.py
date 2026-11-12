@@ -18,7 +18,7 @@ FAIXAS_CEP = [
 
 
 def limpar_cep(cep):
-    return "".join(c for c in (cep or "") if c.isdigit())
+    return "".join(c for c in (cep or "") if c in "0123456789")
 
 
 def uf_por_cep(cep):

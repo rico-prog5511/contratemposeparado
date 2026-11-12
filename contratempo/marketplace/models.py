@@ -331,11 +331,28 @@ class Carrinho(models.Model):
         verbose_name_plural = "Carrinhos"
 
     @classmethod
+    def ativo_de(cls, usuario):
+        ativos = list(cls.objects.filter(usuario=usuario, status="ativo").order_by("id"))
+        if not ativos:
+            return None
+        principal, *sobras = ativos
+        for sobra in sobras:
+            for item in sobra.itens.all():
+                igual = principal.itens.filter(produto_id=item.produto_id).first()
+                if igual:
+                    igual.quantidade += item.quantidade
+                    igual.save(update_fields=["quantidade"])
+                    item.delete()
+                else:
+                    item.carrinho = principal
+                    item.save(update_fields=["carrinho"])
+            sobra.status = "abandonado"
+            sobra.save(update_fields=["status", "data_atualizacao"])
+        return principal
+
+    @classmethod
     def obter_carrinho_ativo(cls, usuario):
-        carrinho, _ = cls.objects.get_or_create(
-            usuario=usuario, status="ativo"
-        )
-        return carrinho
+        return cls.ativo_de(usuario) or cls.objects.create(usuario=usuario, status="ativo")
 
     def __str__(self):
         return f"Carrinho #{self.id} ({self.status}) — {self.usuario}"

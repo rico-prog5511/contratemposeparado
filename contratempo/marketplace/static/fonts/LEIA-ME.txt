@@ -8,8 +8,9 @@ Coloque aqui o arquivo da fonte Adult Swim com UM destes nomes
     adult-swim.ttf
     adult-swim.otf
 
-O CSS (static/css/styles-retro.css, regra @font-face) já procura esses
-arquivos. Sem eles, o logo usa Helvetica/Arial em negrito.
+O site só declara a fonte (templates/partials/fonte_logo.html) quando
+algum desses arquivos existe, então sem eles nenhum arquivo é pedido à
+toa e o logo usa Helvetica/Arial em negrito.
 
 Depois de colocar o arquivo:
   - no computador: atualize a página com Ctrl+F5;

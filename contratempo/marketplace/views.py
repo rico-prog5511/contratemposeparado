@@ -137,7 +137,7 @@ def _faixas_preco():
 
 
 def produtos_vistos(request):
-    ids = [int(i) for i in request.GET.get("ids", "").split(",")[:12] if i.isdigit()]
+    ids = [int(i) for i in request.GET.get("ids", "").split(",")[:12] if i.isdecimal() and len(i) <= 18]
     por_id = {p.id: p for p in produtos_ativos().filter(id__in=ids)}
     produtos = [por_id[i] for i in ids if i in por_id][:4]
     return render(request, "partials/product_cards.html", {"produtos": produtos})
@@ -234,7 +234,7 @@ def produtos(request):
 
     vendedor_atual = None
     vendedor_id = request.GET.get("vendedor", "")
-    if vendedor_id.isdigit():
+    if vendedor_id.isdecimal() and len(vendedor_id) <= 18:
         vendedor_atual = Usuario.objects.filter(pk=vendedor_id, is_active=True).first()
         if vendedor_atual:
             qs = qs.filter(vendedor=vendedor_atual)
@@ -588,7 +588,7 @@ def carrinho(request):
             "breadcrumbs": [{"label": "Carrinho", "url": None}],
         })
 
-    carrinho_ativo = Carrinho.objects.filter(usuario=request.user, status="ativo").first()
+    carrinho_ativo = Carrinho.ativo_de(request.user)
     itens = itens_do_carrinho(carrinho_ativo)
     problemas = validar_itens_carrinho(itens)
 
@@ -614,8 +614,8 @@ def adicionar_ao_carrinho(request, produto_id):
     if request.method != "POST":
         return redirect("produto_detalhe", produto_id=produto.id)
 
-    if produto.status_anuncio != "ativo":
-        messages.error(request, "Este produto não está disponível para compra no momento.")
+    if produto.status_anuncio != "ativo" or produto.quantidade_disponivel == 0:
+        messages.error(request, "Este produto não está disponível para compra no momento (sem estoque ou pausado).")
         return redirect("produto_detalhe", produto_id=produto.id)
 
     if produto.vendedor_id == request.user.id:

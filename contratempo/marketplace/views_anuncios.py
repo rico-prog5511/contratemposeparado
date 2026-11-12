@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
-from .forms import LIMITE_IMAGENS_ANUNCIO, ProdutoForm
+from .forms import ESTOQUE_MAXIMO, LIMITE_IMAGENS_ANUNCIO, ProdutoForm
 from .models import ItemPedido, Produto, ProdutoImagem
 from .moderacao import em_analise, retido_pela_moderacao
 from .sku import gerar_sku
@@ -125,7 +125,7 @@ def anuncio_editar(request, produto_id):
 
     remover_ids = set()
     if request.method == "POST":
-        remover_ids = {int(i) for i in request.POST.getlist("remover_imagens") if i.isdigit()}
+        remover_ids = {int(i) for i in request.POST.getlist("remover_imagens") if i.isdecimal() and len(i) <= 18}
 
     form = ProdutoForm(
         request.POST or None, request.FILES or None, instance=produto,
@@ -139,7 +139,7 @@ def anuncio_editar(request, produto_id):
                 produto.imagens.filter(id__in=remover_ids).delete()
 
             principal_id = request.POST.get("imagem_principal", "")
-            if principal_id.isdigit() and int(principal_id) not in remover_ids:
+            if principal_id.isdecimal() and len(principal_id) <= 18 and int(principal_id) not in remover_ids:
                 imagem = produto.imagens.filter(pk=int(principal_id)).first()
                 if imagem and not imagem.principal:
                     imagem.principal = True
@@ -271,7 +271,7 @@ def estoque(request):
                     continue
                 try:
                     novo = int(bruto)
-                    if novo < 0:
+                    if not 0 <= novo <= ESTOQUE_MAXIMO:
                         raise ValueError
                 except ValueError:
                     erros.append(produto.nome)

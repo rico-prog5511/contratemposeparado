@@ -9,9 +9,9 @@ ANUNCIOS_PROCEDENTES_PARA_SUSPENDER = 3
 TERMOS_PROIBIDOS = {
     "conteúdo para maiores de 18 anos": [
         "porno", "pornos", "pornografia", "pornografias", "pornografico", "pornografica",
-        "pornograficos", "pornograficas", "erotico", "erotica", "eroticos", "eroticas",
-        "hentai", "ecchi", "nsfw", "playboy", "sexshop", "sex shop", "vibrador", "vibradores",
-        "dildo", "dildos", "filme adulto", "filmes adultos", "conteudo adulto", "revista adulta",
+        "pornograficos", "pornograficas", "erotico", "erotica", "eroticos", "eroticas","pinto", "pintos", "peitos", "peito", "buceta", "bucetas", "vagina", "vaginas",
+        "hentai", "ecchi", "nsfw", "playboy", "sexshop", "sex shop", "vibrador", "vibradores","piroca",
+        "dildo", "dildos", "filme adulto", "filmes adultos", "conteudo adulto", "revista adulta","caralho","cu","rola,"
         "revistas adultas", "brinquedo sexual", "brinquedos sexuais",
         "somente para adultos", "so para adultos", "apenas para adultos",
     ],

@@ -20,20 +20,26 @@ ORDENACOES = {
 }
 
 
+PRECO_MAXIMO_FILTRO = Decimal("1000000000")
+
+
 def _decimal(valor):
     try:
-        numero = Decimal(str(valor).replace(",", "."))
+        numero = Decimal(str(valor).replace(",", ".")[:20])
     except (InvalidOperation, TypeError, ValueError):
         return None
-    return numero if numero >= 0 else None
+    if not numero.is_finite() or not 0 <= numero <= PRECO_MAXIMO_FILTRO:
+        return None
+    return numero.quantize(Decimal("0.01"))
 
 
 def _inteiro(valor, minimo=1000, maximo=2100):
-    return int(valor) if str(valor).isdigit() and minimo <= int(valor) <= maximo else None
+    texto = str(valor)
+    return int(texto) if texto.isdecimal() and len(texto) <= 4 and minimo <= int(texto) <= maximo else None
 
 
 def ler_filtros(get):
-    decadas = sorted({int(d) for d in get.getlist("decada") if d.isdigit() and int(d) % 10 == 0 and 1800 <= int(d) <= 2100})
+    decadas = sorted({_inteiro(d, 1800) for d in get.getlist("decada") if _inteiro(d, 1800) is not None and int(d) % 10 == 0})
     return {
         "franquia": [s for s in get.getlist("franquia") if s],
         "condicao": [c for c in get.getlist("condicao") if c in dict(Produto.CONDICAO_CHOICES)],

@@ -8,6 +8,7 @@
     <title>{% block title %}contratempo{% endblock %}</title>
 
     <link rel="stylesheet" href="{% static 'css/styles-retro.css' %}">
+    {% include "partials/fonte_logo.html" %}
     {% block extra_css %}{% endblock %}
     <link rel="stylesheet" href="{% static 'css/acessibilidade.css' %}">
     <script src="{% static 'js/acessibilidade.js' %}"></script>

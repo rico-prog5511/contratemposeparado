@@ -121,6 +121,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "marketplace.context_processors.menu_categorias",
                 "marketplace.context_processors.carrinho_resumo",
+                "marketplace.context_processors.fonte_logo",
             ],
         },
     },

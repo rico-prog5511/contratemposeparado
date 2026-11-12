@@ -5,12 +5,14 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .emails import enviar_aviso_venda, enviar_cancelamento_ao_vendedor, enviar_confirmacao_compra
 from .forms import AvaliacaoForm, validar_cvv
 from .frete import calcular_envios, faixa_para_uf, resumo_envios
 from .models import Avaliacao, Carrinho, ItemPedido, Pedido, Produto
+from .moderacao import retido_pela_moderacao
 from .views import itens_do_carrinho, validar_itens_carrinho
 
 SESSAO_ENDERECO = "checkout_endereco_id"
@@ -35,8 +37,12 @@ class CheckoutInvalido(Exception):
     pass
 
 
+class CompraJaConcluida(CheckoutInvalido):
+    pass
+
+
 def _carrinho_para_checkout(request):
-    carrinho = Carrinho.objects.filter(usuario=request.user, status="ativo").first()
+    carrinho = Carrinho.ativo_de(request.user)
     itens = itens_do_carrinho(carrinho)
     if not itens:
         messages.info(request, "Seu carrinho está vazio.")
@@ -77,7 +83,7 @@ def _breadcrumbs_checkout(etapa):
 def _pagamento_escolhido(usuario, valor):
     if valor in OPCOES_SEM_CADASTRO:
         return None, OPCOES_SEM_CADASTRO[valor][0]
-    if not str(valor).isdigit():
+    if not str(valor).isdecimal() or len(str(valor)) > 18:
         return None, None
     cartao = usuario.formas_pagamento.filter(pk=valor).first()
     if cartao is None or cartao.vencido:
@@ -188,6 +194,9 @@ def checkout_revisao(request):
     if request.method == "POST":
         try:
             pedidos = _criar_pedidos(request.user, carrinho, itens, endereco, cartao, rotulo_pagamento)
+        except CompraJaConcluida as erro:
+            messages.info(request, str(erro))
+            return redirect("pedidos")
         except CheckoutInvalido as erro:
             messages.error(request, str(erro))
             return redirect("carrinho")
@@ -213,6 +222,12 @@ def checkout_revisao(request):
 
 @transaction.atomic
 def _criar_pedidos(usuario, carrinho, itens, endereco, cartao, rotulo_pagamento):
+    fechado = Carrinho.objects.filter(pk=carrinho.pk, status="ativo").update(
+        status="finalizado", data_atualizacao=timezone.now(),
+    )
+    if not fechado:
+        raise CompraJaConcluida("Esta compra já foi concluída. Confira em Meus pedidos.")
+
     faixa = faixa_para_uf(endereco.estado)
     if faixa is None:
         raise CheckoutInvalido(f"Ainda não entregamos em {endereco.estado}. Escolha outro endereço.")
@@ -266,9 +281,6 @@ def _criar_pedidos(usuario, carrinho, itens, endereco, cartao, rotulo_pagamento)
                 campos.append("status_anuncio")
             produto.save(update_fields=campos)
         pedidos.append(pedido)
-
-    carrinho.status = "finalizado"
-    carrinho.save(update_fields=["status", "data_atualizacao"])
     return pedidos
 
 
@@ -287,7 +299,7 @@ def devolver_estoque(pedido):
         produto.quantidade_disponivel += item.quantidade
         campos = ["quantidade_disponivel", "data_atualizacao"]
         if produto.status_anuncio == "vendido":
-            produto.status_anuncio = "ativo"
+            produto.status_anuncio = "pausado" if retido_pela_moderacao(produto) else "ativo"
             campos.append("status_anuncio")
         produto.save(update_fields=campos)
 
@@ -410,7 +422,10 @@ def avaliar_produto(request, pedido_id, produto_id):
 
     form = AvaliacaoForm(request.POST)
     if not form.is_valid():
-        messages.error(request, "Escolha uma nota de 1 a 5 estrelas.")
+        if "comentario" in form.errors:
+            messages.error(request, "O comentário pode ter no máximo 1000 caracteres.")
+        else:
+            messages.error(request, "Escolha uma nota de 1 a 5 estrelas.")
         return redirect("pedido_detalhe", pedido_id=pedido.id)
 
     if Avaliacao.objects.filter(usuario=request.user, produto=produto, pedido=pedido).exists():

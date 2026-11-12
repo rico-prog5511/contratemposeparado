@@ -1,0 +1,1 @@
+{% if fonte_logo %}<style>@font-face { font-family: "Adult Swim"; src: {% for fonte in fonte_logo %}url("{{ fonte.url }}") format("{{ fonte.formato }}"){% if not forloop.last %}, {% endif %}{% endfor %}; font-display: swap; }</style>{% endif %}

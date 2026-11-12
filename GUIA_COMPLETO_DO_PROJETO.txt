@@ -905,7 +905,8 @@ bloco {% block conta %}.
       O middleware BloquearContaSuspensa encerra a sessão de quem é suspenso.
 
 9.10 DESATIVAR CONTA
-  Exige pausar/encerrar os anúncios ativos antes. A conta é desativada
+  Exige pausar/encerrar os anúncios ativos antes e não ter vendas
+  esperando ação do vendedor (pagamento, preparo ou envio). A conta é desativada
   (não apagada) e o histórico permanece.
 
 

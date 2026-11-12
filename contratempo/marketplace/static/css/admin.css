@@ -1,12 +1,3 @@
-@font-face {
-    font-family: "Adult Swim";
-    src: url("../fonts/adult-swim.woff2") format("woff2"),
-         url("../fonts/adult-swim.woff") format("woff"),
-         url("../fonts/adult-swim.ttf") format("truetype"),
-         url("../fonts/adult-swim.otf") format("opentype");
-    font-display: swap;
-}
-
 html[data-theme="light"],
 :root {
     --ct-azul: #313170;
