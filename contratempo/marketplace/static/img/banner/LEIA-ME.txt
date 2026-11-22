@@ -1,30 +1,42 @@
-FOTO DO BANNER DA PÁGINA INICIAL
-================================
+IMAGENS DO BANNER DA PÁGINA INICIAL
+===================================
 
-Coloque aqui a foto de fundo do 1º slide do banner ("Peças raras que
-não voltam ao estoque"), com o nome:
+Cada imagem desta pasta vira um fundo do carrossel da home, na ordem dos
+números:
 
-    banner-1.jpg      (ou banner-1.png, banner-1.webp, banner-1.jpeg)
+    banner-1.jpg, banner-2.jpg, banner-3.jpg ... (até banner-10)
 
-Use só UM arquivo com esse nome. Se houver mais de um, vale o primeiro
-desta ordem: .webp, .jpg, .jpeg, .png.
+Também valem .png, .webp e .jpeg. Com 2 ou mais imagens aparecem as
+setas, os pontos e a troca automática; com 1, o banner fica fixo. Sem
+nenhuma, a home mostra o banner vermelho.
 
-Dicas para a foto
-- Deitada (paisagem), com pelo menos 1920 x 800 pixels.
-- Até uns 500 KB, para a página abrir rápido no celular (dá para
-  diminuir em sites como squoosh.app ou tinypng.com).
-- O texto do banner fica do lado ESQUERDO, sobre uma camada escura:
-  o que for importante na foto deve ficar do centro para a direita.
-- No celular a foto é cortada (aparece mais o centro).
+O texto "Peças raras que não voltam ao estoque" e o botão ficam fixos
+do lado ESQUERDO, sobre uma camada escura, e as imagens trocam por trás.
+Por isso:
+- O banner tem cerca de 480 pixels de altura no computador: a imagem é
+  cortada em cima e embaixo. Use a proporção 2:1, por exemplo
+  2560 x 1280 pixels.
+- O que for importante na imagem deve ficar do centro para a DIREITA.
+  O lado esquerdo fica escurecido e coberto pelo texto.
+- Imagens sem texto ou logotipo próprio ficam melhores: o que estiver
+  escrito na imagem se mistura com o título.
+- No celular a camada escura cobre a imagem inteira.
+- Para escolher a parte que aparece quando a imagem é cortada, ajuste
+  ENQUADRAMENTO_BANNER em marketplace/views.py (por exemplo
+  "center 85%" mostra mais a parte de baixo).
+- Até uns 600 KB por imagem (dá para diminuir em squoosh.app).
 
-Para trocar: substitua o arquivo, mantendo o nome, e faça Commit/Push
-+ atualizar.sh. Para voltar ao fundo vermelho: apague o arquivo.
+Texto alternativo (para leitores de tela): fica em DESCRICOES_BANNER,
+em marketplace/views.py. Ao trocar uma imagem, atualize a descrição dela.
+
+Para trocar ou acrescentar: coloque o arquivo com o nome certo, faça
+Commit/Push e rode o atualizar.sh. Para tirar um slide: apague o arquivo
+(e renumere os seguintes, sem pular números).
 
 Versões leves (automático)
-O site não mostra a foto original (pode ter vários MB): ele usa três
-versões em WebP geradas a partir dela, banner-1-1920.webp (computador),
-banner-1-1280.webp (tablet) e banner-1-800.webp (celular), bem menores, e
-cada tela baixa só a que precisa. Elas são criadas por
+O site não mostra a imagem original: ele usa três versões em WebP
+geradas a partir dela (1920, 1280 e 800 pixels de largura), e cada tela
+baixa só a que precisa. Elas são criadas por
     python manage.py otimizar_banner
 que o atualizar.sh (PythonAnywhere) e o rodar.bat (PC) já rodam sozinhos.
 Não precisa mexer nesses arquivos -webp, e eles não vão para o GitHub.

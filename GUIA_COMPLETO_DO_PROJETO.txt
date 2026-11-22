@@ -556,15 +556,21 @@ Formato:  URL  —  quem acessa  —  arquivo da view  —  template
 
 /  — todos — views.home — home.html
   Na ordem:
-  - banner (carrossel) e faixa "como funciona". O 1º slide pode ter uma
-    FOTO DE FUNDO: basta colocar o arquivo banner-1.jpg (ou .png/.webp)
-    em marketplace/static/img/banner/ (instruções no LEIA-ME.txt de lá).
-    Sem o arquivo, o slide fica com o fundo vermelho e os 3 cartões.
-    O site não usa a foto original (pesada): "manage.py otimizar_banner"
-    gera banner-1-1920/-1280/-800.webp e a página usa <img srcset> com
-    fetchpriority="high", então cada tela baixa só a versão do tamanho
-    dela. O atualizar.sh e o rodar.bat rodam o comando sozinhos; as
-    versões .webp não vão para o Git;
+  - banner (carrossel) e faixa "como funciona". Cada imagem
+    banner-1.jpg, banner-2.jpg... (até 10, proporção 2:1) em
+    marketplace/static/img/banner/ vira um fundo do carrossel, com cerca
+    de 480 px de altura (cortada em cima e embaixo; o enquadramento de
+    cada uma fica em ENQUADRAMENTO_BANNER, em views.py). O título "Peças
+    raras que não voltam ao estoque" e o botão ficam fixos à esquerda,
+    sobre uma camada escura, e as imagens trocam por trás (instruções no
+    LEIA-ME.txt de lá; o texto alternativo de cada imagem fica em
+    DESCRICOES_BANNER). Sem nenhuma imagem, aparece o slide vermelho com
+    texto e os 3 cartões.
+    O site não usa a imagem original (pesada): "manage.py otimizar_banner"
+    gera banner-N-1920/-1280/-800.webp e a página usa <img srcset>; a 1ª
+    imagem carrega com prioridade e as outras só quando aparecem. O
+    atualizar.sh e o rodar.bat rodam o comando sozinhos; as versões .webp
+    não vão para o Git;
   - "Vistos recentemente": os últimos produtos que a pessoa abriu NESTE
     navegador (static/js/vistos.js guarda os ids no localStorage; os cards
     vêm de /produtos/vistos/?ids=..., só anúncios ativos, até 4). Sem

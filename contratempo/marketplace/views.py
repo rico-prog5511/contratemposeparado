@@ -60,34 +60,48 @@ def home(request):
     produtos_recentes = produtos_ativos().order_by("-data_criacao")[:4]
 
     return render(request, "home.html", {
-        "banner_foto": _foto_banner(),
+        "banners": _imagens_banner(),
         "faixas_preco": _faixas_preco(),
         "produtos_recentes": produtos_recentes,
         "artigos_guia": ARTIGOS_GUIA[:3],
     })
 
 
-FOTO_BANNER = "img/banner/banner-1"
 LARGURAS_BANNER = (800, 1280, 1920)
+MAXIMO_BANNERS = 10
+DESCRICOES_BANNER = {
+    1: "contratempo: televisão antiga e produtos de época na prateleira de uma vendinha",
+    2: "contratempo: caixa de correio antiga, azul e vermelha",
+    3: "contratempo: discos de vinil organizados em caixas numa loja de discos",
+}
+ENQUADRAMENTO_BANNER = {
+    3: "center 85%",
+}
 
 
-def _foto_banner():
-    original = next(
-        (f"{FOTO_BANNER}.{ext}" for ext in ("webp", "jpg", "jpeg", "png") if finders.find(f"{FOTO_BANNER}.{ext}")),
-        None,
-    )
+def _imagem_banner(numero):
+    base = f"img/banner/banner-{numero}"
+    original = next((f"{base}.{ext}" for ext in ("webp", "jpg", "jpeg", "png") if finders.find(f"{base}.{ext}")), None)
     if original is None:
         return None
     data_original = os.path.getmtime(finders.find(original))
     versoes = []
     for largura in LARGURAS_BANNER:
-        caminho = f"{FOTO_BANNER}-{largura}.webp"
+        caminho = f"{base}-{largura}.webp"
         arquivo = finders.find(caminho)
         if arquivo and os.path.getmtime(arquivo) >= data_original:
             versoes.append((static(caminho), largura))
+    dados = {
+        "alt": DESCRICOES_BANNER.get(numero, "contratempo: colecionáveis, retrô e cultura geek"),
+        "posicao": ENQUADRAMENTO_BANNER.get(numero, "center"),
+    }
     if versoes:
-        return {"src": versoes[-1][0], "srcset": ", ".join(f"{url} {largura}w" for url, largura in versoes)}
-    return {"src": static(original), "srcset": ""}
+        return {**dados, "src": versoes[-1][0], "srcset": ", ".join(f"{url} {largura}w" for url, largura in versoes)}
+    return {**dados, "src": static(original), "srcset": ""}
+
+
+def _imagens_banner():
+    return [imagem for imagem in map(_imagem_banner, range(1, MAXIMO_BANNERS + 1)) if imagem]
 
 
 FAIXAS_PRECO = [

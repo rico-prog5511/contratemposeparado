@@ -8,6 +8,8 @@ def motivo_como_texto_no_mysql(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
+    atomic = False
+
     dependencies = [
         ('marketplace', '0005_cartoes_validade'),
     ]

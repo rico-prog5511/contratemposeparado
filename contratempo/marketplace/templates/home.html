@@ -12,14 +12,16 @@
 
 {% block content %}
 
-<section class="home-carrossel" aria-label="Destaques" data-carrossel>
+<section class="home-carrossel{% if banners %} home-carrossel--imagens{% endif %}" aria-label="Destaques" data-carrossel>
     <div class="carrossel-trilho" aria-live="off">
 
-        <article class="carrossel-slide slide--vermelho{% if banner_foto %} slide--foto{% endif %} ativo">
-            {% if banner_foto %}
-                <img class="slide-foto" src="{{ banner_foto.src }}"{% if banner_foto.srcset %} srcset="{{ banner_foto.srcset }}" sizes="100vw"{% endif %}
-                     alt="" width="1920" height="1080" fetchpriority="high" decoding="async">
-            {% endif %}
+        {% for banner in banners %}
+        <article class="carrossel-slide slide--imagem{% if forloop.first %} ativo{% endif %}">
+            <img class="slide-imagem" src="{{ banner.src }}"{% if banner.srcset %} srcset="{{ banner.srcset }}" sizes="100vw"{% endif %}
+                 alt="{{ banner.alt }}" width="1920" height="960" style="object-position: {{ banner.posicao }}" decoding="async"{% if forloop.first %} fetchpriority="high"{% else %} loading="lazy"{% endif %}>
+        </article>
+        {% empty %}
+        <article class="carrossel-slide slide--vermelho ativo">
             <div class="container slide-inner">
                 <div class="slide-texto">
                     <h1>Peças raras que <em>não voltam ao estoque.</em></h1>
@@ -28,7 +30,6 @@
                         <a href="{% url 'produtos' %}?ordenar=recentes" class="btn btn-light btn-lg">Ver o que chegou →</a>
                     </div>
                 </div>
-                {% if not banner_foto %}
                 <div class="slide-arte home-banner-art" aria-hidden="true">
                     <div class="banner-card banner-card--1">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="7" width="20" height="11" rx="5"/><line x1="7" y1="10.5" x2="7" y2="14.5"/><line x1="5" y1="12.5" x2="9" y2="12.5"/><circle cx="16" cy="11.5" r="1"/><circle cx="18" cy="13.5" r="1"/></svg>
@@ -43,10 +44,22 @@
                         <span>Cartas</span>
                     </div>
                 </div>
-                {% endif %}
             </div>
         </article>
+        {% endfor %}
     </div>
+
+    {% if banners %}
+    <div class="container banner-texto">
+        <div class="slide-texto">
+            <h1>Peças raras que <em>não voltam ao estoque.</em></h1>
+            <p>Cartas, consoles, vinis, HQs e action figures anunciados por colecionadores de todo o Brasil.</p>
+            <div class="cluster">
+                <a href="{% url 'produtos' %}?ordenar=recentes" class="btn btn-light btn-lg">Ver o que chegou →</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <div class="carrossel-controles" hidden>
         <button type="button" class="carrossel-seta" data-anterior aria-label="Slide anterior">‹</button>

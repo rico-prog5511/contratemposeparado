@@ -19,5 +19,5 @@ contratempo/contratempo.sqlite3
 contratempo/media/
 contratempo/staticfiles/
 # versões leves da foto do banner: cada máquina gera com "manage.py otimizar_banner"
-contratempo/marketplace/static/img/banner/banner-1-*.webp
+contratempo/marketplace/static/img/banner/banner-*-*.webp
 _backup_comentarios/
