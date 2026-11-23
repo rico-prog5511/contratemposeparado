@@ -69,13 +69,32 @@ def home(request):
 
 LARGURAS_BANNER = (800, 1280, 1920)
 MAXIMO_BANNERS = 10
-DESCRICOES_BANNER = {
-    1: "contratempo: televisão antiga e produtos de época na prateleira de uma vendinha",
-    2: "contratempo: caixa de correio antiga, azul e vermelha",
-    3: "contratempo: discos de vinil organizados em caixas numa loja de discos",
+BANNERS = {
+    1: {
+        "alt": "contratempo: televisão antiga e produtos de época na prateleira de uma vendinha",
+        "titulo": "Peças raras que", "destaque": "não voltam ao estoque.",
+        "texto": "Cartas, consoles, vinis, HQs e action figures anunciados por colecionadores de todo o Brasil.",
+        "botao": "Ver o que chegou →", "url": ("produtos", "?ordenar=recentes"),
+    },
+    2: {
+        "alt": "contratempo: caixa de correio antiga, azul e vermelha",
+        "titulo": "Aquela peça parada", "destaque": "merece um novo dono.",
+        "texto": "Anuncie grátis em minutos e envie para colecionadores de todo o país.",
+        "botao": "Anunciar um item →", "url": ("anuncio_criar", ""),
+    },
+    3: {
+        "alt": "contratempo: discos de vinil organizados em caixas numa loja de discos",
+        "titulo": "Antes de garimpar,", "destaque": "leia o guia.",
+        "texto": "Dicas para conferir o estado, reconhecer réplicas e comprar com segurança.",
+        "botao": "Ler o guia →", "url": ("guia", ""),
+        "posicao": "center 85%",
+    },
 }
-ENQUADRAMENTO_BANNER = {
-    3: "center 85%",
+BANNER_PADRAO = {
+    "alt": "contratempo: colecionáveis, retrô e cultura geek",
+    "titulo": "Colecionáveis, retrô", "destaque": "e cultura geek.",
+    "texto": "Encontre a peça que faltava na sua coleção.",
+    "botao": "Ver produtos →", "url": ("produtos", ""),
 }
 
 
@@ -91,9 +110,12 @@ def _imagem_banner(numero):
         arquivo = finders.find(caminho)
         if arquivo and os.path.getmtime(arquivo) >= data_original:
             versoes.append((static(caminho), largura))
+    config = BANNERS.get(numero, BANNER_PADRAO)
+    nome_url, parametros = config["url"]
     dados = {
-        "alt": DESCRICOES_BANNER.get(numero, "contratempo: colecionáveis, retrô e cultura geek"),
-        "posicao": ENQUADRAMENTO_BANNER.get(numero, "center"),
+        **config,
+        "url": reverse(nome_url) + parametros,
+        "posicao": config.get("posicao", "center"),
     }
     if versoes:
         return {**dados, "src": versoes[-1][0], "srcset": ", ".join(f"{url} {largura}w" for url, largura in versoes)}

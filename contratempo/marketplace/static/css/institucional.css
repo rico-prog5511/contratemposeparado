@@ -37,7 +37,7 @@
     color: var(--txt-azul);
 }
 .contact-icon svg { width: 22px; height: 22px; }
-.contact-item span {
+.contact-item > div > span {
     display: block;
     margin-bottom: 2px;
     font-family: var(--font-mono);

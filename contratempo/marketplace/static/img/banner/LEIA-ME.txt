@@ -10,9 +10,8 @@ Também valem .png, .webp e .jpeg. Com 2 ou mais imagens aparecem as
 setas, os pontos e a troca automática; com 1, o banner fica fixo. Sem
 nenhuma, a home mostra o banner vermelho.
 
-O texto "Peças raras que não voltam ao estoque" e o botão ficam fixos
-do lado ESQUERDO, sobre uma camada escura, e as imagens trocam por trás.
-Por isso:
+Cada slide tem o seu texto e o seu botão do lado ESQUERDO, sobre uma
+camada escura. Por isso:
 - O banner tem cerca de 480 pixels de altura no computador: a imagem é
   cortada em cima e embaixo. Use a proporção 2:1, por exemplo
   2560 x 1280 pixels.
@@ -21,13 +20,21 @@ Por isso:
 - Imagens sem texto ou logotipo próprio ficam melhores: o que estiver
   escrito na imagem se mistura com o título.
 - No celular a camada escura cobre a imagem inteira.
-- Para escolher a parte que aparece quando a imagem é cortada, ajuste
-  ENQUADRAMENTO_BANNER em marketplace/views.py (por exemplo
-  "center 85%" mostra mais a parte de baixo).
 - Até uns 600 KB por imagem (dá para diminuir em squoosh.app).
 
-Texto alternativo (para leitores de tela): fica em DESCRICOES_BANNER,
-em marketplace/views.py. Ao trocar uma imagem, atualize a descrição dela.
+Textos e botões: ficam no dicionário BANNERS, em marketplace/views.py,
+um bloco por número de imagem:
+    "alt"      descrição da imagem para leitores de tela
+    "titulo"   começo do título (branco)
+    "destaque" fim do título (em itálico, cor clara)
+    "texto"    frase embaixo do título
+    "botao"    texto do botão
+    "url"      página de destino: (nome da rota, parâmetros), por exemplo
+               ("produtos", "?ordenar=recentes") ou ("guia", "")
+    "posicao"  (opcional) parte que aparece quando a imagem é cortada;
+               "center 85%" mostra mais a parte de baixo
+Ao trocar uma imagem, atualize o bloco dela. Uma imagem nova sem bloco
+usa o texto de BANNER_PADRAO.
 
 Para trocar ou acrescentar: coloque o arquivo com o nome certo, faça
 Commit/Push e rode o atualizar.sh. Para tirar um slide: apague o arquivo

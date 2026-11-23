@@ -19,6 +19,16 @@
         <article class="carrossel-slide slide--imagem{% if forloop.first %} ativo{% endif %}">
             <img class="slide-imagem" src="{{ banner.src }}"{% if banner.srcset %} srcset="{{ banner.srcset }}" sizes="100vw"{% endif %}
                  alt="{{ banner.alt }}" width="1920" height="960" style="object-position: {{ banner.posicao }}" decoding="async"{% if forloop.first %} fetchpriority="high"{% else %} loading="lazy"{% endif %}>
+            <div class="container slide-conteudo">
+                <div class="slide-texto">
+                    {% if forloop.first %}<h1>{{ banner.titulo }} <em>{{ banner.destaque }}</em></h1>
+                    {% else %}<h2>{{ banner.titulo }} <em>{{ banner.destaque }}</em></h2>{% endif %}
+                    <p>{{ banner.texto }}</p>
+                    <div class="cluster">
+                        <a href="{{ banner.url }}" class="btn btn-light btn-lg">{{ banner.botao }}</a>
+                    </div>
+                </div>
+            </div>
         </article>
         {% empty %}
         <article class="carrossel-slide slide--vermelho ativo">
@@ -48,18 +58,6 @@
         </article>
         {% endfor %}
     </div>
-
-    {% if banners %}
-    <div class="container banner-texto">
-        <div class="slide-texto">
-            <h1>Peças raras que <em>não voltam ao estoque.</em></h1>
-            <p>Cartas, consoles, vinis, HQs e action figures anunciados por colecionadores de todo o Brasil.</p>
-            <div class="cluster">
-                <a href="{% url 'produtos' %}?ordenar=recentes" class="btn btn-light btn-lg">Ver o que chegou →</a>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 
     <div class="carrossel-controles" hidden>
         <button type="button" class="carrossel-seta" data-anterior aria-label="Slide anterior">‹</button>

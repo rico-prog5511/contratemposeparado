@@ -560,12 +560,17 @@ Formato:  URL  —  quem acessa  —  arquivo da view  —  template
     banner-1.jpg, banner-2.jpg... (até 10, proporção 2:1) em
     marketplace/static/img/banner/ vira um fundo do carrossel, com cerca
     de 480 px de altura (cortada em cima e embaixo; o enquadramento de
-    cada uma fica em ENQUADRAMENTO_BANNER, em views.py). O título "Peças
-    raras que não voltam ao estoque" e o botão ficam fixos à esquerda,
-    sobre uma camada escura, e as imagens trocam por trás (instruções no
-    LEIA-ME.txt de lá; o texto alternativo de cada imagem fica em
-    DESCRICOES_BANNER). Sem nenhuma imagem, aparece o slide vermelho com
-    texto e os 3 cartões.
+    cada uma fica em "posicao" no dicionário BANNERS, em views.py). Cada
+    slide tem o seu texto e o seu botão, à esquerda, sobre uma camada
+    escura; tudo fica em BANNERS (views.py): texto alternativo, título,
+    destaque, frase, botão e página de destino:
+      1 "Peças raras que não voltam ao estoque" → produtos recentes;
+      2 "Aquela peça parada merece um novo dono" → criar anúncio;
+      3 "Antes de garimpar, leia o guia" → Guia do colecionador.
+    Só o 1º slide usa <h1>; os outros usam <h2>. Uma imagem sem entrada
+    em BANNERS usa o texto de BANNER_PADRAO (instruções no LEIA-ME.txt de
+    lá). Sem nenhuma imagem, aparece o slide vermelho com texto e os 3
+    cartões.
     O site não usa a imagem original (pesada): "manage.py otimizar_banner"
     gera banner-N-1920/-1280/-800.webp e a página usa <img srcset>; a 1ª
     imagem carrega com prioridade e as outras só quando aparecem. O
