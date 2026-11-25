@@ -60,10 +60,19 @@
     </div>
 
     <div class="carrossel-controles" hidden>
-        <button type="button" class="carrossel-seta" data-anterior aria-label="Slide anterior">‹</button>
         <div class="carrossel-pontos" role="group" aria-label="Escolher slide"></div>
-        <button type="button" class="carrossel-seta" data-proximo aria-label="Próximo slide">›</button>
-        <button type="button" class="carrossel-pausa" data-pausa aria-label="Pausar a troca automática">❚❚</button>
+        <div class="carrossel-botoes">
+            <button type="button" class="carrossel-botao" data-anterior aria-label="Slide anterior">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 5 8 12 15 19"/></svg>
+            </button>
+            <button type="button" class="carrossel-botao" data-proximo aria-label="Próximo slide">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 5 16 12 9 19"/></svg>
+            </button>
+            <button type="button" class="carrossel-botao carrossel-pausa" data-pausa aria-label="Pausar a troca automática">
+                <svg class="icone-pausar" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+                <svg class="icone-continuar" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.2-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+            </button>
+        </div>
     </div>
 </section>
 

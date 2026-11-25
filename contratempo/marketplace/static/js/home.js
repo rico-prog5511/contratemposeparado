@@ -25,8 +25,9 @@ document.addEventListener("DOMContentLoaded", function () {
     var atual = 0;
     var timer = null;
     var animacoesPausadas = function () { return document.documentElement.dataset.animacoes === "pausar"; };
-    var pausadoPeloUsuario = window.matchMedia("(prefers-reduced-motion: reduce)").matches || animacoesPausadas();
+    var pausadoPeloUsuario = animacoesPausadas();
     var emInteracao = false;
+    carrossel.style.setProperty("--carrossel-intervalo", INTERVALO + "ms");
 
     controles.hidden = false;
 
@@ -47,15 +48,21 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    function parar() { clearInterval(timer); timer = null; }
+    function parar() {
+        clearInterval(timer);
+        timer = null;
+        carrossel.classList.remove("rodando");
+    }
     function iniciar() {
         parar();
-        if (pausadoPeloUsuario || emInteracao) return;
+        if (pausadoPeloUsuario || emInteracao || document.hidden) return;
         timer = setInterval(function () { mostrar(atual + 1); }, INTERVALO);
+        void carrossel.offsetWidth;
+        carrossel.classList.add("rodando");
     }
 
     function atualizarBotaoPausa() {
-        botaoPausa.textContent = pausadoPeloUsuario ? "▶" : "❚❚";
+        botaoPausa.classList.toggle("pausado", pausadoPeloUsuario);
         botaoPausa.setAttribute("aria-label", pausadoPeloUsuario ? "Retomar a troca automática" : "Pausar a troca automática");
         trilho.setAttribute("aria-live", pausadoPeloUsuario ? "polite" : "off");
     }
@@ -73,11 +80,11 @@ document.addEventListener("DOMContentLoaded", function () {
         iniciar();
     });
 
-    carrossel.addEventListener("mouseenter", function () { emInteracao = true; parar(); });
-    carrossel.addEventListener("mouseleave", function () { emInteracao = false; iniciar(); });
-    carrossel.addEventListener("focusin", function () { emInteracao = true; parar(); });
+    carrossel.addEventListener("focusin", function (e) {
+        if (e.target.matches(":focus-visible")) { emInteracao = true; parar(); }
+    });
     carrossel.addEventListener("focusout", function (e) {
-        if (!carrossel.contains(e.relatedTarget)) { emInteracao = false; iniciar(); }
+        if (emInteracao && !carrossel.contains(e.relatedTarget)) { emInteracao = false; iniciar(); }
     });
 
     carrossel.addEventListener("keydown", function (e) {

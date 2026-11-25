@@ -49,11 +49,6 @@
 }
 .slide-conteudo { width: 100%; }
 .slide--imagem .slide-texto :is(h1, h2, p) { text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5); }
-.home-carrossel--imagens .carrossel-controles {
-    z-index: 3;
-    left: max(var(--gutter), calc((100% - var(--container-width)) / 2 + var(--gutter)));
-    transform: none;
-}
 
 .slide-inner {
     display: grid;
@@ -84,53 +79,70 @@
 
 .carrossel-controles {
     position: absolute;
-    left: 50%;
-    bottom: 24px;
-    transform: translateX(-50%);
+    z-index: 3;
+    bottom: 26px;
+    left: max(var(--gutter), calc((100% - var(--container-width)) / 2 + var(--gutter)));
+    right: max(var(--gutter), calc((100% - var(--container-width)) / 2 + var(--gutter)));
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 6px 8px;
-    background: rgba(27, 26, 51, 0.45);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: var(--radius-pill);
-    backdrop-filter: blur(4px);
+    justify-content: space-between;
+    gap: 16px;
 }
 .carrossel-controles[hidden] { display: none; }
-.carrossel-seta,
-.carrossel-pausa {
-    width: 34px;
-    height: 34px;
+
+.carrossel-pontos { display: flex; gap: 6px; }
+.carrossel-ponto {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+.carrossel-ponto::before,
+.carrossel-ponto::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 4px;
+    margin-top: -2px;
+    border-radius: 2px;
+}
+.carrossel-ponto::before { right: 0; background: rgba(255, 255, 255, 0.38); transition: background 0.15s ease; }
+.carrossel-ponto:hover::before { background: rgba(255, 255, 255, 0.65); }
+.carrossel-ponto::after { width: 0; background: #fff; }
+.carrossel-ponto.ativo::after { width: 100%; }
+.home-carrossel.rodando .carrossel-ponto.ativo::after { animation: carrossel-progresso var(--carrossel-intervalo, 7000ms) linear both; }
+@keyframes carrossel-progresso { from { width: 0; } to { width: 100%; } }
+
+.carrossel-botoes { display: flex; gap: 10px; }
+.carrossel-botao {
+    width: 42px;
+    height: 42px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: transparent;
-    color: #fff;
-    border: 1.5px solid rgba(255, 255, 255, 0.6);
-    border-radius: 50%;
-    font-size: 1.3rem;
-    line-height: 1;
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
-}
-.carrossel-pausa { font-size: 0.62rem; letter-spacing: -0.1em; }
-.carrossel-seta:hover,
-.carrossel-pausa:hover { background: #fff; color: var(--cor-header); }
-.carrossel-pontos { display: flex; gap: 8px; padding: 0 4px; }
-.carrossel-ponto {
-    width: 10px;
-    height: 10px;
     padding: 0;
-    border: 1.5px solid #fff;
-    border-radius: var(--radius-pill);
-    background: transparent;
+    background: #fff;
+    color: var(--cor-header);
+    border: 1.5px solid var(--ink);
+    border-radius: var(--radius);
+    box-shadow: 3px 3px 0 var(--cor-destaque);
     cursor: pointer;
-    transition: width 0.25s ease, background 0.25s ease;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, color 0.12s ease;
 }
-.carrossel-ponto.ativo { width: 28px; background: #fff; }
-.carrossel-seta:focus-visible,
-.carrossel-pausa:focus-visible,
-.carrossel-ponto:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.carrossel-botao svg { width: 20px; height: 20px; }
+.carrossel-botao:hover { background: var(--cor-header); color: #fff; transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--cor-destaque); }
+.carrossel-botao:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--cor-destaque); }
+.carrossel-pausa { margin-left: 6px; }
+.carrossel-pausa svg { width: 16px; height: 16px; }
+.carrossel-pausa .icone-continuar,
+.carrossel-pausa.pausado .icone-pausar { display: none; }
+.carrossel-pausa.pausado .icone-continuar { display: block; }
+.carrossel-botao:focus-visible,
+.carrossel-ponto:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 
 .banner-card {
     position: absolute;
@@ -246,6 +258,9 @@
     .banner-card { width: 96px; height: 132px; gap: 10px; }
     .banner-card svg { width: 42px; height: 42px; }
     .carrossel-controles { bottom: 18px; }
+    .carrossel-ponto { width: 32px; }
+    .carrossel-botoes { gap: 8px; }
+    .carrossel-botao { width: 40px; height: 40px; }
     .home-strip-inner { grid-template-columns: 1fr; }
     .home-strip-inner > div { border-left: 0; border-top: 1px dashed var(--line); padding: 12px 0; }
     .home-strip-inner > div:first-child { border-top: 0; }
